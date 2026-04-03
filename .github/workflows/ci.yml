@@ -42,18 +42,9 @@ jobs:
 
   swift-build-test:
     name: Swift Build & Test
-    # Requires Xcode 26+ for iOS 26 / macOS 26 deployment targets.
-    # Update runner when GitHub adds newer Xcode versions.
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
-
-      - name: Select latest Xcode
-        run: |
-          XCODE=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
-          echo "Using: $XCODE"
-          sudo xcode-select -s "$XCODE"
-          xcodebuild -version
 
       - name: Build (macOS)
         run: |
