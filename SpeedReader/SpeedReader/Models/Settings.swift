@@ -7,81 +7,11 @@ import SwiftUI
 final class ReaderSettings {
     private let defaults: UserDefaults
 
-    // @Observable macro synthesizes _propertyName backing stores, so we use
-    // @ObservationIgnored stored properties + computed properties to avoid
-    // collision and prevent didSet infinite recursion.
-    @ObservationIgnored private var storedWpm: Int = SettingsKeys.Defaults.wpm
-    @ObservationIgnored private var storedFont: ReaderFont = SettingsKeys.Defaults.font
-    @ObservationIgnored private var storedTheme: ReaderTheme = SettingsKeys.Defaults.theme
-    @ObservationIgnored private var storedFontSize: Int = SettingsKeys.Defaults.fontSize
-    @ObservationIgnored private var storedPunctuationPause: Bool = SettingsKeys.Defaults.punctuationPause
-
-    var wpm: Int {
-        get {
-            access(keyPath: \.wpm)
-            return storedWpm
-        }
-        set {
-            withMutation(keyPath: \.wpm) {
-                storedWpm = SettingsKeys.clamp(newValue, min: SettingsKeys.wpmMin, max: SettingsKeys.wpmMax)
-                defaults.set(storedWpm, forKey: SettingsKeys.wpm)
-            }
-        }
-    }
-
-    var font: ReaderFont {
-        get {
-            access(keyPath: \.font)
-            return storedFont
-        }
-        set {
-            withMutation(keyPath: \.font) {
-                storedFont = newValue
-                defaults.set(storedFont.rawValue, forKey: SettingsKeys.font)
-            }
-        }
-    }
-
-    var theme: ReaderTheme {
-        get {
-            access(keyPath: \.theme)
-            return storedTheme
-        }
-        set {
-            withMutation(keyPath: \.theme) {
-                storedTheme = newValue
-                defaults.set(storedTheme.rawValue, forKey: SettingsKeys.theme)
-            }
-        }
-    }
-
-    var fontSize: Int {
-        get {
-            access(keyPath: \.fontSize)
-            return storedFontSize
-        }
-        set {
-            withMutation(keyPath: \.fontSize) {
-                storedFontSize = SettingsKeys.clamp(
-                    newValue, min: SettingsKeys.fontSizeMin, max: SettingsKeys.fontSizeMax
-                )
-                defaults.set(storedFontSize, forKey: SettingsKeys.fontSize)
-            }
-        }
-    }
-
-    var punctuationPause: Bool {
-        get {
-            access(keyPath: \.punctuationPause)
-            return storedPunctuationPause
-        }
-        set {
-            withMutation(keyPath: \.punctuationPause) {
-                storedPunctuationPause = newValue
-                defaults.set(storedPunctuationPause, forKey: SettingsKeys.punctuationPause)
-            }
-        }
-    }
+    var wpm: Int = SettingsKeys.Defaults.wpm
+    var font: ReaderFont = SettingsKeys.Defaults.font
+    var theme: ReaderTheme = SettingsKeys.Defaults.theme
+    var fontSize: Int = SettingsKeys.Defaults.fontSize
+    var punctuationPause: Bool = SettingsKeys.Defaults.punctuationPause
 
     init(defaults: UserDefaults? = nil) {
         let store: UserDefaults
@@ -99,26 +29,61 @@ final class ReaderSettings {
         }
 
         self.defaults = store
+        loadFromDefaults(store)
+    }
 
+    /// Sets WPM, clamped to valid range, and persists to UserDefaults.
+    func setWpm(_ value: Int) {
+        wpm = SettingsKeys.clamp(value, min: SettingsKeys.wpmMin, max: SettingsKeys.wpmMax)
+        defaults.set(wpm, forKey: SettingsKeys.wpm)
+    }
+
+    /// Sets font size, clamped to valid range, and persists to UserDefaults.
+    func setFontSize(_ value: Int) {
+        fontSize = SettingsKeys.clamp(
+            value, min: SettingsKeys.fontSizeMin, max: SettingsKeys.fontSizeMax
+        )
+        defaults.set(fontSize, forKey: SettingsKeys.fontSize)
+    }
+
+    /// Sets font and persists to UserDefaults.
+    func setFont(_ value: ReaderFont) {
+        font = value
+        defaults.set(font.rawValue, forKey: SettingsKeys.font)
+    }
+
+    /// Sets theme and persists to UserDefaults.
+    func setTheme(_ value: ReaderTheme) {
+        theme = value
+        defaults.set(theme.rawValue, forKey: SettingsKeys.theme)
+    }
+
+    /// Sets punctuation pause and persists to UserDefaults.
+    func setPunctuationPause(_ value: Bool) {
+        punctuationPause = value
+        defaults.set(punctuationPause, forKey: SettingsKeys.punctuationPause)
+    }
+
+    private func loadFromDefaults(_ store: UserDefaults) {
         let loadedWpm = store.object(forKey: SettingsKeys.wpm) as? Int
             ?? SettingsKeys.Defaults.wpm
-        storedWpm = SettingsKeys.clamp(loadedWpm, min: SettingsKeys.wpmMin, max: SettingsKeys.wpmMax)
+        wpm = SettingsKeys.clamp(loadedWpm, min: SettingsKeys.wpmMin, max: SettingsKeys.wpmMax)
 
         let fontRaw = store.string(forKey: SettingsKeys.font)
             ?? SettingsKeys.Defaults.font.rawValue
-        storedFont = ReaderFont(rawValue: fontRaw) ?? SettingsKeys.Defaults.font
+        font = ReaderFont(rawValue: fontRaw) ?? SettingsKeys.Defaults.font
 
         let themeRaw = store.string(forKey: SettingsKeys.theme)
             ?? SettingsKeys.Defaults.theme.rawValue
-        storedTheme = ReaderTheme(rawValue: themeRaw) ?? SettingsKeys.Defaults.theme
+        theme = ReaderTheme(rawValue: themeRaw) ?? SettingsKeys.Defaults.theme
 
         let loadedFontSize = store.object(forKey: SettingsKeys.fontSize) as? Int
             ?? SettingsKeys.Defaults.fontSize
-        storedFontSize = SettingsKeys.clamp(
+        fontSize = SettingsKeys.clamp(
             loadedFontSize, min: SettingsKeys.fontSizeMin, max: SettingsKeys.fontSizeMax
         )
 
-        storedPunctuationPause = store.object(forKey: SettingsKeys.punctuationPause) as? Bool
+        punctuationPause = store.object(forKey: SettingsKeys.punctuationPause) as? Bool
             ?? SettingsKeys.Defaults.punctuationPause
     }
 }

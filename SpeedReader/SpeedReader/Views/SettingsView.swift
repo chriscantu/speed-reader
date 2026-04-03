@@ -4,8 +4,6 @@ struct SettingsView: View {
     @Environment(ReaderSettings.self) private var settings
 
     var body: some View {
-        @Bindable var settings = settings
-
         Form {
             Section("Reading Speed") {
                 VStack(alignment: .leading) {
@@ -16,7 +14,7 @@ struct SettingsView: View {
                     Slider(
                         value: Binding(
                             get: { Double(settings.wpm) },
-                            set: { settings.wpm = Int($0) }
+                            set: { settings.setWpm(Int($0)) }
                         ),
                         in: SettingsKeys.wpmRange,
                         step: 25
@@ -25,17 +23,26 @@ struct SettingsView: View {
                     }
                 }
 
-                Toggle("Pause on punctuation", isOn: $settings.punctuationPause)
+                Toggle("Pause on punctuation", isOn: Binding(
+                    get: { settings.punctuationPause },
+                    set: { settings.setPunctuationPause($0) }
+                ))
             }
 
             Section("Appearance") {
-                Picker("Font", selection: $settings.font) {
+                Picker("Font", selection: Binding(
+                    get: { settings.font },
+                    set: { settings.setFont($0) }
+                )) {
                     ForEach(ReaderFont.allCases) { font in
                         Text(font.displayName).tag(font)
                     }
                 }
 
-                Picker("Theme", selection: $settings.theme) {
+                Picker("Theme", selection: Binding(
+                    get: { settings.theme },
+                    set: { settings.setTheme($0) }
+                )) {
                     ForEach(ReaderTheme.allCases) { theme in
                         Text(theme.displayName).tag(theme)
                     }
@@ -47,7 +54,7 @@ struct SettingsView: View {
                     Slider(
                         value: Binding(
                             get: { Double(settings.fontSize) },
-                            set: { settings.fontSize = Int($0) }
+                            set: { settings.setFontSize(Int($0)) }
                         ),
                         in: SettingsKeys.fontSizeRange,
                         step: 2

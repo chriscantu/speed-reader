@@ -16,13 +16,13 @@ final class SettingsTests: XCTestCase {
 
     func testWPMClampedToMinimum() {
         let settings = makeSettings()
-        settings.wpm = 50
+        settings.setWpm(50)
         XCTAssertEqual(settings.wpm, 100)
     }
 
     func testWPMClampedToMaximum() {
         let settings = makeSettings()
-        settings.wpm = 800
+        settings.setWpm(800)
         XCTAssertEqual(settings.wpm, 600)
     }
 
@@ -48,13 +48,13 @@ final class SettingsTests: XCTestCase {
 
     func testFontSizeClampedToMinimum() {
         let settings = makeSettings()
-        settings.fontSize = 10
+        settings.setFontSize(10)
         XCTAssertEqual(settings.fontSize, 28)
     }
 
     func testFontSizeClampedToMaximum() {
         let settings = makeSettings()
-        settings.fontSize = 100
+        settings.setFontSize(100)
         XCTAssertEqual(settings.fontSize, 64)
     }
 }
