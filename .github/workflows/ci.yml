@@ -54,7 +54,7 @@ jobs:
             -destination 'platform=macOS' \
             CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_ENTITLEMENTS= \
             -quiet
 
       - name: Test (macOS)
@@ -65,7 +65,7 @@ jobs:
             -destination 'platform=macOS' \
             CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_ENTITLEMENTS= \
             -quiet
 
       - name: Build (iOS simulator)
@@ -76,5 +76,5 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_ENTITLEMENTS= \
             -quiet
