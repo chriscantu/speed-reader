@@ -21,6 +21,7 @@ export function calculateFocusPoint(word) {
  * @returns {{ before: string, focus: string, after: string }}
  */
 export function splitWordAtFocus(word) {
+  if (!word) return { before: '', focus: '', after: '' };
   const focusIndex = calculateFocusPoint(word);
   return {
     before: word.slice(0, focusIndex),

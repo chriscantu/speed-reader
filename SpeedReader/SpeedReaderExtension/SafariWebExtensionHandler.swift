@@ -29,8 +29,11 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         case "saveSettings":
             if let settingsData = messageDict["settings"] as? [String: Any] {
                 saveSettingsToAppGroup(settingsData)
+                response.userInfo = [SFExtensionMessageKey: ["status": "ok"]]
+            } else {
+                os_log(.error, "[SpeedReader] saveSettings called without valid 'settings' key")
+                response.userInfo = [SFExtensionMessageKey: ["error": "Missing or invalid settings payload"]]
             }
-            response.userInfo = [SFExtensionMessageKey: ["status": "ok"]]
 
         default:
             os_log(.default, "[SpeedReader] Unknown action: %{public}@", action)
@@ -66,10 +69,12 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             defaults.set(SettingsKeys.clamp(wpm, min: SettingsKeys.wpmMin, max: SettingsKeys.wpmMax),
                          forKey: SettingsKeys.wpm)
         }
-        if let font = settings["font"] as? String {
+        if let font = settings["font"] as? String,
+           ReaderFont(rawValue: font) != nil {
             defaults.set(font, forKey: SettingsKeys.font)
         }
-        if let theme = settings["theme"] as? String {
+        if let theme = settings["theme"] as? String,
+           ReaderTheme(rawValue: theme) != nil {
             defaults.set(theme, forKey: SettingsKeys.theme)
         }
         if let fontSize = settings["fontSize"] as? Int {

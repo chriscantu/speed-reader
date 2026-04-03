@@ -34,6 +34,7 @@ async function extractAndLaunch() {
     }
   } catch (e) {
     console.error('[SpeedReader] Selection read failed:', e);
+    showToast('Could not read your selection. Extracting full article instead.');
   }
 
   if (selectedText) {
@@ -126,6 +127,7 @@ browser.runtime.onMessage.addListener(function(message) {
       }
     }).catch(function(err) {
       console.error('[SpeedReader] toggle-reader failed:', err);
+      showToast('Something went wrong. Try reloading the page.');
     });
   }
 });

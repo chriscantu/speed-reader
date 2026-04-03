@@ -77,4 +77,13 @@ describe('splitWordAtFocus', () => {
       after: 'llo,',
     });
   });
+
+  it('returns empty parts for empty string', () => {
+    const result = splitWordAtFocus('');
+    assert.deepStrictEqual(result, {
+      before: '',
+      focus: '',
+      after: '',
+    });
+  });
 });
