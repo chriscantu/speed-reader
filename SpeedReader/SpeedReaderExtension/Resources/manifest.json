@@ -27,6 +27,7 @@
       "resources": [
         "overlay.css",
         "overlay.js",
+        "state-machine.js",
         "word-processor.js",
         "focus-point.js",
         "Readability.js",
