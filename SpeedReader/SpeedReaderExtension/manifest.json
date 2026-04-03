@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "SpeedReader",
+  "version": "1.0.0",
+  "description": "Free RSVP speed reading for any web page. Built for accessibility.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "SpeedReader"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "rsvp/overlay.css",
+        "rsvp/overlay.js",
+        "rsvp/word-processor.js",
+        "rsvp/focus-point.js",
+        "lib/Readability.js",
+        "fonts/OpenDyslexic-Regular.woff2"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "48": "images/icon-48.png",
+    "96": "images/icon-96.png",
+    "128": "images/icon-128.png",
+    "256": "images/icon-256.png"
+  }
+}
