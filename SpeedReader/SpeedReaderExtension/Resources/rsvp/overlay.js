@@ -273,6 +273,10 @@ export class RSVPOverlay {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = browser.runtime.getURL('overlay.css');
+    link.onerror = () => {
+      console.error('[SpeedReader] Failed to load overlay stylesheet');
+      this._showPageToast('Speed Reader styles failed to load. Try reloading the page.');
+    };
     this.shadow.appendChild(link);
 
     // Override word size if custom

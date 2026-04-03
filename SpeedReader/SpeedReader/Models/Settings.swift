@@ -2,38 +2,6 @@ import Foundation
 import SwiftUI
 import os.log
 
-/// Font options for the RSVP reader.
-enum ReaderFont: String, CaseIterable, Identifiable {
-    case system = "system"
-    case openDyslexic = "opendyslexic"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .system: return "System (San Francisco)"
-        case .openDyslexic: return "OpenDyslexic"
-        }
-    }
-}
-
-/// Theme options for the RSVP reader.
-enum ReaderTheme: String, CaseIterable, Identifiable {
-    case system = "system"
-    case light = "light"
-    case dark = "dark"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .system: return "System"
-        case .light: return "Light"
-        case .dark: return "Dark"
-        }
-    }
-}
-
 /// Observable settings model backed by App Group UserDefaults.
 @Observable
 final class ReaderSettings {

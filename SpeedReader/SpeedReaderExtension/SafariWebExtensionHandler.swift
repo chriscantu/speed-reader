@@ -1,24 +1,21 @@
-//
-//  SafariWebExtensionHandler.swift
-//  SpeedReaderExtension
-//
-//  Created by Cantu on 4/2/26.
-//
-
 import SafariServices
 import os.log
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
     func beginRequest(with context: NSExtensionContext) {
-        let item = context.inputItems[0] as! NSExtensionItem
+        guard let item = context.inputItems.first as? NSExtensionItem else {
+            os_log(.error, "[SpeedReader] No input items in extension context")
+            context.completeRequest(returningItems: [], completionHandler: nil)
+            return
+        }
+
         let message = item.userInfo?[SFExtensionMessageKey]
-        os_log(.default, "Received message from browser.runtime.sendNativeMessage: %@", message as! CVarArg)
+        os_log(.default, "[SpeedReader] Received message: %{public}@",
+               String(describing: message))
 
         let response = NSExtensionItem()
-        response.userInfo = [ SFExtensionMessageKey: [ "Response to": message ] ]
-
+        response.userInfo = [SFExtensionMessageKey: ["Response to": message as Any]]
         context.completeRequest(returningItems: [response], completionHandler: nil)
     }
-
 }

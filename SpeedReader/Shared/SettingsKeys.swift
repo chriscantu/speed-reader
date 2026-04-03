@@ -1,5 +1,37 @@
 import Foundation
 
+/// Font options for the RSVP reader.
+enum ReaderFont: String, CaseIterable, Identifiable {
+    case system = "system"
+    case openDyslexic = "opendyslexic"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .system: return "System (San Francisco)"
+        case .openDyslexic: return "OpenDyslexic"
+        }
+    }
+}
+
+/// Theme options for the RSVP reader.
+enum ReaderTheme: String, CaseIterable, Identifiable {
+    case system = "system"
+    case light = "light"
+    case dark = "dark"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .system: return "System"
+        case .light: return "Light"
+        case .dark: return "Dark"
+        }
+    }
+}
+
 /// Constants for App Group settings shared between the app and extension.
 enum SettingsKeys {
     /// App Group identifier — must match the entitlements file.
@@ -11,7 +43,7 @@ enum SettingsKeys {
     static let fontSize = "sr_fontSize"
     static let punctuationPause = "sr_punctuationPause"
 
-    /// Default values — use typed enum cases to prevent drift from raw values.
+    /// Default values — typed enum cases prevent drift from raw values.
     enum Defaults {
         static let wpm = 250
         static let font: ReaderFont = .system

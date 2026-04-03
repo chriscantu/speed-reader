@@ -6,21 +6,36 @@ let pendingSelectionMode = false;
 
 async function getOverlay() {
   if (overlay) return overlay;
-  const overlayModule = await import(browser.runtime.getURL('overlay.js'));
-  overlay = new overlayModule.RSVPOverlay();
-  return overlay;
+  try {
+    var overlayModule = await import(browser.runtime.getURL('overlay.js'));
+    overlay = new overlayModule.RSVPOverlay();
+    return overlay;
+  } catch (e) {
+    console.error('[SpeedReader] Failed to load overlay module:', e);
+    showToast('Speed Reader failed to load. Try reloading the page.');
+    throw e;
+  }
 }
 
 async function extractAndLaunch() {
-  const reader = await getOverlay();
+  var reader;
+  try {
+    reader = await getOverlay();
+  } catch (e) {
+    return; // Toast already shown by getOverlay
+  }
 
   // Check for user text selection first
-  const selection = window.getSelection();
-  if (selection && selection.toString().trim().length > 0) {
-    const text = selection.toString().trim();
-    reader.open(text, document.title, await getSettings());
-    pendingSelectionMode = false;
-    return;
+  try {
+    var selection = window.getSelection();
+    if (selection && selection.toString().trim().length > 0) {
+      var text = selection.toString().trim();
+      reader.open(text, document.title, await getSettings());
+      pendingSelectionMode = false;
+      return;
+    }
+  } catch (e) {
+    console.error('[SpeedReader] Selection read failed:', e);
   }
 
   // If we're in selection fallback mode, remind user to select text
@@ -30,15 +45,15 @@ async function extractAndLaunch() {
   }
 
   try {
-    const readabilityModule = await import(browser.runtime.getURL('Readability.js'));
-    const Readability = readabilityModule.Readability;
+    var readabilityModule = await import(browser.runtime.getURL('Readability.js'));
+    var Readability = readabilityModule.Readability;
 
     // Clone the document so Readability doesn't mutate the live DOM
-    const docClone = document.cloneNode(true);
-    const article = new Readability(docClone).parse();
+    var docClone = document.cloneNode(true);
+    var article = new Readability(docClone).parse();
 
     if (article && article.textContent && article.textContent.trim().length > 0) {
-      const settings = await getSettings();
+      var settings = await getSettings();
       reader.open(article.textContent.trim(), article.title || document.title, settings);
     } else {
       pendingSelectionMode = true;
@@ -53,7 +68,7 @@ async function extractAndLaunch() {
 
 async function getSettings() {
   try {
-    const stored = await browser.storage.sync.get({
+    var stored = await browser.storage.sync.get({
       wpm: 250,
       font: 'system',
       theme: 'system',
@@ -62,6 +77,8 @@ async function getSettings() {
     });
     return stored;
   } catch (e) {
+    console.error('[SpeedReader] Failed to load settings:', e);
+    showToast('Could not load your settings. Using defaults.');
     return {
       wpm: 250,
       font: 'system',
@@ -73,10 +90,10 @@ async function getSettings() {
 }
 
 function showToast(message) {
-  const existing = document.querySelector('.speed-reader-toast');
+  var existing = document.querySelector('.speed-reader-toast');
   if (existing) existing.remove();
 
-  const toast = document.createElement('div');
+  var toast = document.createElement('div');
   toast.className = 'speed-reader-toast';
   toast.style.cssText =
     'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);' +
@@ -97,6 +114,8 @@ browser.runtime.onMessage.addListener(function(message) {
       } else {
         extractAndLaunch();
       }
+    }).catch(function(err) {
+      console.error('[SpeedReader] toggle-reader failed:', err);
     });
   }
 });
