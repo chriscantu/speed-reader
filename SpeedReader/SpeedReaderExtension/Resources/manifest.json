@@ -5,7 +5,9 @@
   "description": "Free RSVP speed reading for any web page. Built for accessibility.",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "nativeMessaging",
+    "scripting"
   ],
   "background": {
     "service_worker": "background.js"

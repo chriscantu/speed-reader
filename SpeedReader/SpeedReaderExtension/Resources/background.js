@@ -4,7 +4,6 @@ browser.action.onClicked.addListener(async (tab) => {
     await browser.tabs.sendMessage(tab.id, { action: 'toggle-reader' });
   } catch (error) {
     console.error('[SpeedReader] Could not reach content script:', error);
-    // Content script may not be injected on this page — inform user
     try {
       await browser.scripting.executeScript({
         target: { tabId: tab.id },
@@ -17,12 +16,30 @@ browser.action.onClicked.addListener(async (tab) => {
         },
       });
     } catch (_) {
-      // Truly restricted page (about:, safari-web-extension:) — nothing we can do
+      // Truly restricted page — nothing we can do
     }
   }
 });
 
-// Initialize default settings on install
+// Sync settings from native App Group UserDefaults to browser.storage.sync.
+// This bridges the SwiftUI settings app with the web extension.
+async function syncSettingsFromNative() {
+  try {
+    var response = await browser.runtime.sendNativeMessage(
+      'application.id',
+      { action: 'getSettings' }
+    );
+    if (response && response.wpm !== undefined) {
+      await browser.storage.sync.set(response);
+      console.log('[SpeedReader] Settings synced from native app');
+    }
+  } catch (error) {
+    console.error('[SpeedReader] Failed to sync native settings:', error);
+    // Not fatal — extension will use browser.storage.sync defaults
+  }
+}
+
+// Initialize default settings on install, then sync from native
 browser.runtime.onInstalled.addListener(() => {
   browser.storage.sync.get({ wpm: null })
     .then((result) => {
@@ -36,7 +53,11 @@ browser.runtime.onInstalled.addListener(() => {
         });
       }
     })
+    .then(() => syncSettingsFromNative())
     .catch((error) => {
-      console.error('[SpeedReader] Failed to initialize default settings:', error);
+      console.error('[SpeedReader] Failed to initialize settings:', error);
     });
 });
+
+// Sync settings from native app whenever the service worker starts
+syncSettingsFromNative();
