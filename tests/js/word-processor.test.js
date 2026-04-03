@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { processText, calculateDelay } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/word-processor.js';
+import { processText, calculateDelay, wpmToDelay } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/word-processor.js';
 
 describe('processText', () => {
   it('splits text into words on whitespace', () => {
@@ -88,5 +88,19 @@ describe('calculateDelay', () => {
   it('returns 1.2x delay for words ending with colon', () => {
     const delay = calculateDelay('note:', baseDelay);
     assert.strictEqual(delay, Math.round(baseDelay * 1.2));
+  });
+});
+
+describe('wpmToDelay', () => {
+  it('converts 250 WPM to 240ms', () => {
+    assert.strictEqual(wpmToDelay(250), 240);
+  });
+
+  it('converts 100 WPM to 600ms', () => {
+    assert.strictEqual(wpmToDelay(100), 600);
+  });
+
+  it('converts 600 WPM to 100ms', () => {
+    assert.strictEqual(wpmToDelay(600), 100);
   });
 });

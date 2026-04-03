@@ -38,4 +38,16 @@ final class SettingsTests: XCTestCase {
         let settings = ReaderSettings()
         XCTAssertEqual(settings.fontSize, 42)
     }
+
+    func testFontSizeClampedToMinimum() {
+        let settings = ReaderSettings()
+        settings.fontSize = 10
+        XCTAssertEqual(settings.fontSize, 28)
+    }
+
+    func testFontSizeClampedToMaximum() {
+        let settings = ReaderSettings()
+        settings.fontSize = 100
+        XCTAssertEqual(settings.fontSize, 64)
+    }
 }
