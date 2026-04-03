@@ -1,19 +1,14 @@
-import { processText, calculateDelay, wpmToDelay } from './word-processor.js';
-import { splitWordAtFocus } from './focus-point.js';
+import { RSVPStateMachine } from './state-machine.js';
 
 export class RSVPOverlay {
   constructor() {
-    this.words = [];
-    this.currentIndex = 0;
-    this.isPlaying = false;
-    this.wpm = 250;
+    this.state = new RSVPStateMachine();
     this.timerId = null;
     this.title = '';
     this.settings = {
       theme: 'system',
       font: 'system',
       fontSize: 42,
-      punctuationPause: true,
     };
     this.host = null;
     this.shadow = null;
@@ -27,19 +22,16 @@ export class RSVPOverlay {
     }
 
     Object.assign(this.settings, settings);
-    if (settings.wpm !== undefined) {
-      this.wpm = Math.max(100, Math.min(600, settings.wpm));
-    }
     this.title = title || '';
-    this.words = processText(text);
+    this.state.init(text, {
+      wpm: settings.wpm,
+      punctuationPause: settings.punctuationPause ?? true,
+    });
 
-    if (this.words.length === 0) {
+    if (this.state.words.length === 0) {
       this._showPageToast('No readable content found.');
       return;
     }
-
-    this.currentIndex = 0;
-    this.isPlaying = false;
 
     this._createDOM();
     this._bindEvents();
@@ -62,17 +54,14 @@ export class RSVPOverlay {
   }
 
   play() {
-    if (this.currentIndex >= this.words.length) {
-      this.currentIndex = 0;
-    }
-    this.isPlaying = true;
+    this.state.play();
     this._updatePlayButton();
     this._hideContext();
-    this._tick();
+    this._startLoop();
   }
 
   pause() {
-    this.isPlaying = false;
+    this.state.pause();
     if (this.timerId !== null) {
       clearTimeout(this.timerId);
       this.timerId = null;
@@ -82,7 +71,7 @@ export class RSVPOverlay {
   }
 
   togglePlayPause() {
-    if (this.isPlaying) {
+    if (this.state.isPlaying) {
       this.pause();
     } else {
       this.play();
@@ -90,73 +79,56 @@ export class RSVPOverlay {
   }
 
   prevSentence() {
-    this.pause();
-    let i = this.currentIndex - 1;
-    while (i > 0) {
-      if (this.words[i].sentenceStart) {
-        break;
-      }
-      i--;
+    this.state.prevSentence();
+    if (this.timerId !== null) {
+      clearTimeout(this.timerId);
+      this.timerId = null;
     }
-    this.currentIndex = Math.max(0, i);
+    this._updatePlayButton();
+    this._showContext();
     this._renderWord();
     this._updateProgress();
   }
 
   nextSentence() {
-    this.pause();
-    let i = this.currentIndex + 1;
-    while (i < this.words.length) {
-      if (this.words[i].sentenceStart) {
-        break;
-      }
-      i++;
+    this.state.nextSentence();
+    if (this.timerId !== null) {
+      clearTimeout(this.timerId);
+      this.timerId = null;
     }
-    if (i < this.words.length) {
-      this.currentIndex = i;
-    }
+    this._updatePlayButton();
+    this._showContext();
     this._renderWord();
     this._updateProgress();
   }
 
   adjustWpm(delta) {
-    this.wpm = Math.max(100, Math.min(600, this.wpm + delta));
+    this.state.adjustWpm(delta);
     if (this.elements.wpmLabel) {
-      this.elements.wpmLabel.textContent = this.wpm + ' wpm';
+      this.elements.wpmLabel.textContent = this.state.wpm + ' wpm';
     }
     if (this.elements.slider) {
-      this.elements.slider.value = this.wpm;
+      this.elements.slider.value = this.state.wpm;
     }
   }
 
-  _tick() {
-    if (!this.isPlaying || this.currentIndex >= this.words.length) {
-      if (this.currentIndex >= this.words.length) {
-        this.pause();
-      }
-      return;
-    }
-
+  _startLoop() {
     this._renderWord();
     this._updateProgress();
 
-    const word = this.words[this.currentIndex];
-    const baseDelay = wpmToDelay(this.wpm);
-    const delay = this.settings.punctuationPause
-      ? calculateDelay(word.text, baseDelay)
-      : baseDelay;
-
-    this.currentIndex++;
+    const result = this.state.tick();
+    if (result.done) {
+      this.pause();
+      return;
+    }
 
     this.timerId = setTimeout(() => {
-      this._tick();
-    }, delay);
+      this._startLoop();
+    }, result.delay);
   }
 
   _renderWord() {
-    if (this.currentIndex >= this.words.length) return;
-    const word = this.words[this.currentIndex];
-    const parts = splitWordAtFocus(word.text);
+    const parts = this.state.currentWord();
     if (this.elements.wordBefore) {
       this.elements.wordBefore.textContent = parts.before;
     }
@@ -169,20 +141,18 @@ export class RSVPOverlay {
   }
 
   _updateProgress() {
-    const pct = this.words.length > 0
-      ? Math.round((this.currentIndex / this.words.length) * 100)
-      : 0;
+    const p = this.state.progress();
     if (this.elements.progressFill) {
-      this.elements.progressFill.style.width = pct + '%';
+      this.elements.progressFill.style.width = p.percent + '%';
     }
     if (this.elements.progressLabel) {
-      this.elements.progressLabel.textContent = pct + '%';
+      this.elements.progressLabel.textContent = p.percent + '%';
     }
   }
 
   _updatePlayButton() {
     if (this.elements.playBtn) {
-      this.elements.playBtn.textContent = this.isPlaying ? '⏸' : '▶';
+      this.elements.playBtn.textContent = this.state.isPlaying ? '⏸' : '▶';
     }
   }
 
@@ -193,36 +163,24 @@ export class RSVPOverlay {
     const contentEl = this.elements.contextContent;
     if (!contentEl) return;
 
-    // Clear existing content
     while (contentEl.firstChild) {
       contentEl.removeChild(contentEl.firstChild);
     }
 
-    if (this.currentIndex >= this.words.length) return;
+    const ctx = this.state.contextSentence();
+    if (ctx.words.length === 0) return;
 
-    // Find sentence boundaries
-    let sentenceStart = this.currentIndex;
-    while (sentenceStart > 0 && !this.words[sentenceStart].sentenceStart) {
-      sentenceStart--;
-    }
-
-    let sentenceEnd = this.currentIndex + 1;
-    while (sentenceEnd < this.words.length && !this.words[sentenceEnd].sentenceStart) {
-      sentenceEnd++;
-    }
-
-    // Build context with highlighted current word
-    for (let i = sentenceStart; i < sentenceEnd; i++) {
-      if (i > sentenceStart) {
+    for (let i = 0; i < ctx.words.length; i++) {
+      if (i > 0) {
         contentEl.appendChild(document.createTextNode(' '));
       }
-      if (i === this.currentIndex) {
+      if (i === ctx.highlightIndex) {
         const highlight = document.createElement('span');
         highlight.className = 'sr-context-highlight';
-        highlight.textContent = this.words[i].text;
+        highlight.textContent = ctx.words[i];
         contentEl.appendChild(highlight);
       } else {
-        contentEl.appendChild(document.createTextNode(this.words[i].text));
+        contentEl.appendChild(document.createTextNode(ctx.words[i]));
       }
     }
   }
@@ -419,7 +377,7 @@ export class RSVPOverlay {
     sliderLabels.className = 'sr-slider-labels';
 
     const wpmLabel = document.createElement('span');
-    wpmLabel.textContent = this.wpm + ' wpm';
+    wpmLabel.textContent = this.state.wpm + ' wpm';
     this.elements.wpmLabel = wpmLabel;
 
     const speedLabel = document.createElement('span');
@@ -433,7 +391,7 @@ export class RSVPOverlay {
     slider.className = 'sr-slider';
     slider.min = '100';
     slider.max = '600';
-    slider.value = this.wpm;
+    slider.value = this.state.wpm;
     slider.setAttribute('aria-label', 'Words per minute');
     this.elements.slider = slider;
 
@@ -452,7 +410,7 @@ export class RSVPOverlay {
     this.elements.progressLabel = progressLabel;
 
     const wordsCountLabel = document.createElement('span');
-    wordsCountLabel.textContent = this.words.length + ' words';
+    wordsCountLabel.textContent = this.state.words.length + ' words';
 
     progressLabels.appendChild(progressLabel);
     progressLabels.appendChild(wordsCountLabel);
@@ -506,8 +464,9 @@ export class RSVPOverlay {
     });
 
     this.elements.slider.addEventListener('input', () => {
-      this.wpm = parseInt(this.elements.slider.value, 10);
-      this.elements.wpmLabel.textContent = this.wpm + ' wpm';
+      const value = parseInt(this.elements.slider.value, 10);
+      this.state.wpm = Math.max(100, Math.min(600, value));
+      this.elements.wpmLabel.textContent = this.state.wpm + ' wpm';
     });
 
     this.elements.backdrop.addEventListener('click', (e) => {
