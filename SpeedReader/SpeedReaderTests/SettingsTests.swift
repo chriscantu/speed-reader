@@ -1,4 +1,3 @@
-@testable import SpeedReader
 import XCTest
 
 final class SettingsTests: XCTestCase {

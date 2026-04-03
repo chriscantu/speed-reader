@@ -20,6 +20,8 @@
 		48FCA143BF399C387037D81B /* icon-512.png in Resources */ = {isa = PBXBuildFile; fileRef = B2205A307F3EF0C111669CE3 /* icon-512.png */; };
 		5CA2565520B2E716D3A553BE /* icon-96.png in Resources */ = {isa = PBXBuildFile; fileRef = 0091ABB7D83EA546A908A891 /* icon-96.png */; };
 		697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60576CF8DFF855A5FBC03458 /* SettingsTests.swift */; };
+		AA0000000000000000000001 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE082F7F6F9E007CB358 /* Settings.swift */; };
+		AA0000000000000000000002 /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
 		788CF3F0745CACC88B6FD3A5 /* icon-128.png in Resources */ = {isa = PBXBuildFile; fileRef = CDA736A75407BDAE1865E723 /* icon-128.png */; };
 		7AE95D2EE93DB5249B5A178D /* toolbar-icon-38.png in Resources */ = {isa = PBXBuildFile; fileRef = 88A4B6630BB0B8A463E914FF /* toolbar-icon-38.png */; };
 		82122095B9DA95903C1FE117 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57270C891B5A8607F4D7800E /* SafariWebExtensionHandler.swift */; };
@@ -509,6 +511,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */,
+				AA0000000000000000000001 /* Settings.swift in Sources */,
+				AA0000000000000000000002 /* SettingsKeys.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -825,7 +829,6 @@
 		3B865454FB317964B213BC92 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -838,14 +841,12 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpeedReader.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SpeedReader";
 			};
 			name = Debug;
 		};
 		E16705D186796CF7BED25E3E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -858,7 +859,6 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpeedReader.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SpeedReader";
 			};
 			name = Release;
 		};
