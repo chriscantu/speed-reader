@@ -1,7 +1,7 @@
 .PHONY: test-js test-swift test-all
 
 test-js:
-	node --test tests/js/
+	node --test tests/js/*.test.js
 
 test-swift:
 	xcodebuild test \
