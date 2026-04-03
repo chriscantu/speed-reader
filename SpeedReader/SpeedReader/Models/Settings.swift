@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import os.log
 
 /// Font options for the RSVP reader.
 enum ReaderFont: String, CaseIterable, Identifiable {
@@ -40,7 +41,7 @@ final class ReaderSettings {
 
     var wpm: Int {
         didSet {
-            wpm = max(SettingsKeys.wpmMin, min(SettingsKeys.wpmMax, wpm))
+            wpm = SettingsKeys.clamp(wpm, min: SettingsKeys.wpmMin, max: SettingsKeys.wpmMax)
             defaults.set(wpm, forKey: SettingsKeys.wpm)
         }
     }
@@ -55,7 +56,7 @@ final class ReaderSettings {
 
     var fontSize: Int {
         didSet {
-            fontSize = max(SettingsKeys.fontSizeMin, min(SettingsKeys.fontSizeMax, fontSize))
+            fontSize = SettingsKeys.clamp(fontSize, min: SettingsKeys.fontSizeMin, max: SettingsKeys.fontSizeMax)
             defaults.set(fontSize, forKey: SettingsKeys.fontSize)
         }
     }
@@ -65,25 +66,35 @@ final class ReaderSettings {
     }
 
     init(defaults: UserDefaults? = nil) {
-        let store = defaults
-            ?? UserDefaults(suiteName: SettingsKeys.appGroupID)
-            ?? .standard
+        let store: UserDefaults
+        if let injected = defaults {
+            store = injected
+        } else if let groupDefaults = UserDefaults(suiteName: SettingsKeys.appGroupID) {
+            store = groupDefaults
+        } else {
+            os_log(.error, "[SpeedReader] App Group '%{public}@' not configured — settings will not sync with extension",
+                   SettingsKeys.appGroupID)
+            store = .standard
+        }
 
         self.defaults = store
 
-        self.wpm = store.object(forKey: SettingsKeys.wpm) as? Int
+        // Clamp values loaded from UserDefaults — didSet does NOT fire during init
+        let loadedWpm = store.object(forKey: SettingsKeys.wpm) as? Int
             ?? SettingsKeys.Defaults.wpm
+        self.wpm = SettingsKeys.clamp(loadedWpm, min: SettingsKeys.wpmMin, max: SettingsKeys.wpmMax)
 
         let fontRaw = store.string(forKey: SettingsKeys.font)
-            ?? SettingsKeys.Defaults.font
-        self.font = ReaderFont(rawValue: fontRaw) ?? .system
+            ?? SettingsKeys.Defaults.font.rawValue
+        self.font = ReaderFont(rawValue: fontRaw) ?? SettingsKeys.Defaults.font
 
         let themeRaw = store.string(forKey: SettingsKeys.theme)
-            ?? SettingsKeys.Defaults.theme
-        self.theme = ReaderTheme(rawValue: themeRaw) ?? .system
+            ?? SettingsKeys.Defaults.theme.rawValue
+        self.theme = ReaderTheme(rawValue: themeRaw) ?? SettingsKeys.Defaults.theme
 
-        self.fontSize = store.object(forKey: SettingsKeys.fontSize) as? Int
+        let loadedFontSize = store.object(forKey: SettingsKeys.fontSize) as? Int
             ?? SettingsKeys.Defaults.fontSize
+        self.fontSize = SettingsKeys.clamp(loadedFontSize, min: SettingsKeys.fontSizeMin, max: SettingsKeys.fontSizeMax)
 
         self.punctuationPause = store.object(forKey: SettingsKeys.punctuationPause) as? Bool
             ?? SettingsKeys.Defaults.punctuationPause

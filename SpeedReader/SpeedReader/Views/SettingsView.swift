@@ -18,7 +18,7 @@ struct SettingsView: View {
                             get: { Double(settings.wpm) },
                             set: { settings.wpm = Int($0) }
                         ),
-                        in: 100...600,
+                        in: SettingsKeys.wpmRange,
                         step: 25
                     ) {
                         Text("Words per minute")
@@ -49,7 +49,7 @@ struct SettingsView: View {
                             get: { Double(settings.fontSize) },
                             set: { settings.fontSize = Int($0) }
                         ),
-                        in: 28...64,
+                        in: SettingsKeys.fontSizeRange,
                         step: 2
                     ) {
                         Text("Font size")
