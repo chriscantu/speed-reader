@@ -66,7 +66,18 @@ jobs:
             CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_ENTITLEMENTS= \
-            -quiet
+            -resultBundlePath TestResults.xcresult \
+            2>&1 || true
+
+      - name: Collect crash logs
+        if: always()
+        run: |
+          echo "=== Recent crash reports ==="
+          find ~/Library/Logs/DiagnosticReports -name "SpeedReader*" -newer /tmp -print -exec head -50 {} \; 2>/dev/null || echo "No crash reports found"
+          echo "=== xcresult test failures ==="
+          xcrun xcresulttool get test-results summary --path TestResults.xcresult 2>/dev/null || echo "No result bundle"
+          echo "=== Test result details ==="
+          xcrun xcresulttool get test-results tests --path TestResults.xcresult 2>/dev/null | head -100 || echo "No test details"
 
       - name: Build (iOS simulator)
         run: |
