@@ -16,7 +16,7 @@
 
 ## v1.1 — Test Coverage & Hardening
 
-- [ ] RSVPOverlay state machine tests (play/pause/nav/wpm clamping) — extract testable logic or use DOM shim
+- [x] RSVPOverlay state machine tests (play/pause/nav/wpm clamping) — extracted to `rsvp/state-machine.js`
 - [ ] Content script decision tree tests (selection priority, Readability fallback, error paths)
 - [x] Settings persistence round-trip test (write → new instance → verify)
 - [ ] Settings init with pre-populated out-of-range UserDefaults test

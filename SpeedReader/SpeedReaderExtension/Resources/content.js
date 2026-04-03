@@ -141,10 +141,10 @@ window.addEventListener('message', function(event) {
     if (overlay && overlay.host && overlay.shadow) {
       result.overlayOpen = true;
       result.hasShadow = true;
-      result.isPlaying = overlay.isPlaying;
-      result.wordCount = overlay.words.length;
-      result.currentIndex = overlay.currentIndex;
-      result.wpm = overlay.wpm;
+      result.isPlaying = overlay.state.isPlaying;
+      result.wordCount = overlay.state.words.length;
+      result.currentIndex = overlay.state.currentIndex;
+      result.wpm = overlay.state.wpm;
       var wordEl = overlay.shadow.querySelector('.sr-word');
       result.wordText = wordEl ? wordEl.textContent.trim() : '';
       var focusEl = overlay.shadow.querySelector('.sr-word-focus');
@@ -192,10 +192,10 @@ browser.runtime.onMessage.addListener(function(message, _sender, sendResponse) {
     var state = { overlayOpen: false };
     if (overlay && overlay.host) {
       state.overlayOpen = true;
-      state.isPlaying = overlay.isPlaying;
-      state.wordCount = overlay.words.length;
-      state.currentIndex = overlay.currentIndex;
-      state.wpm = overlay.wpm;
+      state.isPlaying = overlay.state.isPlaying;
+      state.wordCount = overlay.state.words.length;
+      state.currentIndex = overlay.state.currentIndex;
+      state.wpm = overlay.state.wpm;
     }
     sendResponse(state);
   }
