@@ -14,6 +14,21 @@
 - [x] SwiftUI container app with settings + onboarding
 - [x] Keyboard shortcuts on Mac (Space, arrows, ESC)
 
+## v1.1 — Test Coverage & Hardening
+
+- [ ] RSVPOverlay state machine tests (play/pause/nav/wpm clamping) — extract testable logic or use DOM shim
+- [ ] Content script decision tree tests (selection priority, Readability fallback, error paths)
+- [x] Settings persistence round-trip test (write → new instance → verify)
+- [ ] Settings init with pre-populated out-of-range UserDefaults test
+- [x] Guard `splitWordAtFocus` against empty string input
+- [ ] Guard `calculateDelay` against empty string input
+- [x] Settings test isolation — inject ephemeral UserDefaults to prevent test pollution
+- [ ] `saveSettingsToAppGroup` — track saved field count, log warning when zero fields match types
+- [ ] `syncSettingsFromNative` — surface sync failure to user (e.g., store lastSyncStatus flag)
+- [x] Selection read failure — show toast when selection is ignored due to API error
+- [ ] App Group unavailable — surface visible warning in SwiftUI app when settings won't sync
+- [ ] Full regression test infrastructure — `make send`-style command router, scripted assertions for all overlay states, keyboard shortcuts, WPM changes, theme switching, multi-platform coverage
+
 ## v2 — Enhanced Navigation
 
 - [ ] Scrubber/progress bar — draggable video-player-style position control

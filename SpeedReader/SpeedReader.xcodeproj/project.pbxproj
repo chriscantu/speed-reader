@@ -1,0 +1,907 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		02E2FE0E2F7F6F9E007CB358 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE082F7F6F9E007CB358 /* Settings.swift */; };
+		02E2FE0F2F7F6F9E007CB358 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE0C2F7F6F9E007CB358 /* SettingsView.swift */; };
+		02E2FE102F7F6F9E007CB358 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE0B2F7F6F9E007CB358 /* OnboardingView.swift */; };
+		02E2FE112F7F6F9E007CB358 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE0A2F7F6F9E007CB358 /* ContentView.swift */; };
+		02E2FE312F7F7065007CB358 /* SpeedReaderExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 02E2FE192F7F7065007CB358 /* SpeedReaderExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0989A66035529726AA8D3585 /* toolbar-icon-16.png in Resources */ = {isa = PBXBuildFile; fileRef = 4586AA0F45F69A2D1FC767DC /* toolbar-icon-16.png */; };
+		0AD203D7953EA09F2C6B7B07 /* overlay.css in Resources */ = {isa = PBXBuildFile; fileRef = 08A86BDA6B48DD89677FDA88 /* overlay.css */; };
+		10A2A1E3E8D6D194B037DDC9 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 2662E9DB546F37F248F0DE75 /* manifest.json */; };
+		36D5E08F108FB92A242E4979 /* SpeedReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0597FC2C9EB996C1C0D68C /* SpeedReaderApp.swift */; };
+		4096BCD140BB50A6E096992D /* overlay.js in Resources */ = {isa = PBXBuildFile; fileRef = 15596D479A5D0D7345265215 /* overlay.js */; };
+		48FCA143BF399C387037D81B /* icon-512.png in Resources */ = {isa = PBXBuildFile; fileRef = B2205A307F3EF0C111669CE3 /* icon-512.png */; };
+		5CA2565520B2E716D3A553BE /* icon-96.png in Resources */ = {isa = PBXBuildFile; fileRef = 0091ABB7D83EA546A908A891 /* icon-96.png */; };
+		697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60576CF8DFF855A5FBC03458 /* SettingsTests.swift */; };
+		AA0000000000000000000001 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE082F7F6F9E007CB358 /* Settings.swift */; };
+		AA0000000000000000000002 /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
+		788CF3F0745CACC88B6FD3A5 /* icon-128.png in Resources */ = {isa = PBXBuildFile; fileRef = CDA736A75407BDAE1865E723 /* icon-128.png */; };
+		7AE95D2EE93DB5249B5A178D /* toolbar-icon-38.png in Resources */ = {isa = PBXBuildFile; fileRef = 88A4B6630BB0B8A463E914FF /* toolbar-icon-38.png */; };
+		82122095B9DA95903C1FE117 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57270C891B5A8607F4D7800E /* SafariWebExtensionHandler.swift */; };
+		8583EC8C5846A9425A341FF0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C47E9825806A930B7A8484 /* Cocoa.framework */; };
+		8C9DEF341921D79BD47B1A7C /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
+		911C4EA4CA18B73F30A21BB4 /* icon-48.png in Resources */ = {isa = PBXBuildFile; fileRef = 78F0C821786D5C099708EEF6 /* icon-48.png */; };
+		960D360CC604419E248D2FD7 /* word-processor.js in Resources */ = {isa = PBXBuildFile; fileRef = 4DFBFC19ACD7105EA7C06AF3 /* word-processor.js */; };
+		999A0B7B3E9CF6018D8A0ADF /* icon-256.png in Resources */ = {isa = PBXBuildFile; fileRef = 2DA726110F99D7F38B30E0C3 /* icon-256.png */; };
+		9BBBF3E66EBBBFF67255B557 /* focus-point.js in Resources */ = {isa = PBXBuildFile; fileRef = 72D243DCA7839B0A1128F247 /* focus-point.js */; };
+		A02C1E7DD3352C9E28B80F91 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 155C7D23A470E05538BC8787 /* content.js */; };
+		A47CDB11F84049FC292C6B66 /* toolbar-icon-19.png in Resources */ = {isa = PBXBuildFile; fileRef = 64C4F798A63CCC4C2CF9EFAE /* toolbar-icon-19.png */; };
+		A504339B9FF7DC5BF5CD9B27 /* OpenDyslexic-Regular.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 4B0A632B0E777E5FFA671453 /* OpenDyslexic-Regular.woff2 */; };
+		A51B026E2FB7F1F9030AE110 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 336BA88D6062B640644E045E /* background.js */; };
+		ABC84A71AB9B9F43D28F006A /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
+		C046EB48F426B4E631D272B6 /* Readability.js in Resources */ = {isa = PBXBuildFile; fileRef = 113712A7066B13702A2D6917 /* Readability.js */; };
+		C39DA992C82EB5842E7DFD6D /* toolbar-icon-48.png in Resources */ = {isa = PBXBuildFile; fileRef = 042E566B2DEE5872585FEB36 /* toolbar-icon-48.png */; };
+		D34F1079F9E7ADE93DFE7C7A /* toolbar-icon-32.png in Resources */ = {isa = PBXBuildFile; fileRef = 3C69FA3A05A6044A0054D95C /* toolbar-icon-32.png */; };
+		DAB8DCFD212EBA275AADDF48 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7C9932756921056EBA7A59 /* SafariServices.framework */; };
+		E42B3C02D637304DA72F12DC /* icon-64.png in Resources */ = {isa = PBXBuildFile; fileRef = BA31BAC0466DEE4171A83080 /* icon-64.png */; };
+		F0569B338845840B71B6D212 /* toolbar-icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = CAFFEE1258C20D75FFDA8F4F /* toolbar-icon-72.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		02E2FE2F2F7F7065007CB358 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 02E2FDE82F7F6E15007CB358 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 02E2FE182F7F7065007CB358;
+			remoteInfo = SpeedReaderExtension;
+		};
+		A55BD1969DEEB98A966E509F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 02E2FDE82F7F6E15007CB358 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 02E2FDEF2F7F6E15007CB358;
+			remoteInfo = SpeedReader;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		02E2FE362F7F7065007CB358 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				02E2FE312F7F7065007CB358 /* SpeedReaderExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0091ABB7D83EA546A908A891 /* icon-96.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "icon-96.png"; sourceTree = "<group>"; };
+		01C47E9825806A930B7A8484 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		02E2FDF02F7F6E15007CB358 /* SpeedReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpeedReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		02E2FE082F7F6F9E007CB358 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		02E2FE0A2F7F6F9E007CB358 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		02E2FE0B2F7F6F9E007CB358 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		02E2FE0C2F7F6F9E007CB358 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		02E2FE192F7F7065007CB358 /* SpeedReaderExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SpeedReaderExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsKeys.swift; sourceTree = "<group>"; };
+		042E566B2DEE5872585FEB36 /* toolbar-icon-48.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-48.png"; sourceTree = "<group>"; };
+		08A86BDA6B48DD89677FDA88 /* overlay.css */ = {isa = PBXFileReference; includeInIndex = 1; path = overlay.css; sourceTree = "<group>"; };
+		113712A7066B13702A2D6917 /* Readability.js */ = {isa = PBXFileReference; includeInIndex = 1; path = Readability.js; sourceTree = "<group>"; };
+		15596D479A5D0D7345265215 /* overlay.js */ = {isa = PBXFileReference; includeInIndex = 1; path = overlay.js; sourceTree = "<group>"; };
+		155C7D23A470E05538BC8787 /* content.js */ = {isa = PBXFileReference; includeInIndex = 1; path = content.js; sourceTree = "<group>"; };
+		2662E9DB546F37F248F0DE75 /* manifest.json */ = {isa = PBXFileReference; includeInIndex = 1; path = manifest.json; sourceTree = "<group>"; };
+		2DA726110F99D7F38B30E0C3 /* icon-256.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "icon-256.png"; sourceTree = "<group>"; };
+		336BA88D6062B640644E045E /* background.js */ = {isa = PBXFileReference; includeInIndex = 1; path = background.js; sourceTree = "<group>"; };
+		375BDE4B0BE9A3FDCD86C57A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3C69FA3A05A6044A0054D95C /* toolbar-icon-32.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-32.png"; sourceTree = "<group>"; };
+		4586AA0F45F69A2D1FC767DC /* toolbar-icon-16.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-16.png"; sourceTree = "<group>"; };
+		4B0A632B0E777E5FFA671453 /* OpenDyslexic-Regular.woff2 */ = {isa = PBXFileReference; includeInIndex = 1; path = "OpenDyslexic-Regular.woff2"; sourceTree = "<group>"; };
+		4D0597FC2C9EB996C1C0D68C /* SpeedReaderApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeedReaderApp.swift; sourceTree = "<group>"; };
+		4DFBFC19ACD7105EA7C06AF3 /* word-processor.js */ = {isa = PBXFileReference; includeInIndex = 1; path = "word-processor.js"; sourceTree = "<group>"; };
+		57270C891B5A8607F4D7800E /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		60576CF8DFF855A5FBC03458 /* SettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
+		64C4F798A63CCC4C2CF9EFAE /* toolbar-icon-19.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-19.png"; sourceTree = "<group>"; };
+		72D243DCA7839B0A1128F247 /* focus-point.js */ = {isa = PBXFileReference; includeInIndex = 1; path = "focus-point.js"; sourceTree = "<group>"; };
+		78F0C821786D5C099708EEF6 /* icon-48.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "icon-48.png"; sourceTree = "<group>"; };
+		88A4B6630BB0B8A463E914FF /* toolbar-icon-38.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-38.png"; sourceTree = "<group>"; };
+		95C08B51DBDF2C79E03A0E65 /* SpeedReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpeedReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2205A307F3EF0C111669CE3 /* icon-512.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "icon-512.png"; sourceTree = "<group>"; };
+		BA31BAC0466DEE4171A83080 /* icon-64.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "icon-64.png"; sourceTree = "<group>"; };
+		CAFFEE1258C20D75FFDA8F4F /* toolbar-icon-72.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-72.png"; sourceTree = "<group>"; };
+		CDA736A75407BDAE1865E723 /* icon-128.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "icon-128.png"; sourceTree = "<group>"; };
+		EE7C9932756921056EBA7A59 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		02E2FE322F7F7065007CB358 /* Exceptions for "SpeedReaderExtension" folder in "SpeedReaderExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 02E2FE182F7F7065007CB358 /* SpeedReaderExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		02E2FDF22F7F6E15007CB358 /* SpeedReader */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = SpeedReader;
+			sourceTree = "<group>";
+		};
+		02E2FE1A2F7F7065007CB358 /* SpeedReaderExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				02E2FE322F7F7065007CB358 /* Exceptions for "SpeedReaderExtension" folder in "SpeedReaderExtension" target */,
+			);
+			explicitFolders = (
+				Resources/images,
+			);
+			path = SpeedReaderExtension;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		02E2FDED2F7F6E15007CB358 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAB8DCFD212EBA275AADDF48 /* SafariServices.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		02E2FE162F7F7065007CB358 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D9BB2E7900FA26392AB79C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8583EC8C5846A9425A341FF0 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		02E2FDE72F7F6E15007CB358 = {
+			isa = PBXGroup;
+			children = (
+				02E2FE4D2F7F707E007CB358 /* Shared */,
+				02E2FE092F7F6F9E007CB358 /* Models */,
+				02E2FE0D2F7F6F9E007CB358 /* Views */,
+				02E2FDF22F7F6E15007CB358 /* SpeedReader */,
+				02E2FE1A2F7F7065007CB358 /* SpeedReaderExtension */,
+				02E2FDF12F7F6E15007CB358 /* Products */,
+				2097534A20B2DDFF5BD35ACF /* SpeedReader */,
+				93B65BF1B9E6706F62E90922 /* SpeedReaderExtension */,
+				A37BCB2C7E68BF9FC84D9E3E /* Frameworks */,
+				186F1FDC7316F16A3BC64AD0 /* SpeedReaderTests */,
+			);
+			sourceTree = "<group>";
+		};
+		02E2FDF12F7F6E15007CB358 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				02E2FDF02F7F6E15007CB358 /* SpeedReader.app */,
+				02E2FE192F7F7065007CB358 /* SpeedReaderExtension.appex */,
+				95C08B51DBDF2C79E03A0E65 /* SpeedReaderTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		02E2FE092F7F6F9E007CB358 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				02E2FE082F7F6F9E007CB358 /* Settings.swift */,
+			);
+			name = Models;
+			path = SpeedReader/Models;
+			sourceTree = "<group>";
+		};
+		02E2FE0D2F7F6F9E007CB358 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				02E2FE0A2F7F6F9E007CB358 /* ContentView.swift */,
+				02E2FE0B2F7F6F9E007CB358 /* OnboardingView.swift */,
+				02E2FE0C2F7F6F9E007CB358 /* SettingsView.swift */,
+			);
+			name = Views;
+			path = SpeedReader/Views;
+			sourceTree = "<group>";
+		};
+		02E2FE4D2F7F707E007CB358 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		0CC95A975897B0B6DB3C00F1 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				4B0A632B0E777E5FFA671453 /* OpenDyslexic-Regular.woff2 */,
+			);
+			name = fonts;
+			path = fonts;
+			sourceTree = "<group>";
+		};
+		16BE38F5E3D2B4A5DC50CAD7 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				336BA88D6062B640644E045E /* background.js */,
+				155C7D23A470E05538BC8787 /* content.js */,
+				0CC95A975897B0B6DB3C00F1 /* fonts */,
+				6EC5A3CCAD698A36D7BBECAB /* images */,
+				6BC5DE1D105E75B697976892 /* lib */,
+				2662E9DB546F37F248F0DE75 /* manifest.json */,
+				501BEB10C77FF47B8CE52FFC /* rsvp */,
+			);
+			name = Resources;
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		186F1FDC7316F16A3BC64AD0 /* SpeedReaderTests */ = {
+			isa = PBXGroup;
+			children = (
+				60576CF8DFF855A5FBC03458 /* SettingsTests.swift */,
+			);
+			name = SpeedReaderTests;
+			path = SpeedReaderTests;
+			sourceTree = "<group>";
+		};
+		2097534A20B2DDFF5BD35ACF /* SpeedReader */ = {
+			isa = PBXGroup;
+			children = (
+				4D0597FC2C9EB996C1C0D68C /* SpeedReaderApp.swift */,
+			);
+			name = SpeedReader;
+			path = SpeedReader;
+			sourceTree = "<group>";
+		};
+		501BEB10C77FF47B8CE52FFC /* rsvp */ = {
+			isa = PBXGroup;
+			children = (
+				72D243DCA7839B0A1128F247 /* focus-point.js */,
+				08A86BDA6B48DD89677FDA88 /* overlay.css */,
+				15596D479A5D0D7345265215 /* overlay.js */,
+				4DFBFC19ACD7105EA7C06AF3 /* word-processor.js */,
+			);
+			name = rsvp;
+			path = rsvp;
+			sourceTree = "<group>";
+		};
+		6BC5DE1D105E75B697976892 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				113712A7066B13702A2D6917 /* Readability.js */,
+			);
+			name = lib;
+			path = lib;
+			sourceTree = "<group>";
+		};
+		6EC5A3CCAD698A36D7BBECAB /* images */ = {
+			isa = PBXGroup;
+			children = (
+				CDA736A75407BDAE1865E723 /* icon-128.png */,
+				2DA726110F99D7F38B30E0C3 /* icon-256.png */,
+				78F0C821786D5C099708EEF6 /* icon-48.png */,
+				B2205A307F3EF0C111669CE3 /* icon-512.png */,
+				BA31BAC0466DEE4171A83080 /* icon-64.png */,
+				0091ABB7D83EA546A908A891 /* icon-96.png */,
+				4586AA0F45F69A2D1FC767DC /* toolbar-icon-16.png */,
+				64C4F798A63CCC4C2CF9EFAE /* toolbar-icon-19.png */,
+				3C69FA3A05A6044A0054D95C /* toolbar-icon-32.png */,
+				88A4B6630BB0B8A463E914FF /* toolbar-icon-38.png */,
+				042E566B2DEE5872585FEB36 /* toolbar-icon-48.png */,
+				CAFFEE1258C20D75FFDA8F4F /* toolbar-icon-72.png */,
+			);
+			name = images;
+			path = images;
+			sourceTree = "<group>";
+		};
+		93B65BF1B9E6706F62E90922 /* SpeedReaderExtension */ = {
+			isa = PBXGroup;
+			children = (
+				57270C891B5A8607F4D7800E /* SafariWebExtensionHandler.swift */,
+				375BDE4B0BE9A3FDCD86C57A /* Info.plist */,
+				16BE38F5E3D2B4A5DC50CAD7 /* Resources */,
+			);
+			name = SpeedReaderExtension;
+			path = SpeedReaderExtension;
+			sourceTree = "<group>";
+		};
+		A37BCB2C7E68BF9FC84D9E3E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EE7C9932756921056EBA7A59 /* SafariServices.framework */,
+				E007297FFA46C10FD17F9F6E /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E007297FFA46C10FD17F9F6E /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				01C47E9825806A930B7A8484 /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		02E2FDEF2F7F6E15007CB358 /* SpeedReader */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 02E2FDFB2F7F6E16007CB358 /* Build configuration list for PBXNativeTarget "SpeedReader" */;
+			buildPhases = (
+				02E2FDEC2F7F6E15007CB358 /* Sources */,
+				02E2FDED2F7F6E15007CB358 /* Frameworks */,
+				02E2FDEE2F7F6E15007CB358 /* Resources */,
+				02E2FE362F7F7065007CB358 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				02E2FE302F7F7065007CB358 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				02E2FDF22F7F6E15007CB358 /* SpeedReader */,
+			);
+			name = SpeedReader;
+			productName = SpeedReader;
+			productReference = 02E2FDF02F7F6E15007CB358 /* SpeedReader.app */;
+			productType = "com.apple.product-type.application";
+		};
+		02E2FE182F7F7065007CB358 /* SpeedReaderExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 02E2FE332F7F7065007CB358 /* Build configuration list for PBXNativeTarget "SpeedReaderExtension" */;
+			buildPhases = (
+				02E2FE152F7F7065007CB358 /* Sources */,
+				02E2FE162F7F7065007CB358 /* Frameworks */,
+				02E2FE172F7F7065007CB358 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				02E2FE1A2F7F7065007CB358 /* SpeedReaderExtension */,
+			);
+			name = SpeedReaderExtension;
+			productName = SpeedReaderExtension;
+			productReference = 02E2FE192F7F7065007CB358 /* SpeedReaderExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		C6309D8D6C327E36BF2B673F /* SpeedReaderTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA807B1B02D57CA84419681B /* Build configuration list for PBXNativeTarget "SpeedReaderTests" */;
+			buildPhases = (
+				ED1FD65A560CDB662994501D /* Sources */,
+				3D9BB2E7900FA26392AB79C7 /* Frameworks */,
+				3927423A1E99A0BB5DF309E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				91EDBB3D2089089D9652DA3C /* PBXTargetDependency */,
+			);
+			name = SpeedReaderTests;
+			productName = SpeedReaderTests;
+			productReference = 95C08B51DBDF2C79E03A0E65 /* SpeedReaderTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		02E2FDE82F7F6E15007CB358 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					02E2FDEF2F7F6E15007CB358 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+					02E2FE182F7F7065007CB358 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+				};
+			};
+			buildConfigurationList = 02E2FDEB2F7F6E15007CB358 /* Build configuration list for PBXProject "SpeedReader" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 02E2FDE72F7F6E15007CB358;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 02E2FDF12F7F6E15007CB358 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				02E2FDEF2F7F6E15007CB358 /* SpeedReader */,
+				02E2FE182F7F7065007CB358 /* SpeedReaderExtension */,
+				C6309D8D6C327E36BF2B673F /* SpeedReaderTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		02E2FDEE2F7F6E15007CB358 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		02E2FE172F7F7065007CB358 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A51B026E2FB7F1F9030AE110 /* background.js in Resources */,
+				A02C1E7DD3352C9E28B80F91 /* content.js in Resources */,
+				A504339B9FF7DC5BF5CD9B27 /* OpenDyslexic-Regular.woff2 in Resources */,
+				788CF3F0745CACC88B6FD3A5 /* icon-128.png in Resources */,
+				999A0B7B3E9CF6018D8A0ADF /* icon-256.png in Resources */,
+				911C4EA4CA18B73F30A21BB4 /* icon-48.png in Resources */,
+				48FCA143BF399C387037D81B /* icon-512.png in Resources */,
+				E42B3C02D637304DA72F12DC /* icon-64.png in Resources */,
+				5CA2565520B2E716D3A553BE /* icon-96.png in Resources */,
+				0989A66035529726AA8D3585 /* toolbar-icon-16.png in Resources */,
+				A47CDB11F84049FC292C6B66 /* toolbar-icon-19.png in Resources */,
+				D34F1079F9E7ADE93DFE7C7A /* toolbar-icon-32.png in Resources */,
+				7AE95D2EE93DB5249B5A178D /* toolbar-icon-38.png in Resources */,
+				C39DA992C82EB5842E7DFD6D /* toolbar-icon-48.png in Resources */,
+				F0569B338845840B71B6D212 /* toolbar-icon-72.png in Resources */,
+				C046EB48F426B4E631D272B6 /* Readability.js in Resources */,
+				10A2A1E3E8D6D194B037DDC9 /* manifest.json in Resources */,
+				9BBBF3E66EBBBFF67255B557 /* focus-point.js in Resources */,
+				0AD203D7953EA09F2C6B7B07 /* overlay.css in Resources */,
+				4096BCD140BB50A6E096992D /* overlay.js in Resources */,
+				960D360CC604419E248D2FD7 /* word-processor.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3927423A1E99A0BB5DF309E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		02E2FDEC2F7F6E15007CB358 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02E2FE0E2F7F6F9E007CB358 /* Settings.swift in Sources */,
+				02E2FE0F2F7F6F9E007CB358 /* SettingsView.swift in Sources */,
+				02E2FE102F7F6F9E007CB358 /* OnboardingView.swift in Sources */,
+				02E2FE112F7F6F9E007CB358 /* ContentView.swift in Sources */,
+				8C9DEF341921D79BD47B1A7C /* SettingsKeys.swift in Sources */,
+				36D5E08F108FB92A242E4979 /* SpeedReaderApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		02E2FE152F7F7065007CB358 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABC84A71AB9B9F43D28F006A /* SettingsKeys.swift in Sources */,
+				82122095B9DA95903C1FE117 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ED1FD65A560CDB662994501D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */,
+				AA0000000000000000000001 /* Settings.swift in Sources */,
+				AA0000000000000000000002 /* SettingsKeys.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		02E2FE302F7F7065007CB358 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 02E2FE182F7F7065007CB358 /* SpeedReaderExtension */;
+			targetProxy = 02E2FE2F2F7F7065007CB358 /* PBXContainerItemProxy */;
+		};
+		91EDBB3D2089089D9652DA3C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SpeedReader;
+			target = 02E2FDEF2F7F6E15007CB358 /* SpeedReader */;
+			targetProxy = A55BD1969DEEB98A966E509F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		02E2FDF92F7F6E16007CB358 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		02E2FDFA2F7F6E16007CB358 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		02E2FDFC2F7F6E16007CB358 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SpeedReader/SpeedReader.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4AKSB2RDBU;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chriscantu.SpeedReader;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Debug;
+		};
+		02E2FDFD2F7F6E16007CB358 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SpeedReader/SpeedReader.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4AKSB2RDBU;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chriscantu.SpeedReader;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Release;
+		};
+		02E2FE342F7F7065007CB358 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SpeedReaderExtension/SpeedReaderExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4AKSB2RDBU;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SpeedReaderExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SpeedReaderExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.chriscantu.SpeedReader.SpeedReaderExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = xros;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				XROS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Debug;
+		};
+		02E2FE352F7F7065007CB358 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SpeedReaderExtension/SpeedReaderExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4AKSB2RDBU;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SpeedReaderExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SpeedReaderExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.chriscantu.SpeedReader.SpeedReaderExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				XROS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Release;
+		};
+		3B865454FB317964B213BC92 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4AKSB2RDBU;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chriscantu.SpeedReader.SpeedReaderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+			};
+			name = Debug;
+		};
+		E16705D186796CF7BED25E3E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4AKSB2RDBU;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chriscantu.SpeedReader.SpeedReaderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		02E2FDEB2F7F6E15007CB358 /* Build configuration list for PBXProject "SpeedReader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				02E2FDF92F7F6E16007CB358 /* Debug */,
+				02E2FDFA2F7F6E16007CB358 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		02E2FDFB2F7F6E16007CB358 /* Build configuration list for PBXNativeTarget "SpeedReader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				02E2FDFC2F7F6E16007CB358 /* Debug */,
+				02E2FDFD2F7F6E16007CB358 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		02E2FE332F7F7065007CB358 /* Build configuration list for PBXNativeTarget "SpeedReaderExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				02E2FE342F7F7065007CB358 /* Debug */,
+				02E2FE352F7F7065007CB358 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA807B1B02D57CA84419681B /* Build configuration list for PBXNativeTarget "SpeedReaderTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E16705D186796CF7BED25E3E /* Release */,
+				3B865454FB317964B213BC92 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 02E2FDE82F7F6E15007CB358 /* Project object */;
+}

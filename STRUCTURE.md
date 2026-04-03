@@ -20,18 +20,22 @@ ios-speed-reader/
 │   │   └── Assets.xcassets             # App icons, colors
 │   │
 │   ├── SpeedReaderExtension/           # Safari Web Extension target
-│   │   ├── manifest.json               # WebExtension manifest
-│   │   ├── background.js               # Settings sync, message routing
-│   │   ├── content.js                  # Text extraction, overlay injection
-│   │   ├── rsvp/                       # RSVP reader UI
-│   │   │   ├── overlay.js              # Overlay UI logic
-│   │   │   ├── overlay.css             # Shadow DOM styles (light + dark)
-│   │   │   ├── focus-point.js          # ORP calculation
-│   │   │   └── word-processor.js       # Text splitting, punctuation timing
-│   │   ├── lib/
-│   │   │   └── readability.js          # Mozilla Readability (vendored)
-│   │   └── fonts/
-│   │       └── OpenDyslexic.woff2      # Bundled font
+│   │   ├── SafariWebExtensionHandler.swift  # Native extension handler
+│   │   ├── Info.plist                  # Extension configuration
+│   │   └── Resources/                  # Web resources (JS, CSS, fonts)
+│   │       ├── manifest.json           # WebExtension manifest
+│   │       ├── background.js           # Settings sync, message routing
+│   │       ├── content.js              # Text extraction, overlay injection
+│   │       ├── rsvp/                   # RSVP reader UI
+│   │       │   ├── overlay.js          # Overlay UI logic
+│   │       │   ├── overlay.css         # Shadow DOM styles (light + dark)
+│   │       │   ├── focus-point.js      # ORP calculation
+│   │       │   └── word-processor.js   # Text splitting, punctuation timing
+│   │       ├── lib/
+│   │       │   └── Readability.js      # Mozilla Readability (vendored)
+│   │       ├── fonts/
+│   │       │   └── OpenDyslexic-Regular.woff2  # Bundled font
+│   │       └── images/                 # Extension icons (various sizes)
 │   │
 │   ├── Shared/                         # Code shared between app + extension
 │   │   └── SettingsKeys.swift          # App Group keys, defaults
@@ -53,7 +57,7 @@ ios-speed-reader/
 
 ## Tech Stack
 
-- **Swift / SwiftUI** — container app, iOS 17+ / iPadOS 17+ / macOS 14+
+- **Swift / SwiftUI** — container app, iOS 26+ / macOS 26+
 - **JavaScript (ES2020+)** — Safari Web Extension (content script, background script)
 - **Readability.js** — Mozilla's text extraction library (vendored, not npm)
 - **Shadow DOM** — overlay isolation from page styles
@@ -65,10 +69,11 @@ ios-speed-reader/
 |------|-------|
 | Swift UI views | `SpeedReader/SpeedReader/Views/` |
 | Swift models | `SpeedReader/SpeedReader/Models/` |
-| Extension JS (core) | `SpeedReader/SpeedReaderExtension/` |
-| RSVP reader code | `SpeedReader/SpeedReaderExtension/rsvp/` |
-| Vendored libraries | `SpeedReader/SpeedReaderExtension/lib/` |
-| Bundled fonts | `SpeedReader/SpeedReaderExtension/fonts/` |
+| Extension JS (core) | `SpeedReader/SpeedReaderExtension/Resources/` |
+| RSVP reader code | `SpeedReader/SpeedReaderExtension/Resources/rsvp/` |
+| Vendored libraries | `SpeedReader/SpeedReaderExtension/Resources/lib/` |
+| Bundled fonts | `SpeedReader/SpeedReaderExtension/Resources/fonts/` |
+| Extension icons | `SpeedReader/SpeedReaderExtension/Resources/images/` |
 | Shared Swift code | `SpeedReader/Shared/` |
 | Design specs | `docs/superpowers/specs/` |
 | Implementation plans | `docs/plans/` |
@@ -84,8 +89,23 @@ open SpeedReader/SpeedReader.xcodeproj
 # After first run: enable the extension in Safari > Settings > Extensions
 ```
 
-## Testing
+## Testing & Linting
 
-- Run tests from Xcode: ⌘U
-- JavaScript tests: TBD (will add test runner for extension code)
+```bash
+make test-all     # Run JS + Swift tests
+make lint-all     # Run ESLint + SwiftLint
+make ci           # Run everything (lint + test)
+```
+
+- **Swift tests**: `make test-swift` (or Xcode ⌘U)
+- **JS tests**: `make test-js` (Node.js test runner)
+- **SwiftLint**: `make lint-swift` (enforces style + safety rules)
+- **ESLint**: `make lint-js` (enforces JS quality rules)
 - Test on all three platforms: iPhone simulator, iPad simulator, Mac (native)
+
+## CI
+
+GitHub Actions runs on every push to `main` and on pull requests:
+- JS tests + ESLint (ubuntu)
+- SwiftLint (ubuntu)
+- Swift build + test on macOS, iOS simulator build

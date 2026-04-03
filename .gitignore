@@ -1,1 +1,8 @@
 .superpowers/
+.DS_Store
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.claude/settings.json
+node_modules/

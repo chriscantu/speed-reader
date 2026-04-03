@@ -1,0 +1,40 @@
+# SwiftLint configuration for SpeedReader
+
+# Only lint project source files
+included:
+  - SpeedReader
+
+excluded:
+  - SpeedReader/SpeedReaderExtension/Resources
+
+# Rules
+opt_in_rules:
+  - closure_spacing
+  - empty_count
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - overridden_super_call
+  - private_over_fileprivate
+  - redundant_nil_coalescing
+  - sorted_imports
+  - vertical_whitespace_closing_braces
+
+disabled_rules:
+  - trailing_comma
+
+# Thresholds
+line_length:
+  warning: 120
+  error: 200
+
+function_body_length:
+  warning: 60
+  error: 100
+
+file_length:
+  warning: 400
+  error: 600
+
+type_body_length:
+  warning: 300
+  error: 500
