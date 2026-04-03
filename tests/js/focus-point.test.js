@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateFocusPoint, splitWordAtFocus } from '../../SpeedReader/SpeedReaderExtension/rsvp/focus-point.js';
+import { calculateFocusPoint, splitWordAtFocus } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/focus-point.js';
 
 describe('calculateFocusPoint', () => {
   it('returns 0 for single-character words', () => {

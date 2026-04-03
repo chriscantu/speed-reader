@@ -20,18 +20,22 @@ ios-speed-reader/
 │   │   └── Assets.xcassets             # App icons, colors
 │   │
 │   ├── SpeedReaderExtension/           # Safari Web Extension target
-│   │   ├── manifest.json               # WebExtension manifest
-│   │   ├── background.js               # Settings sync, message routing
-│   │   ├── content.js                  # Text extraction, overlay injection
-│   │   ├── rsvp/                       # RSVP reader UI
-│   │   │   ├── overlay.js              # Overlay UI logic
-│   │   │   ├── overlay.css             # Shadow DOM styles (light + dark)
-│   │   │   ├── focus-point.js          # ORP calculation
-│   │   │   └── word-processor.js       # Text splitting, punctuation timing
-│   │   ├── lib/
-│   │   │   └── readability.js          # Mozilla Readability (vendored)
-│   │   └── fonts/
-│   │       └── OpenDyslexic.woff2      # Bundled font
+│   │   ├── SafariWebExtensionHandler.swift  # Native extension handler
+│   │   ├── Info.plist                  # Extension configuration
+│   │   └── Resources/                  # Web resources (JS, CSS, fonts)
+│   │       ├── manifest.json           # WebExtension manifest
+│   │       ├── background.js           # Settings sync, message routing
+│   │       ├── content.js              # Text extraction, overlay injection
+│   │       ├── rsvp/                   # RSVP reader UI
+│   │       │   ├── overlay.js          # Overlay UI logic
+│   │       │   ├── overlay.css         # Shadow DOM styles (light + dark)
+│   │       │   ├── focus-point.js      # ORP calculation
+│   │       │   └── word-processor.js   # Text splitting, punctuation timing
+│   │       ├── lib/
+│   │       │   └── Readability.js      # Mozilla Readability (vendored)
+│   │       ├── fonts/
+│   │       │   └── OpenDyslexic-Regular.woff2  # Bundled font
+│   │       └── images/                 # Extension icons (various sizes)
 │   │
 │   ├── Shared/                         # Code shared between app + extension
 │   │   └── SettingsKeys.swift          # App Group keys, defaults
@@ -53,7 +57,7 @@ ios-speed-reader/
 
 ## Tech Stack
 
-- **Swift / SwiftUI** — container app, iOS 17+ / iPadOS 17+ / macOS 14+
+- **Swift / SwiftUI** — container app, iOS 26+ / macOS 26+
 - **JavaScript (ES2020+)** — Safari Web Extension (content script, background script)
 - **Readability.js** — Mozilla's text extraction library (vendored, not npm)
 - **Shadow DOM** — overlay isolation from page styles
@@ -65,10 +69,11 @@ ios-speed-reader/
 |------|-------|
 | Swift UI views | `SpeedReader/SpeedReader/Views/` |
 | Swift models | `SpeedReader/SpeedReader/Models/` |
-| Extension JS (core) | `SpeedReader/SpeedReaderExtension/` |
-| RSVP reader code | `SpeedReader/SpeedReaderExtension/rsvp/` |
-| Vendored libraries | `SpeedReader/SpeedReaderExtension/lib/` |
-| Bundled fonts | `SpeedReader/SpeedReaderExtension/fonts/` |
+| Extension JS (core) | `SpeedReader/SpeedReaderExtension/Resources/` |
+| RSVP reader code | `SpeedReader/SpeedReaderExtension/Resources/rsvp/` |
+| Vendored libraries | `SpeedReader/SpeedReaderExtension/Resources/lib/` |
+| Bundled fonts | `SpeedReader/SpeedReaderExtension/Resources/fonts/` |
+| Extension icons | `SpeedReader/SpeedReaderExtension/Resources/images/` |
 | Shared Swift code | `SpeedReader/Shared/` |
 | Design specs | `docs/superpowers/specs/` |
 | Implementation plans | `docs/plans/` |

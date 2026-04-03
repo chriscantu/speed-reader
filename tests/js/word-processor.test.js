@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { processText, calculateDelay } from '../../SpeedReader/SpeedReaderExtension/rsvp/word-processor.js';
+import { processText, calculateDelay } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/word-processor.js';
 
 describe('processText', () => {
   it('splits text into words on whitespace', () => {

@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(macOS)
+import SafariServices
+#endif
 
 struct OnboardingView: View {
     @Binding var extensionEnabled: Bool
@@ -10,7 +13,7 @@ struct OnboardingView: View {
 
             Image(systemName: "book.pages")
                 .font(.system(size: 64))
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
 
             Text("SpeedReader")
                 .font(.largeTitle)
@@ -36,7 +39,7 @@ struct OnboardingView: View {
             #if os(macOS)
             Button("Open Safari Settings") {
                 SFSafariApplication.showPreferencesForExtension(
-                    withIdentifier: "com.speedreader.SpeedReader.SpeedReaderExtension"
+                    withIdentifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
                 ) { error in
                     if let error {
                         print("[SpeedReader] Could not open settings: \(error)")
@@ -73,7 +76,7 @@ struct OnboardingView: View {
                 .font(.caption)
                 .fontWeight(.bold)
                 .frame(width: 24, height: 24)
-                .background(.accent)
+                .background(Color.accentColor)
                 .foregroundStyle(.white)
                 .clipShape(Circle())
 
@@ -85,7 +88,7 @@ struct OnboardingView: View {
     private func checkExtensionStatus() {
         #if os(macOS)
         SFSafariExtensionManager.getStateOfSafariExtension(
-            withIdentifier: "com.speedreader.SpeedReader.SpeedReaderExtension"
+            withIdentifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
         ) { state, error in
             DispatchQueue.main.async {
                 hasChecked = true
