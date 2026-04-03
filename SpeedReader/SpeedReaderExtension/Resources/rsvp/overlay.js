@@ -27,6 +27,9 @@ export class RSVPOverlay {
     }
 
     Object.assign(this.settings, settings);
+    if (settings.wpm !== undefined) {
+      this.wpm = Math.max(100, Math.min(600, settings.wpm));
+    }
     this.title = title || '';
     this.words = processText(text);
 
