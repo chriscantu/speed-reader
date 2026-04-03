@@ -5,3 +5,4 @@ xcuserdata/
 DerivedData/
 build/
 .claude/settings.json
+node_modules/

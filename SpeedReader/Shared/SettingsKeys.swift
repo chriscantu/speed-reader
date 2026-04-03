@@ -17,9 +17,9 @@ enum ReaderFont: String, CaseIterable, Identifiable {
 
 /// Theme options for the RSVP reader.
 enum ReaderTheme: String, CaseIterable, Identifiable {
-    case system = "system"
-    case light = "light"
-    case dark = "dark"
+    case system
+    case light
+    case dark
 
     var id: String { rawValue }
 

@@ -1,5 +1,5 @@
-import SafariServices
 import os.log
+import SafariServices
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
@@ -51,7 +51,8 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             "font": defaults.string(forKey: SettingsKeys.font) ?? SettingsKeys.Defaults.font.rawValue,
             "theme": defaults.string(forKey: SettingsKeys.theme) ?? SettingsKeys.Defaults.theme.rawValue,
             "fontSize": defaults.object(forKey: SettingsKeys.fontSize) ?? SettingsKeys.Defaults.fontSize,
-            "punctuationPause": defaults.object(forKey: SettingsKeys.punctuationPause) ?? SettingsKeys.Defaults.punctuationPause,
+            "punctuationPause": defaults.object(forKey: SettingsKeys.punctuationPause)
+                ?? SettingsKeys.Defaults.punctuationPause,
         ]
     }
 

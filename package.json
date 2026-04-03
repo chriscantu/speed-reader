@@ -7,5 +7,9 @@
     "test": "node --test tests/js/*.test.js",
     "test:word-processor": "node --test tests/js/word-processor.test.js",
     "test:focus-point": "node --test tests/js/focus-point.test.js"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.4",
+    "globals": "^15.15.0"
   }
 }

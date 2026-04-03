@@ -89,7 +89,7 @@ struct OnboardingView: View {
         #if os(macOS)
         SFSafariExtensionManager.getStateOfSafariExtension(
             withIdentifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
-        ) { state, error in
+        ) { state, _ in
             DispatchQueue.main.async {
                 hasChecked = true
                 extensionEnabled = state?.isEnabled ?? false

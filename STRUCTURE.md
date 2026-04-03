@@ -89,8 +89,23 @@ open SpeedReader/SpeedReader.xcodeproj
 # After first run: enable the extension in Safari > Settings > Extensions
 ```
 
-## Testing
+## Testing & Linting
 
-- Run tests from Xcode: ⌘U
-- JavaScript tests: TBD (will add test runner for extension code)
+```bash
+make test-all     # Run JS + Swift tests
+make lint-all     # Run ESLint + SwiftLint
+make ci           # Run everything (lint + test)
+```
+
+- **Swift tests**: `make test-swift` (or Xcode ⌘U)
+- **JS tests**: `make test-js` (Node.js test runner)
+- **SwiftLint**: `make lint-swift` (enforces style + safety rules)
+- **ESLint**: `make lint-js` (enforces JS quality rules)
 - Test on all three platforms: iPhone simulator, iPad simulator, Mac (native)
+
+## CI
+
+GitHub Actions runs on every push to `main` and on pull requests:
+- JS tests + ESLint (ubuntu)
+- SwiftLint (ubuntu)
+- Swift build + test on macOS, iOS simulator build

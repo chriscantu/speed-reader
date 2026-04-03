@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  js:
+    name: JS Tests & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: npm ci
+
+      - name: ESLint
+        run: npx eslint .
+
+      - name: Unit tests
+        run: npm test
+
+  swift-lint:
+    name: SwiftLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SwiftLint
+        uses: norio-nomura/action-swiftlint@3.2.1
+        with:
+          args: --strict
+
+  swift-build-test:
+    name: Swift Build & Test
+    # Requires Xcode 26+ for iOS 26 / macOS 26 deployment targets.
+    # Update runner when GitHub adds newer Xcode versions.
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          ls /Applications/Xcode*.app/Contents/Developer 2>/dev/null || true
+          sudo xcode-select -p
+
+      - name: Build (macOS)
+        run: |
+          xcodebuild build \
+            -project SpeedReader/SpeedReader.xcodeproj \
+            -scheme SpeedReader \
+            -destination 'platform=macOS' \
+            -quiet
+
+      - name: Test (macOS)
+        run: |
+          xcodebuild test \
+            -project SpeedReader/SpeedReader.xcodeproj \
+            -scheme SpeedReader \
+            -destination 'platform=macOS' \
+            -quiet
+
+      - name: Build (iOS simulator)
+        run: |
+          xcodebuild build \
+            -project SpeedReader/SpeedReader.xcodeproj \
+            -scheme SpeedReader \
+            -destination 'generic/platform=iOS Simulator' \
+            -quiet

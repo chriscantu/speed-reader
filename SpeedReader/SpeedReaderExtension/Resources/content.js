@@ -21,7 +21,7 @@ async function extractAndLaunch() {
   var reader;
   try {
     reader = await getOverlay();
-  } catch (e) {
+  } catch (_e) {
     return; // Toast already shown by getOverlay
   }
 
