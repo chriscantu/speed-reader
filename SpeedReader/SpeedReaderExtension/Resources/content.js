@@ -117,7 +117,7 @@ function showToast(message) {
 }
 
 // Listen for messages from background script
-browser.runtime.onMessage.addListener(function(message) {
+browser.runtime.onMessage.addListener(function(message, _sender, sendResponse) {
   if (message.action === 'toggle-reader') {
     getOverlay().then(function(reader) {
       if (reader.host) {
@@ -129,5 +129,17 @@ browser.runtime.onMessage.addListener(function(message) {
       console.error('[SpeedReader] toggle-reader failed:', err);
       showToast('Something went wrong. Try reloading the page.');
     });
+  }
+
+  if (message.action === 'get-state') {
+    var state = { overlayOpen: false };
+    if (overlay && overlay.host) {
+      state.overlayOpen = true;
+      state.isPlaying = overlay.isPlaying;
+      state.wordCount = overlay.words.length;
+      state.currentIndex = overlay.currentIndex;
+      state.wpm = overlay.wpm;
+    }
+    sendResponse(state);
   }
 });

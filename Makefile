@@ -1,4 +1,4 @@
-.PHONY: test-js test-swift test-all lint-js lint-swift lint-all ci
+.PHONY: test-js test-swift test-all lint-js lint-swift lint-all ci test-regression
 
 test-js:
 	node --test tests/js/*.test.js
@@ -21,3 +21,6 @@ lint-swift:
 lint-all: lint-js lint-swift
 
 ci: lint-all test-all
+
+test-regression:
+	./scripts/regression-test.sh

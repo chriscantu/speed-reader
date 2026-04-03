@@ -35,6 +35,9 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 response.userInfo = [SFExtensionMessageKey: ["error": "Missing or invalid settings payload"]]
             }
 
+        case "ping":
+            response.userInfo = [SFExtensionMessageKey: ["status": "ok", "version": "1.0.0"]]
+
         default:
             os_log(.default, "[SpeedReader] Unknown action: %{public}@", action)
             response.userInfo = [SFExtensionMessageKey: ["error": "Unknown action"]]

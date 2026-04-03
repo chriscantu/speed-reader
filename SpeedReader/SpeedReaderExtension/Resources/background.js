@@ -61,3 +61,16 @@ browser.runtime.onInstalled.addListener(() => {
 
 // Sync settings from native app whenever the service worker starts
 syncSettingsFromNative();
+
+// Test hook — allows querying overlay state from native handler
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'test-get-state') {
+    browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+      if (tabs[0]) {
+        return browser.tabs.sendMessage(tabs[0].id, { action: 'get-state' });
+      }
+      return { error: 'No active tab' };
+    }).then(sendResponse).catch(() => sendResponse({ error: 'Could not reach content script' }));
+    return true; // async response
+  }
+});
