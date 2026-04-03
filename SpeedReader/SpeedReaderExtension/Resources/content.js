@@ -6,7 +6,7 @@ let pendingSelectionMode = false;
 
 async function getOverlay() {
   if (overlay) return overlay;
-  const overlayModule = await import(browser.runtime.getURL('rsvp/overlay.js'));
+  const overlayModule = await import(browser.runtime.getURL('overlay.js'));
   overlay = new overlayModule.RSVPOverlay();
   return overlay;
 }
@@ -30,7 +30,7 @@ async function extractAndLaunch() {
   }
 
   try {
-    const readabilityModule = await import(browser.runtime.getURL('lib/Readability.js'));
+    const readabilityModule = await import(browser.runtime.getURL('Readability.js'));
     const Readability = readabilityModule.Readability;
 
     // Clone the document so Readability doesn't mutate the live DOM

@@ -23,12 +23,12 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "rsvp/overlay.css",
-        "rsvp/overlay.js",
-        "rsvp/word-processor.js",
-        "rsvp/focus-point.js",
-        "lib/Readability.js",
-        "fonts/OpenDyslexic-Regular.woff2"
+        "overlay.css",
+        "overlay.js",
+        "word-processor.js",
+        "focus-point.js",
+        "Readability.js",
+        "OpenDyslexic-Regular.woff2"
       ],
       "matches": ["<all_urls>"]
     }

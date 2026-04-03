@@ -269,7 +269,7 @@ export class RSVPOverlay {
     // Link stylesheet
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = browser.runtime.getURL('rsvp/overlay.css');
+    link.href = browser.runtime.getURL('overlay.css');
     this.shadow.appendChild(link);
 
     // Override word size if custom
