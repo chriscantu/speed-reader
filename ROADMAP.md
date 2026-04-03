@@ -14,6 +14,15 @@
 - [x] SwiftUI container app with settings + onboarding
 - [x] Keyboard shortcuts on Mac (Space, arrows, ESC)
 
+## v1.1 — Test Coverage & Hardening
+
+- [ ] RSVPOverlay state machine tests (play/pause/nav/wpm clamping) — extract testable logic or use DOM shim
+- [ ] Content script decision tree tests (selection priority, Readability fallback, error paths)
+- [ ] Settings persistence round-trip test (write → new instance → verify)
+- [ ] Settings init with pre-populated out-of-range UserDefaults test
+- [ ] Guard `splitWordAtFocus` and `calculateDelay` against empty string input
+- [ ] Settings test isolation — inject ephemeral UserDefaults to prevent test pollution
+
 ## v2 — Enhanced Navigation
 
 - [ ] Scrubber/progress bar — draggable video-player-style position control
