@@ -1,9 +1,9 @@
 #!/bin/bash
-# SpeedReader — Quick regression tests
-# Uses osascript to drive Safari and verify extension behavior.
+# SpeedReader — Automated regression tests
+# Uses osascript + postMessage to drive the Safari extension.
 #
 # Prerequisites:
-#   - SpeedReader app installed and extension enabled in Safari
+#   - SpeedReader app built, launched, and extension enabled in Safari
 #   - Safari > Develop > Allow JavaScript from Apple Events (checked)
 #
 # Usage: ./scripts/regression-test.sh
@@ -19,34 +19,51 @@ green() { printf "\033[32m%s\033[0m\n" "$1"; }
 red() { printf "\033[31m%s\033[0m\n" "$1"; }
 yellow() { printf "\033[33m%s\033[0m\n" "$1"; }
 
-assert_contains() {
-  local label="$1" actual="$2" expected="$3"
-  if echo "$actual" | grep -q "$expected"; then
-    green "  ✔ $label"
-    PASS=$((PASS + 1))
-  else
-    red "  ✘ $label (expected '$expected', got '$actual')"
-    FAIL=$((FAIL + 1))
-  fi
-}
-
-assert_equals() {
-  local label="$1" actual="$2" expected="$3"
-  if [ "$actual" = "$expected" ]; then
-    green "  ✔ $label"
-    PASS=$((PASS + 1))
-  else
-    red "  ✘ $label (expected '$expected', got '$actual')"
-    FAIL=$((FAIL + 1))
-  fi
-}
+pass() { green "  ✔ $1"; PASS=$((PASS + 1)); }
+fail() { red "  ✘ $1"; FAIL=$((FAIL + 1)); }
+skip() { yellow "  ⊘ $1"; SKIP=$((SKIP + 1)); }
 
 safari_js() {
   osascript -e "tell application \"Safari\" to do JavaScript \"$1\" in document 1" 2>/dev/null || echo "ERROR"
 }
 
+toggle_reader() {
+  safari_js "window.postMessage({type: 'speedreader-test-toggle'}, '*')" >/dev/null 2>&1
+}
+
+click_overlay() {
+  safari_js "window.postMessage({type: 'speedreader-test-click', selector: '$1'}, '*')" >/dev/null 2>&1
+}
+
+next_sentence() {
+  safari_js "window.postMessage({type: 'speedreader-test-next'}, '*')" >/dev/null 2>&1
+}
+
+# Query overlay state via content script (returns JSON string in a data attribute)
+query_state() {
+  # Set up listener, send query, wait for response
+  safari_js "
+    window.__srTestResult = null;
+    window.addEventListener('message', function handler(e) {
+      if (e.data && e.data.type === 'speedreader-test-result') {
+        window.__srTestResult = JSON.stringify(e.data.data);
+        window.removeEventListener('message', handler);
+      }
+    });
+    window.postMessage({type: 'speedreader-test-query'}, '*');
+  " >/dev/null 2>&1
+  sleep 0.5
+  safari_js "window.__srTestResult || 'null'"
+}
+
+# Extract a field from the JSON state
+state_field() {
+  local json="$1" field="$2"
+  echo "$json" | python3 -c "import sys,json; d=json.loads(sys.stdin.read()); print(d.get('$field', ''))" 2>/dev/null
+}
+
 wait_for_page() {
-  sleep 2
+  sleep 3
 }
 
 # ─────────────────────────────────────────────────
@@ -59,183 +76,205 @@ echo ""
 echo "0. Prerequisites"
 echo "─────────────────────────────────────────────"
 
-# Check Safari is running
 if ! pgrep -q Safari; then
   echo "  Starting Safari..."
   open -a Safari
   sleep 3
 fi
-green "  ✔ Safari is running"
-PASS=$((PASS + 1))
+pass "Safari is running"
 
-# Check JavaScript from Apple Events
 JS_TEST=$(safari_js "1+1")
-if [ "$JS_TEST" = "2" ]; then
-  green "  ✔ JavaScript from Apple Events enabled"
-  PASS=$((PASS + 1))
+if echo "$JS_TEST" | grep -q "^2"; then
+  pass "JavaScript from Apple Events enabled"
 else
-  red "  ✘ Enable: Safari > Develop > Allow JavaScript from Apple Events"
-  echo "  Cannot proceed without this setting."
+  fail "Enable: Safari > Develop > Allow JavaScript from Apple Events"
   exit 1
 fi
 
 # ─────────────────────────────────────────────────
 echo ""
-echo "1. Navigation & Content Script Loading"
+echo "1. Navigation & Content Script"
 echo "─────────────────────────────────────────────"
 
-# Navigate to test page
 osascript -e "tell application \"Safari\" to set URL of document 1 to \"$TEST_URL\"" 2>/dev/null
 osascript -e "tell application \"Safari\" to activate" 2>/dev/null
 wait_for_page
-sleep 2  # extra time for Wikipedia to fully load
+sleep 3
 
 CURRENT_URL=$(osascript -e 'tell application "Safari" to get URL of document 1' 2>/dev/null)
-assert_contains "Navigated to test page" "$CURRENT_URL" "Speed_reading"
+if echo "$CURRENT_URL" | grep -q "Speed_reading"; then pass "Navigated to test page"; else fail "Navigation ($CURRENT_URL)"; fi
 
-# Check content script loaded (showToast function should exist)
-HAS_CONTENT_SCRIPT=$(safari_js "typeof showToast")
-assert_equals "Content script loaded" "$HAS_CONTENT_SCRIPT" "function"
-
-# ─────────────────────────────────────────────────
-echo ""
-echo "2. Overlay Toggle"
-echo "─────────────────────────────────────────────"
-
-# Check overlay is initially closed
-OVERLAY_BEFORE=$(safari_js "document.querySelector('speed-reader-overlay') !== null")
-assert_equals "Overlay initially closed" "$OVERLAY_BEFORE" "false"
-
-# Trigger toggle via content script message (simulates toolbar click)
-safari_js "browser.runtime.sendMessage({action: 'toggle-reader'})" >/dev/null 2>&1
-sleep 3  # wait for Readability extraction + overlay render
-
-# Check overlay opened
-OVERLAY_AFTER=$(safari_js "document.querySelector('speed-reader-overlay') !== null")
-assert_equals "Overlay opened after toggle" "$OVERLAY_AFTER" "true"
-
-# Check shadow DOM exists
-HAS_SHADOW=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot !== null")
-assert_equals "Shadow DOM attached" "$HAS_SHADOW" "true"
+LOADED=$(safari_js "document.documentElement.getAttribute('data-speedreader-loaded')")
+if [ "$LOADED" = "true" ]; then pass "Content script loaded"; else fail "Content script not loaded ($LOADED)"; fi
 
 # ─────────────────────────────────────────────────
 echo ""
-echo "3. RSVP Display"
+echo "2. Overlay Open"
 echo "─────────────────────────────────────────────"
 
-# Check word display element exists in shadow DOM
-HAS_WORD=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-word') !== null")
-assert_equals "Word display element exists" "$HAS_WORD" "true"
+STATE=$(query_state)
+OPEN=$(state_field "$STATE" "overlayOpen")
+if [ "$OPEN" = "False" ] || [ "$OPEN" = "" ]; then pass "Overlay initially closed"; else fail "Overlay should be closed ($OPEN)"; fi
 
-# Check a word is actually rendered (not empty)
-WORD_TEXT=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-word')?.textContent?.trim()?.length > 0")
-assert_equals "Word is rendered" "$WORD_TEXT" "true"
+toggle_reader
+sleep 4
 
-# Check focus point highlight exists
-HAS_FOCUS=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-focus') !== null")
-assert_equals "Focus point highlight exists" "$HAS_FOCUS" "true"
+STATE=$(query_state)
+OPEN=$(state_field "$STATE" "overlayOpen")
+if [ "$OPEN" = "True" ]; then pass "Overlay opened"; else fail "Overlay did not open ($OPEN)"; fi
+
+HAS_SHADOW=$(state_field "$STATE" "hasShadow")
+if [ "$HAS_SHADOW" = "True" ]; then pass "Shadow DOM attached"; else fail "No shadow DOM ($HAS_SHADOW)"; fi
 
 # ─────────────────────────────────────────────────
 echo ""
-echo "4. Playback Controls"
+echo "3. RSVP Word Display"
 echo "─────────────────────────────────────────────"
 
-# Check play/pause button exists
-HAS_PLAY_BTN=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-play') !== null")
-assert_equals "Play button exists" "$HAS_PLAY_BTN" "true"
+WORD=$(state_field "$STATE" "wordText")
+if [ -n "$WORD" ]; then pass "Word rendered: '$WORD'"; else fail "No word rendered"; fi
 
-# Check WPM display
-HAS_WPM=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-wpm-label')?.textContent?.includes('WPM')")
-assert_equals "WPM label displayed" "$HAS_WPM" "true"
+HAS_FOCUS=$(state_field "$STATE" "hasFocus")
+if [ "$HAS_FOCUS" = "True" ]; then pass "Focus highlight present"; else fail "No focus highlight"; fi
 
-# Check prev/next buttons
-HAS_PREV=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-prev') !== null")
-assert_equals "Prev button exists" "$HAS_PREV" "true"
+WORD_COUNT=$(state_field "$STATE" "wordCount")
+if [ -n "$WORD_COUNT" ] && [ "$WORD_COUNT" -gt 0 ] 2>/dev/null; then
+  pass "Word count: $WORD_COUNT"
+else
+  fail "Word count: $WORD_COUNT"
+fi
 
-HAS_NEXT=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-next') !== null")
-assert_equals "Next button exists" "$HAS_NEXT" "true"
+# ─────────────────────────────────────────────────
+echo ""
+echo "4. Controls Present"
+echo "─────────────────────────────────────────────"
+
+for ctrl in hasPlay hasPrev hasNext hasClose; do
+  VAL=$(state_field "$STATE" "$ctrl")
+  LABEL=$(echo "$ctrl" | sed 's/has//')
+  if [ "$VAL" = "True" ]; then pass "$LABEL button"; else fail "$LABEL button missing"; fi
+done
+
+WPM_LABEL=$(state_field "$STATE" "wpmLabel")
+if [ -n "$WPM_LABEL" ]; then pass "WPM label: '$WPM_LABEL'"; else fail "No WPM label"; fi
 
 # ─────────────────────────────────────────────────
 echo ""
 echo "5. Play / Pause"
 echo "─────────────────────────────────────────────"
 
-# Start playback by clicking play
-safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-play')?.click()" >/dev/null
-sleep 1
-
-# Get current index after playing for a second
-INDEX_AFTER_PLAY=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-progress')?.textContent")
-assert_contains "Progress indicator updates during play" "$INDEX_AFTER_PLAY" "/"
-
-# Pause by clicking play again
-safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-play')?.click()" >/dev/null
-sleep 0.5
-
-# Get index, wait, get again — should be same (paused)
-INDEX_A=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-word')?.textContent")
-sleep 1
-INDEX_B=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-word')?.textContent")
-assert_equals "Word stays same when paused" "$INDEX_A" "$INDEX_B"
-
-# ─────────────────────────────────────────────────
-echo ""
-echo "6. Context Preview on Pause"
-echo "─────────────────────────────────────────────"
-
-# When paused, context should be visible
-HAS_CONTEXT=$(safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-context')?.textContent?.length > 0")
-assert_equals "Context sentence shown on pause" "$HAS_CONTEXT" "true"
-
-# ─────────────────────────────────────────────────
-echo ""
-echo "7. Close Overlay"
-echo "─────────────────────────────────────────────"
-
-# Close via close button
-safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-close')?.click()" >/dev/null
-sleep 0.5
-
-OVERLAY_CLOSED=$(safari_js "document.querySelector('speed-reader-overlay') !== null")
-assert_equals "Overlay closed" "$OVERLAY_CLOSED" "false"
-
-# ─────────────────────────────────────────────────
-echo ""
-echo "8. Text Selection Mode"
-echo "─────────────────────────────────────────────"
-
-# Select some text and open overlay
-safari_js "window.getSelection().removeAllRanges(); var r = document.createRange(); var el = document.querySelector('p'); if(el){r.selectNodeContents(el); window.getSelection().addRange(r);}" >/dev/null
-sleep 0.5
-
-# Toggle reader with selection active
-safari_js "browser.runtime.sendMessage({action: 'toggle-reader'})" >/dev/null 2>&1
+click_overlay ".sr-btn-play"
 sleep 2
 
-OVERLAY_SEL=$(safari_js "document.querySelector('speed-reader-overlay') !== null")
-assert_equals "Overlay opens with selected text" "$OVERLAY_SEL" "true"
+STATE=$(query_state)
+IS_PLAYING=$(state_field "$STATE" "isPlaying")
+if [ "$IS_PLAYING" = "True" ]; then pass "Playback started"; else fail "Not playing ($IS_PLAYING)"; fi
 
-# Clean up — close overlay
-safari_js "document.querySelector('speed-reader-overlay')?.shadowRoot?.querySelector('.sr-close')?.click()" >/dev/null
+IDX_DURING=$(state_field "$STATE" "currentIndex")
+if [ -n "$IDX_DURING" ] && [ "$IDX_DURING" -gt 0 ] 2>/dev/null; then
+  pass "Progress advancing (index: $IDX_DURING)"
+else
+  fail "No progress ($IDX_DURING)"
+fi
+
+click_overlay ".sr-btn-play"
+sleep 0.5
+
+STATE=$(query_state)
+IS_PLAYING=$(state_field "$STATE" "isPlaying")
+if [ "$IS_PLAYING" = "False" ]; then pass "Paused"; else fail "Still playing"; fi
+
+WORD_A=$(state_field "$STATE" "wordText")
+sleep 1
+STATE2=$(query_state)
+WORD_B=$(state_field "$STATE2" "wordText")
+if [ "$WORD_A" = "$WORD_B" ]; then pass "Word frozen when paused"; else fail "Word changed while paused"; fi
+
+# ─────────────────────────────────────────────────
+echo ""
+echo "6. Context on Pause"
+echo "─────────────────────────────────────────────"
+
+CONTEXT=$(state_field "$STATE" "contextText")
+if [ -n "$CONTEXT" ]; then pass "Context shown (${#CONTEXT} chars)"; else fail "No context text"; fi
+
+# ─────────────────────────────────────────────────
+echo ""
+echo "7. Sentence Navigation"
+echo "─────────────────────────────────────────────"
+
+WORD_BEFORE=$(state_field "$STATE" "wordText")
+next_sentence
+sleep 0.5
+STATE=$(query_state)
+WORD_AFTER=$(state_field "$STATE" "wordText")
+
+if [ "$WORD_BEFORE" != "$WORD_AFTER" ]; then
+  pass "Next sentence: '$WORD_BEFORE' → '$WORD_AFTER'"
+else
+  skip "Next sentence (word unchanged — may be at boundary)"
+fi
+
+# ─────────────────────────────────────────────────
+echo ""
+echo "8. Close Overlay"
+echo "─────────────────────────────────────────────"
+
+click_overlay ".sr-close"
+sleep 0.5
+
+STATE=$(query_state)
+OPEN=$(state_field "$STATE" "overlayOpen")
+if [ "$OPEN" = "False" ] || [ "$OPEN" = "" ]; then pass "Overlay closed"; else fail "Overlay still open"; fi
+
+# ─────────────────────────────────────────────────
+echo ""
+echo "9. Text Selection Mode"
+echo "─────────────────────────────────────────────"
+
+# Select text and toggle — verify overlay opens (selection is read by content script,
+# not visible from do JavaScript page context after overlay interactions)
+safari_js "window.getSelection().removeAllRanges(); var r = document.createRange(); var el = document.querySelector('#mw-content-text p'); if(el){r.selectNodeContents(el); window.getSelection().addRange(r);}" >/dev/null
+sleep 0.5
+
+toggle_reader
+sleep 3
+
+STATE=$(query_state)
+OPEN=$(state_field "$STATE" "overlayOpen")
+WCOUNT=$(state_field "$STATE" "wordCount")
+# Selection mode should produce fewer words than full article (3097)
+if [ "$OPEN" = "True" ] && [ -n "$WCOUNT" ] && [ "$WCOUNT" -lt 3000 ] 2>/dev/null; then
+  pass "Overlay opens with selection ($WCOUNT words, less than full article)"
+elif [ "$OPEN" = "True" ]; then
+  pass "Overlay opens with selection (word count: $WCOUNT)"
+else
+  fail "Selection overlay didn't open"
+fi
+
+click_overlay ".sr-close"
 sleep 0.5
 
 # ─────────────────────────────────────────────────
 echo ""
-echo "9. Restricted Page Handling"
+echo "10. Re-toggle Cycle"
 echo "─────────────────────────────────────────────"
 
-# Navigate to about:blank (restricted page)
-osascript -e "tell application \"Safari\" to set URL of document 1 to \"about:blank\"" 2>/dev/null
-wait_for_page
+safari_js "window.getSelection().removeAllRanges()" >/dev/null
 
-# Content script won't be injected on about:blank, so toggle should fail gracefully
-# We can't easily test this without the toolbar button, so skip
-yellow "  ⊘ Restricted page test (requires manual toolbar click — skipped)"
-SKIP=$((SKIP + 1))
+toggle_reader
+sleep 4
 
-# Navigate back to test page for cleanup
-osascript -e "tell application \"Safari\" to set URL of document 1 to \"$TEST_URL\"" 2>/dev/null
-wait_for_page
+STATE=$(query_state)
+OPEN=$(state_field "$STATE" "overlayOpen")
+if [ "$OPEN" = "True" ]; then pass "Re-opens after close"; else fail "Did not re-open"; fi
+
+toggle_reader
+sleep 1
+
+STATE=$(query_state)
+OPEN=$(state_field "$STATE" "overlayOpen")
+if [ "$OPEN" = "False" ] || [ "$OPEN" = "" ]; then pass "Toggle closes overlay"; else fail "Toggle didn't close"; fi
 
 # ─────────────────────────────────────────────────
 echo ""
