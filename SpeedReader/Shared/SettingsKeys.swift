@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 /// Font options for the RSVP reader.
 enum ReaderFont: String, CaseIterable, Identifiable {
@@ -11,6 +12,14 @@ enum ReaderFont: String, CaseIterable, Identifiable {
         switch self {
         case .system: return "System (San Francisco)"
         case .openDyslexic: return "OpenDyslexic"
+        }
+    }
+
+    /// Returns a SwiftUI Font at the given size for use in previews.
+    func font(size: CGFloat) -> Font {
+        switch self {
+        case .system: return .system(size: size, weight: .regular)
+        case .openDyslexic: return .custom("OpenDyslexic", size: size)
         }
     }
 }
