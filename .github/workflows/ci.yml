@@ -48,10 +48,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Select latest Xcode
         run: |
-          ls /Applications/Xcode*.app/Contents/Developer 2>/dev/null || true
-          sudo xcode-select -p
+          XCODE=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          echo "Using: $XCODE"
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
 
       - name: Build (macOS)
         run: |
@@ -59,6 +61,9 @@ jobs:
             -project SpeedReader/SpeedReader.xcodeproj \
             -scheme SpeedReader \
             -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
             -quiet
 
       - name: Test (macOS)
@@ -67,6 +72,9 @@ jobs:
             -project SpeedReader/SpeedReader.xcodeproj \
             -scheme SpeedReader \
             -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
             -quiet
 
       - name: Build (iOS simulator)
@@ -75,4 +83,7 @@ jobs:
             -project SpeedReader/SpeedReader.xcodeproj \
             -scheme SpeedReader \
             -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
             -quiet
