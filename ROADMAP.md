@@ -22,6 +22,9 @@
 - [ ] Settings init with pre-populated out-of-range UserDefaults test
 - [ ] Guard `splitWordAtFocus` and `calculateDelay` against empty string input
 - [ ] Settings test isolation — inject ephemeral UserDefaults to prevent test pollution
+- [ ] `saveSettingsToAppGroup` — track saved field count, log warning when zero fields match types
+- [ ] `syncSettingsFromNative` — surface sync failure to user (e.g., store lastSyncStatus)
+- [ ] Selection read failure — show toast when selection is ignored due to API error
 
 ## v2 — Enhanced Navigation
 

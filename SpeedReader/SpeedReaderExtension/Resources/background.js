@@ -15,8 +15,8 @@ browser.action.onClicked.addListener(async (tab) => {
           setTimeout(function() { t.remove(); }, 4000);
         },
       });
-    } catch (_) {
-      // Truly restricted page — nothing we can do
+    } catch (innerErr) {
+      console.warn('[SpeedReader] Cannot inject toast (restricted page):', innerErr.message);
     }
   }
 });

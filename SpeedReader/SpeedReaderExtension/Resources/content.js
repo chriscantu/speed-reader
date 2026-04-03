@@ -25,17 +25,27 @@ async function extractAndLaunch() {
     return; // Toast already shown by getOverlay
   }
 
-  // Check for user text selection first
+  // Check for user text selection first — narrow try/catch to selection API only
+  var selectedText = null;
   try {
     var selection = window.getSelection();
     if (selection && selection.toString().trim().length > 0) {
-      var text = selection.toString().trim();
-      reader.open(text, document.title, await getSettings());
-      pendingSelectionMode = false;
-      return;
+      selectedText = selection.toString().trim();
     }
   } catch (e) {
     console.error('[SpeedReader] Selection read failed:', e);
+  }
+
+  if (selectedText) {
+    try {
+      reader.open(selectedText, document.title, await getSettings());
+      pendingSelectionMode = false;
+      return;
+    } catch (e) {
+      console.error('[SpeedReader] Failed to open reader with selection:', e);
+      showToast('Something went wrong. Try reloading the page.');
+      return;
+    }
   }
 
   // If we're in selection fallback mode, remind user to select text
