@@ -1,0 +1,11 @@
+{
+  "name": "speed-reader-tests",
+  "private": true,
+  "type": "module",
+  "description": "Test runner for SpeedReader extension JavaScript (dev only, not bundled)",
+  "scripts": {
+    "test": "node --test tests/js/",
+    "test:word-processor": "node --test tests/js/word-processor.test.js",
+    "test:focus-point": "node --test tests/js/focus-point.test.js"
+  }
+}
