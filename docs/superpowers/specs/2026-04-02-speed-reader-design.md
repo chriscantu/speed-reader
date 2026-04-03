@@ -12,6 +12,8 @@
 
 **Constraints**: Must work across iOS, iPadOS, and macOS. Free. Must handle arbitrary web content. Iterative — POC first, polish over time. Accessibility-aware design.
 
+**Deployment Targets**: iOS 17+ / iPadOS 17+ / macOS 14+ (Sonoma). These are the minimum versions that support the unified Safari Web Extension API with full `browser.storage` and content script capabilities.
+
 ---
 
 ## Architecture
