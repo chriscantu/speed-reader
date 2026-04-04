@@ -232,6 +232,8 @@ window.addEventListener('message', function(event) {
       result.hasPrev = overlay.elements.prevBtn !== undefined;
       result.hasNext = overlay.elements.nextBtn !== undefined;
       result.hasClose = overlay.shadow.querySelector('.sr-close') !== null;
+      result.theme = overlay.host.getAttribute('data-theme') || 'system';
+      result.font = overlay.host.getAttribute('data-font') || 'default';
     }
     // Post result back to page context
     window.postMessage({ type: 'speedreader-test-result', data: result }, '*');
@@ -246,6 +248,36 @@ window.addEventListener('message', function(event) {
 
   if (event.data.type === 'speedreader-test-next') {
     if (overlay) overlay.nextSentence();
+  }
+
+  if (event.data.type === 'speedreader-test-dispatch') {
+    var action = event.data.action;
+    var payload = event.data.payload || {};
+
+    if (action === 'keypress') {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: payload.key, bubbles: true }));
+    }
+
+    if (action === 'set-theme' && overlay) {
+      overlay.updateSettings({ theme: payload.theme });
+    }
+
+    if (action === 'set-font' && overlay) {
+      overlay.updateSettings({ font: payload.font });
+    }
+
+    if (action === 'set-wpm' && overlay) {
+      overlay.updateSettings({ wpm: payload.wpm });
+    }
+
+    if (action === 'get-host-attrs') {
+      var attrs = {};
+      if (overlay && overlay.host) {
+        attrs.theme = overlay.host.getAttribute('data-theme') || 'system';
+        attrs.font = overlay.host.getAttribute('data-font') || 'default';
+      }
+      window.postMessage({ type: 'speedreader-test-result', data: attrs }, '*');
+    }
   }
 });
 
