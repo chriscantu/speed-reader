@@ -234,7 +234,7 @@ window.addEventListener('message', function(event) {
       result.hasClose = overlay.shadow.querySelector('.sr-close') !== null;
       result.theme = overlay.host.getAttribute('data-theme') || 'system';
       result.font = overlay.host.getAttribute('data-font') || 'default';
-      result.fontSize = overlay.settings.fontSize || 42;
+      result.fontSize = overlay.settings.fontSize || settingsDefaults.fontSize;
     }
     // Post result back to page context
     window.postMessage({ type: 'speedreader-test-result', data: result }, '*');
