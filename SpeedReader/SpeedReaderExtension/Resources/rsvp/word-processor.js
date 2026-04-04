@@ -34,6 +34,7 @@ export function processText(text) {
  * @returns {number} Adjusted delay in ms
  */
 export function calculateDelay(word, baseDelay) {
+  if (!word) return baseDelay;
   const lastChar = word[word.length - 1];
 
   if ('.!?'.includes(lastChar)) {

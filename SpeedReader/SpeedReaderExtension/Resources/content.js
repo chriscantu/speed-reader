@@ -60,8 +60,9 @@ async function extractAndLaunch() {
     return; // Toast already shown by getOverlay
   }
 
-  // Check for user text selection first — narrow try/catch to selection API only
+  // Gather inputs for the content decision tree
   var selectedText = null;
+  var selectionError = false;
   try {
     var selection = window.getSelection();
     if (selection && selection.toString().trim().length > 0) {
@@ -69,47 +70,67 @@ async function extractAndLaunch() {
     }
   } catch (e) {
     console.error('[SpeedReader] Selection read failed:', e);
-    showToast('Could not read your selection. Extracting full article instead.');
+    selectionError = true;
   }
 
-  if (selectedText) {
+  var article = null;
+  var articleError = false;
+  if (!selectedText) {
     try {
-      reader.open(selectedText, document.title, await getSettings());
-      pendingSelectionMode = false;
-      return;
-    } catch (e) {
-      console.error('[SpeedReader] Failed to open reader with selection:', e);
-      showToast('Something went wrong. Try reloading the page.');
-      return;
+      var readabilityModule = await import(browser.runtime.getURL('Readability.js'));
+      var Readability = readabilityModule.Readability;
+      var docClone = document.cloneNode(true);
+      article = new Readability(docClone).parse();
+    } catch (error) {
+      console.error('[SpeedReader] Extraction failed:', error);
+      articleError = true;
     }
   }
 
-  // If we're in selection fallback mode, remind user to select text
-  if (pendingSelectionMode) {
+  // Use extracted decision logic
+  var resolverModule = await import(browser.runtime.getURL('content-resolver.js'));
+  var decision = resolverModule.resolveContent({
+    selectedText: selectedText,
+    selectionError: selectionError,
+    pendingSelectionMode: pendingSelectionMode,
+    article: article,
+    articleError: articleError,
+  });
+
+  if (decision.selectionWarning) {
+    showToast('Could not read your selection. Extracting full article instead.');
+  }
+
+  if (decision.action === 'use-selection') {
+    try {
+      reader.open(decision.text, document.title, await getSettings());
+      pendingSelectionMode = false;
+    } catch (e) {
+      console.error('[SpeedReader] Failed to open reader with selection:', e);
+      showToast('Something went wrong. Try reloading the page.');
+    }
+    return;
+  }
+
+  if (decision.action === 'use-article') {
+    try {
+      var settings = await getSettings();
+      reader.open(decision.text, decision.title || document.title, settings);
+    } catch (e) {
+      console.error('[SpeedReader] Failed to open reader with article:', e);
+      showToast('Something went wrong. Try reloading the page.');
+    }
+    return;
+  }
+
+  if (decision.action === 'prompt-selection') {
     showToast('Select some text on the page, then tap the extension icon again.');
     return;
   }
 
-  try {
-    var readabilityModule = await import(browser.runtime.getURL('Readability.js'));
-    var Readability = readabilityModule.Readability;
-
-    // Clone the document so Readability doesn't mutate the live DOM
-    var docClone = document.cloneNode(true);
-    var article = new Readability(docClone).parse();
-
-    if (article && article.textContent && article.textContent.trim().length > 0) {
-      var settings = await getSettings();
-      reader.open(article.textContent.trim(), article.title || document.title, settings);
-    } else {
-      pendingSelectionMode = true;
-      showToast("Couldn't extract article. Select text and tap the extension icon again.");
-    }
-  } catch (error) {
-    console.error('[SpeedReader] Extraction failed:', error);
-    pendingSelectionMode = true;
-    showToast("Couldn't extract article. Select text and tap the extension icon again.");
-  }
+  // enter-selection-mode
+  pendingSelectionMode = true;
+  showToast("Couldn't extract article. Select text and tap the extension icon again.");
 }
 
 var settingsDefaults = {

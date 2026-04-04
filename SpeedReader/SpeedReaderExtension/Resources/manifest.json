@@ -31,6 +31,7 @@
         "settings-defaults.js",
         "word-processor.js",
         "focus-point.js",
+        "content-resolver.js",
         "Readability.js",
         "OpenDyslexic-Regular.woff2"
       ],
