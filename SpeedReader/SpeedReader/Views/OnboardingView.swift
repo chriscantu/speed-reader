@@ -80,5 +80,4 @@ struct OnboardingView: View {
                 .font(.body)
         }
     }
-
 }
