@@ -30,8 +30,17 @@ async function syncSettingsFromNative() {
       { action: 'getSettings' }
     );
     if (response && response.wpm !== undefined) {
-      await browser.storage.sync.set(response);
+      var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause'];
+      var filtered = {};
+      for (var i = 0; i < allowed.length; i++) {
+        if (response[allowed[i]] !== undefined) {
+          filtered[allowed[i]] = response[allowed[i]];
+        }
+      }
+      await browser.storage.sync.set(filtered);
       console.log('[SpeedReader] Settings synced from native app');
+    } else if (response) {
+      console.warn('[SpeedReader] Native response missing expected fields:', JSON.stringify(response));
     }
   } catch (error) {
     console.error('[SpeedReader] Failed to sync native settings:', error);
@@ -66,7 +75,10 @@ syncSettingsFromNative();
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'sync-settings') {
     syncSettingsFromNative().then(() => sendResponse({ ok: true }))
-      .catch(() => sendResponse({ ok: false }));
+      .catch(function(err) {
+        console.warn('[SpeedReader] sync-settings request failed:', err.message || err);
+        sendResponse({ ok: false, error: err.message || String(err) });
+      });
     return true; // async response
   }
 

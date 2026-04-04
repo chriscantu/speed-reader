@@ -12,16 +12,29 @@ browser.storage.onChanged.addListener(function(changes, area) {
   if (area !== 'sync' || !overlay || !overlay.host) return;
   var updated = {};
   for (var key in changes) {
-    updated[key] = changes[key].newValue;
+    if (changes[key].newValue !== undefined) {
+      updated[key] = changes[key].newValue;
+    }
   }
-  overlay.updateSettings(updated);
+  if (Object.keys(updated).length === 0) return;
+  try {
+    overlay.updateSettings(updated);
+  } catch (e) {
+    console.error('[SpeedReader] Failed to apply live settings update:', e);
+  }
 });
 
 // When Safari returns to foreground, sync settings from native in case
 // the user changed them in the companion app while away.
+// Debounced to at most once per 5 seconds to avoid overhead on tab switches.
+var _lastSyncTime = 0;
 document.addEventListener('visibilitychange', function() {
-  if (document.visibilityState === 'visible' && overlay && overlay.host) {
-    browser.runtime.sendMessage({ action: 'sync-settings' }).catch(function() {});
+  var now = Date.now();
+  if (document.visibilityState === 'visible' && overlay && overlay.host && now - _lastSyncTime > 5000) {
+    _lastSyncTime = now;
+    browser.runtime.sendMessage({ action: 'sync-settings' }).catch(function(err) {
+      console.warn('[SpeedReader] Foreground sync failed:', err.message || err);
+    });
   }
 });
 
@@ -107,12 +120,15 @@ var settingsDefaults = {
 };
 
 async function getSettings() {
-  // Request a fresh sync from native App Group before reading storage.
-  // This ensures the overlay always opens with the latest SwiftUI settings.
+  // Attempt a fresh sync from native App Group before reading storage,
+  // so the overlay is likely to open with current SwiftUI settings.
   try {
-    await browser.runtime.sendMessage({ action: 'sync-settings' });
+    var syncResult = await browser.runtime.sendMessage({ action: 'sync-settings' });
+    if (syncResult && !syncResult.ok) {
+      console.warn('[SpeedReader] Native sync returned failure:', syncResult.error || 'unknown');
+    }
   } catch (_e) {
-    // Background script unreachable — proceed with cached values
+    console.warn('[SpeedReader] Background script unreachable for settings sync:', _e.message || _e);
   }
 
   try {
