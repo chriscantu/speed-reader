@@ -1,6 +1,8 @@
 # SpeedReader Roadmap
 
-## v1 — Core RSVP Reader
+## v1 — Full-Featured RSVP Reader (App Store Release)
+
+### Core (complete)
 
 - [x] Safari Web Extension across iOS, iPadOS, macOS
 - [x] Readability.js text extraction + text selection fallback
@@ -14,7 +16,7 @@
 - [x] SwiftUI container app with settings + onboarding
 - [x] Keyboard shortcuts on Mac (Space, arrows, ESC)
 
-### Hardening (pre-release)
+### Hardening (complete)
 
 - [x] RSVPOverlay state machine tests (play/pause/nav/wpm clamping) — extracted to `rsvp/state-machine.js`
 - [x] Content script decision tree tests (selection priority, Readability fallback, error paths)
@@ -29,13 +31,13 @@
 - [x] App Group unavailable — surface visible warning in SwiftUI app when settings won't sync
 - [x] Full regression test infrastructure — modular Node.js suite with Safari driver, dispatch command router, keyboard/WPM/theme/font coverage, manual iOS/iPadOS checklist
 
-## v2 — Enhanced Navigation
+### Navigation
 
 - [ ] Scrubber/progress bar — draggable video-player-style position control
 - [ ] Save reading position per URL — resume where you left off
 - [ ] Reading history in companion app
 
-## v3 — Full Customization
+### Customization
 
 - [ ] Font picker — curated set (system, OpenDyslexic, monospace, serif)
 - [ ] Font size, weight, and contrast controls
