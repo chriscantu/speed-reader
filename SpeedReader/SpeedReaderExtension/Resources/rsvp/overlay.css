@@ -385,6 +385,10 @@
 }
 
 @media (max-width: 480px) {
+  :host {
+    --sr-word-area-height: 120px;
+  }
+
   .sr-card {
     width: calc(100vw - 24px);
     padding: 16px;
