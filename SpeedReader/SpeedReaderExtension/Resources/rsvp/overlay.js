@@ -49,6 +49,8 @@ export class RSVPOverlay {
     }
 
     if (typeof settings.fontSize === 'number' && this.shadow) {
+      settings.fontSize = clampFontSize(settings.fontSize);
+      this.settings.fontSize = settings.fontSize;
       this._syncFontSizeOverride(settings.fontSize);
       if (this.elements.fontSizeValue) {
         this.elements.fontSizeValue.textContent = settings.fontSize + 'px';
@@ -184,18 +186,18 @@ export class RSVPOverlay {
     this._persistFontSize(newSize);
   }
 
+  // Persist to browser.storage.sync (extension's source of truth) AND relay to
+  // native app via background script so the SwiftUI settings UI stays in sync.
   _persistFontSize(fontSize) {
-    try {
-      browser.storage.sync.set({ fontSize: fontSize });
-      browser.runtime.sendMessage({
-        action: 'save-settings',
-        settings: { fontSize: fontSize },
-      }).catch(function(err) {
-        console.warn('[SpeedReader] Failed to save font size to native:', err.message || err);
-      });
-    } catch (e) {
-      console.warn('[SpeedReader] Failed to persist font size:', e);
-    }
+    browser.storage.sync.set({ fontSize: fontSize }).catch(function(err) {
+      console.warn('[SpeedReader] Failed to persist font size to storage:', err.message || err);
+    });
+    browser.runtime.sendMessage({
+      action: 'save-settings',
+      settings: { fontSize: fontSize },
+    }).catch(function(err) {
+      console.warn('[SpeedReader] Failed to save font size to native:', err.message || err);
+    });
   }
 
   _startLoop() {

@@ -96,15 +96,27 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // async response
   }
 
+  // Relay settings changes from extension to native App Group via sendNativeMessage.
   if (message.action === 'save-settings') {
-    var settings = message.settings;
-    if (!settings || typeof settings !== 'object') {
+    var raw = message.settings;
+    if (!raw || typeof raw !== 'object') {
       sendResponse({ ok: false, error: 'Missing settings payload' });
+      return true;
+    }
+    var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause'];
+    var filtered = {};
+    for (var i = 0; i < allowed.length; i++) {
+      if (raw[allowed[i]] !== undefined) {
+        filtered[allowed[i]] = raw[allowed[i]];
+      }
+    }
+    if (Object.keys(filtered).length === 0) {
+      sendResponse({ ok: false, error: 'No recognized settings keys' });
       return true;
     }
     browser.runtime.sendNativeMessage(
       'com.chriscantu.SpeedReader',
-      { action: 'saveSettings', settings: settings }
+      { action: 'saveSettings', settings: filtered }
     ).then(function(response) {
       sendResponse({ ok: true, savedCount: response.savedCount || 0 });
     }).catch(function(err) {
