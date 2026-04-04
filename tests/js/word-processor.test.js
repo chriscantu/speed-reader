@@ -89,6 +89,18 @@ describe('calculateDelay', () => {
     const delay = calculateDelay('note:', baseDelay);
     assert.strictEqual(delay, Math.round(baseDelay * 1.2));
   });
+
+  it('returns base delay for empty string', () => {
+    assert.strictEqual(calculateDelay('', baseDelay), baseDelay);
+  });
+
+  it('returns base delay for undefined', () => {
+    assert.strictEqual(calculateDelay(undefined, baseDelay), baseDelay);
+  });
+
+  it('returns base delay for null', () => {
+    assert.strictEqual(calculateDelay(null, baseDelay), baseDelay);
+  });
 });
 
 describe('wpmToDelay', () => {

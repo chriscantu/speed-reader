@@ -17,11 +17,11 @@
 ### Hardening (pre-release)
 
 - [x] RSVPOverlay state machine tests (play/pause/nav/wpm clamping) — extracted to `rsvp/state-machine.js`
-- [ ] Content script decision tree tests (selection priority, Readability fallback, error paths)
+- [x] Content script decision tree tests (selection priority, Readability fallback, error paths)
 - [x] Settings persistence round-trip test (write → new instance → verify)
 - [x] Settings init with pre-populated out-of-range UserDefaults test
 - [x] Guard `splitWordAtFocus` against empty string input
-- [ ] Guard `calculateDelay` against empty string input
+- [x] Guard `calculateDelay` against empty string input
 - [x] Settings test isolation — inject ephemeral UserDefaults to prevent test pollution
 - [x] `saveSettingsToAppGroup` — track saved field count, log warning when zero fields match types
 - [x] `syncSettingsFromNative` — surface sync failure to user (e.g., store lastSyncStatus flag)
