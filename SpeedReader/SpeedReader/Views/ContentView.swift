@@ -2,18 +2,22 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(ReaderSettings.self) private var settings
-    @State private var extensionEnabled = false
-    @State private var hasCheckedExtension = false
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @State private var showingOnboarding = false
 
     var body: some View {
         NavigationStack {
-            if hasCheckedExtension && extensionEnabled {
-                SettingsView()
-            } else {
-                OnboardingView(
-                    extensionEnabled: $extensionEnabled,
-                    hasChecked: $hasCheckedExtension
-                )
+            SettingsView()
+                .sheet(isPresented: $showingOnboarding) {
+                    OnboardingView(onComplete: {
+                        hasCompletedOnboarding = true
+                        showingOnboarding = false
+                    })
+                }
+        }
+        .onAppear {
+            if !hasCompletedOnboarding {
+                showingOnboarding = true
             }
         }
     }
