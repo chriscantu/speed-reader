@@ -44,6 +44,13 @@
 - [ ] Background color options (cream/pastel for dyslexic readers)
 - [ ] Configurable chunk size (1, 2, or 3 words at a time)
 
+### Polish
+
+- [ ] Fix overlay vertical shift on long words (#10)
+- [ ] Fix font size stepper jitter (#11) — same root cause as #10
+- [ ] Match settings preview ORP color to overlay accent (#12)
+- [ ] Investigate ORP-centered alignment for stable focus point (#13)
+
 ## Future Ideas
 
 - [ ] Saved articles / reading list in companion app
