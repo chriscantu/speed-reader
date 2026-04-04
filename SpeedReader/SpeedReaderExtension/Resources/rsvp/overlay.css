@@ -118,6 +118,7 @@
   border-top: 1px solid var(--sr-border);
   border-bottom: 1px solid var(--sr-border);
   cursor: pointer;
+  overflow: hidden;
 }
 
 .sr-focus-marker {
@@ -131,6 +132,7 @@
   font-weight: 300;
   letter-spacing: 2px;
   font-family: var(--sr-font-family);
+  word-break: break-all;
 }
 
 .sr-word-before,
@@ -317,10 +319,6 @@
   .sr-card {
     width: calc(100vw - 24px);
     padding: 16px;
-  }
-
-  :host {
-    --sr-word-size: 36px;
   }
 
   .sr-btn-play {
