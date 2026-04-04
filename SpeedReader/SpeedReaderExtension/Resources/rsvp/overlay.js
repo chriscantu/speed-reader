@@ -1,5 +1,5 @@
 import { RSVPStateMachine } from './state-machine.js';
-import { FONT_SIZE_DEFAULT, FONT_SIZE_MIN, FONT_SIZE_MAX, FONT_SIZE_STEP, clampWpm, clampFontSize } from './settings-defaults.js';
+import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, clampWpm, clampFontSize } from './settings-defaults.js';
 
 export class RSVPOverlay {
   constructor() {
