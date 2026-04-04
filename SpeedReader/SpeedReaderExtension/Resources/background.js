@@ -30,6 +30,7 @@ async function syncSettingsFromNative() {
       { action: 'getSettings' }
     );
     if (response && response.wpm !== undefined) {
+      // Keep in sync with SETTINGS_KEYS in rsvp/settings-defaults.js
       var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause'];
       var filtered = {};
       for (var i = 0; i < allowed.length; i++) {
@@ -96,10 +97,44 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // async response
   }
 
+  // Relay settings changes from extension to native App Group via sendNativeMessage.
+  if (message.action === 'save-settings') {
+    var raw = message.settings;
+    if (!raw || typeof raw !== 'object') {
+      sendResponse({ ok: false, error: 'Missing settings payload' });
+      return true;
+    }
+    // Keep in sync with SETTINGS_KEYS in rsvp/settings-defaults.js
+    var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause'];
+    var filtered = {};
+    for (var i = 0; i < allowed.length; i++) {
+      if (raw[allowed[i]] !== undefined) {
+        filtered[allowed[i]] = raw[allowed[i]];
+      }
+    }
+    if (Object.keys(filtered).length === 0) {
+      sendResponse({ ok: false, error: 'No recognized settings keys' });
+      return true;
+    }
+    browser.runtime.sendNativeMessage(
+      'com.chriscantu.SpeedReader',
+      { action: 'saveSettings', settings: filtered }
+    ).then(function(response) {
+      sendResponse({ ok: true, savedCount: response.savedCount || 0 });
+    }).catch(function(err) {
+      console.warn('[SpeedReader] save-settings to native failed:', err.message || err);
+      sendResponse({ ok: false, error: err.message || String(err) });
+    });
+    return true; // async response
+  }
+
   if (message.action === 'get-sync-status') {
     browser.storage.local.get({ lastSyncStatus: null, lastSyncTime: null, lastSyncError: null })
       .then(sendResponse)
-      .catch(function() { sendResponse({ lastSyncStatus: null }); });
+      .catch(function(err) {
+        console.warn('[SpeedReader] get-sync-status failed:', err.message || err);
+        sendResponse({ lastSyncStatus: null });
+      });
     return true; // async response
   }
 

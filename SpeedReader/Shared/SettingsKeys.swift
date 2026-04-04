@@ -5,6 +5,9 @@ import os.log
 enum ReaderFont: String, CaseIterable, Identifiable {
     case system = "system"
     case openDyslexic = "opendyslexic"
+    case newYork = "newYork"
+    case georgia = "georgia"
+    case menlo = "menlo"
 
     var id: String { rawValue }
 
@@ -12,6 +15,9 @@ enum ReaderFont: String, CaseIterable, Identifiable {
         switch self {
         case .system: return "System (San Francisco)"
         case .openDyslexic: return "OpenDyslexic"
+        case .newYork: return "New York (Serif)"
+        case .georgia: return "Georgia (Serif)"
+        case .menlo: return "Menlo (Monospace)"
         }
     }
 }
@@ -61,8 +67,8 @@ enum SettingsKeys {
     static let wpmRange = Double(wpmMin)...Double(wpmMax)
 
     /// Font size bounds
-    static let fontSizeMin = 28
-    static let fontSizeMax = 64
+    static let fontSizeMin = 24
+    static let fontSizeMax = 96
 
     /// Font size range for sliders
     static let fontSizeRange = Double(fontSizeMin)...Double(fontSizeMax)

@@ -51,13 +51,13 @@ final class SettingsTests: XCTestCase {
     func testFontSizeClampedToMinimum() {
         let settings = makeSettings()
         settings.setFontSize(10)
-        XCTAssertEqual(settings.fontSize, 28)
+        XCTAssertEqual(settings.fontSize, 24)
     }
 
     func testFontSizeClampedToMaximum() {
         let settings = makeSettings()
         settings.setFontSize(100)
-        XCTAssertEqual(settings.fontSize, 64)
+        XCTAssertEqual(settings.fontSize, 96)
     }
 
     func testAppGroupAvailableWithInjectedDefaults() {
@@ -241,5 +241,77 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(second.theme, .dark)
         XCTAssertEqual(second.fontSize, 36)
         XCTAssertFalse(second.punctuationPause)
+    }
+
+    // MARK: - New font cases
+
+    func testNewYorkFontRoundTrips() {
+        let store = makeDefaults()
+        let settings = ReaderSettings(defaults: store)
+        settings.setFont(.newYork)
+        let reloaded = ReaderSettings(defaults: store)
+        XCTAssertEqual(reloaded.font, .newYork)
+    }
+
+    func testGeorgiaFontRoundTrips() {
+        let store = makeDefaults()
+        let settings = ReaderSettings(defaults: store)
+        settings.setFont(.georgia)
+        let reloaded = ReaderSettings(defaults: store)
+        XCTAssertEqual(reloaded.font, .georgia)
+    }
+
+    func testMenloFontRoundTrips() {
+        let store = makeDefaults()
+        let settings = ReaderSettings(defaults: store)
+        settings.setFont(.menlo)
+        let reloaded = ReaderSettings(defaults: store)
+        XCTAssertEqual(reloaded.font, .menlo)
+    }
+
+    func testSaveSettingsAcceptsNewFontRawValues() {
+        let store = makeDefaults()
+        for rawValue in ["newYork", "georgia", "menlo"] {
+            let count = SettingsKeys.saveSettings(["font": rawValue], to: store)
+            XCTAssertEqual(count, 1, "Expected \(rawValue) to be accepted")
+            XCTAssertEqual(store.string(forKey: SettingsKeys.font), rawValue)
+        }
+    }
+
+    // MARK: - Widened font size bounds
+
+    func testFontSizeAccepts24() {
+        let settings = makeSettings()
+        settings.setFontSize(24)
+        XCTAssertEqual(settings.fontSize, 24)
+    }
+
+    func testFontSizeAccepts96() {
+        let settings = makeSettings()
+        settings.setFontSize(96)
+        XCTAssertEqual(settings.fontSize, 96)
+    }
+
+    func testFontSizeClampedToNewMinimum() {
+        let settings = makeSettings()
+        settings.setFontSize(10)
+        XCTAssertEqual(settings.fontSize, 24)
+    }
+
+    func testFontSizeClampedToNewMaximum() {
+        let settings = makeSettings()
+        settings.setFontSize(200)
+        XCTAssertEqual(settings.fontSize, 96)
+    }
+
+    func testSaveSettingsClampsFontSizeToNewRange() {
+        let store = makeDefaults()
+        let countLow = SettingsKeys.saveSettings(["fontSize": 10], to: store)
+        XCTAssertEqual(countLow, 1)
+        XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), 24)
+
+        let countHigh = SettingsKeys.saveSettings(["fontSize": 200], to: store)
+        XCTAssertEqual(countHigh, 1)
+        XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), 96)
     }
 }
