@@ -96,6 +96,24 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // async response
   }
 
+  if (message.action === 'save-settings') {
+    var settings = message.settings;
+    if (!settings || typeof settings !== 'object') {
+      sendResponse({ ok: false, error: 'Missing settings payload' });
+      return true;
+    }
+    browser.runtime.sendNativeMessage(
+      'com.chriscantu.SpeedReader',
+      { action: 'saveSettings', settings: settings }
+    ).then(function(response) {
+      sendResponse({ ok: true, savedCount: response.savedCount || 0 });
+    }).catch(function(err) {
+      console.warn('[SpeedReader] save-settings to native failed:', err.message || err);
+      sendResponse({ ok: false, error: err.message || String(err) });
+    });
+    return true; // async response
+  }
+
   if (message.action === 'get-sync-status') {
     browser.storage.local.get({ lastSyncStatus: null, lastSyncTime: null, lastSyncError: null })
       .then(sendResponse)
