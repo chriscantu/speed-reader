@@ -6,7 +6,8 @@ import { execJS, navigate, waitFor } from './helpers.js';
 describe('Prerequisites', () => {
   it('Safari accepts JavaScript from Apple Events', () => {
     const result = execJS('1+1');
-    assert.strictEqual(result, '2');
+    // osascript returns JS numbers as floats (e.g. '2.0')
+    assert.ok(parseFloat(result) === 2, `Expected 2, got: ${result}`);
   });
 
   it('navigates to test page', async () => {

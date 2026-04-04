@@ -3,7 +3,7 @@
 // NOTE: Uses execSync intentionally — osascript is a local-only test tool,
 // not production code. No user input reaches these commands.
 
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 
 const TEST_URL = 'https://en.wikipedia.org/wiki/Speed_reading';
 
@@ -12,10 +12,14 @@ const TEST_URL = 'https://en.wikipedia.org/wiki/Speed_reading';
  * Returns the string result. Throws on osascript failure.
  */
 export function execJS(jsCode) {
-  const escaped = jsCode.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-  const cmd = `osascript -e 'tell application "Safari" to do JavaScript "${escaped}" in document 1'`;
+  // Use execFileSync to avoid shell quoting issues entirely.
+  // Passes the AppleScript as an argument, not through shell interpolation.
+  const appleScript = `tell application "Safari" to do JavaScript "${jsCode.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}" in document 1`;
   try {
-    const result = execSync(cmd, { encoding: 'utf-8', timeout: 10000 });
+    const result = execFileSync('osascript', ['-e', appleScript], {
+      encoding: 'utf-8',
+      timeout: 10000,
+    });
     return result.trim();
   } catch (e) {
     const msg = e.stderr ? e.stderr.trim() : e.message;
@@ -27,15 +31,23 @@ export function execJS(jsCode) {
  * Navigate Safari to a URL and wait for the page to load.
  */
 export async function navigate(url = TEST_URL) {
-  execSync(
-    `osascript -e 'tell application "Safari" to set URL of document 1 to "${url}"'`,
-    { encoding: 'utf-8', timeout: 10000 }
-  );
-  execSync(
-    `osascript -e 'tell application "Safari" to activate'`,
-    { encoding: 'utf-8', timeout: 5000 }
-  );
+  // Mark current page so we can detect when navigation actually starts
+  execJS('document.__srNavPending = true');
+  execFileSync('osascript', ['-e', `tell application "Safari" to set URL of document 1 to "${url}"`], {
+    encoding: 'utf-8', timeout: 10000,
+  });
+  execFileSync('osascript', ['-e', 'tell application "Safari" to activate'], {
+    encoding: 'utf-8', timeout: 5000,
+  });
+  // Wait for the NEW page to finish loading (marker absent = new page)
   await waitFor(() => {
+    try {
+      const marker = execJS('document.__srNavPending');
+      // If marker still exists, we're on the old page
+      if (marker === 'true') return false;
+    } catch {
+      // execJS may throw during page transition — that's progress
+    }
     const state = execJS('document.readyState');
     return state === 'complete';
   }, { timeout: 15000, interval: 500 });
@@ -98,7 +110,8 @@ export async function queryState() {
  */
 export function dispatch(action, payload = {}) {
   const msg = JSON.stringify({ type: 'speedreader-test-dispatch', action, payload });
-  execJS("window.postMessage(" + msg.replace(/"/g, '\\"') + ", '*')");
+  // No manual quote escaping — execJS handles it via execFileSync
+  execJS("window.postMessage(" + msg + ", '*')");
 }
 
 /**
