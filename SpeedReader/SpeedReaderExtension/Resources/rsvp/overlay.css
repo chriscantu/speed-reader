@@ -279,6 +279,59 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+.sr-font-size-area {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--sr-border);
+}
+
+.sr-font-size-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sr-font-size-label {
+  font-size: 12px;
+  color: var(--sr-text-muted);
+}
+
+.sr-font-size-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sr-font-size-btn {
+  background: none;
+  border: 1px solid var(--sr-border);
+  border-radius: 5px;
+  color: var(--sr-text-muted);
+  font-size: 13px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sr-font-family);
+  padding: 0;
+  line-height: 1;
+}
+
+.sr-font-size-btn:hover {
+  color: var(--sr-text);
+  border-color: var(--sr-text-muted);
+}
+
+.sr-font-size-value {
+  font-size: 12px;
+  color: var(--sr-text);
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .sr-progress-area {
   margin-top: 12px;
 }
@@ -351,6 +404,26 @@
 
   .sr-shortcut-hint {
     display: none;
+  }
+
+  .sr-font-size-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    border-radius: 6px;
+  }
+
+  .sr-font-size-value {
+    font-size: 14px;
+    min-width: 40px;
+  }
+
+  .sr-font-size-controls {
+    gap: 14px;
+  }
+
+  .sr-font-size-label {
+    font-size: 13px;
   }
 }
 

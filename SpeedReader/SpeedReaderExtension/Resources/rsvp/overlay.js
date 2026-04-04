@@ -1,5 +1,5 @@
 import { RSVPStateMachine } from './state-machine.js';
-import { FONT_SIZE_DEFAULT, clampWpm } from './settings-defaults.js';
+import { FONT_SIZE_DEFAULT, FONT_SIZE_MIN, FONT_SIZE_MAX, FONT_SIZE_STEP, clampWpm, clampFontSize } from './settings-defaults.js';
 
 export class RSVPOverlay {
   constructor() {
@@ -50,6 +50,9 @@ export class RSVPOverlay {
 
     if (typeof settings.fontSize === 'number' && this.shadow) {
       this._syncFontSizeOverride(settings.fontSize);
+      if (this.elements.fontSizeValue) {
+        this.elements.fontSizeValue.textContent = settings.fontSize + 'px';
+      }
     }
 
     // WPM and punctuationPause take effect on the next tick.
@@ -167,6 +170,31 @@ export class RSVPOverlay {
     }
     if (this.elements.slider) {
       this.elements.slider.value = this.state.wpm;
+    }
+  }
+
+  adjustFontSize(delta) {
+    var current = this.settings.fontSize || FONT_SIZE_DEFAULT;
+    var newSize = clampFontSize(current + delta);
+    this.settings.fontSize = newSize;
+    this._syncFontSizeOverride(newSize);
+    if (this.elements.fontSizeValue) {
+      this.elements.fontSizeValue.textContent = newSize + 'px';
+    }
+    this._persistFontSize(newSize);
+  }
+
+  _persistFontSize(fontSize) {
+    try {
+      browser.storage.sync.set({ fontSize: fontSize });
+      browser.runtime.sendMessage({
+        action: 'save-settings',
+        settings: { fontSize: fontSize },
+      }).catch(function(err) {
+        console.warn('[SpeedReader] Failed to save font size to native:', err.message || err);
+      });
+    } catch (e) {
+      console.warn('[SpeedReader] Failed to persist font size:', e);
     }
   }
 
@@ -450,6 +478,46 @@ export class RSVPOverlay {
     sliderArea.appendChild(sliderLabels);
     sliderArea.appendChild(slider);
 
+    // Font size stepper area
+    const fontSizeArea = document.createElement('div');
+    fontSizeArea.className = 'sr-font-size-area';
+
+    const fontSizeRow = document.createElement('div');
+    fontSizeRow.className = 'sr-font-size-row';
+
+    const fontSizeLabel = document.createElement('span');
+    fontSizeLabel.className = 'sr-font-size-label';
+    fontSizeLabel.textContent = 'Text Size';
+
+    const fontSizeControls = document.createElement('div');
+    fontSizeControls.className = 'sr-font-size-controls';
+
+    const fontSizeDown = document.createElement('button');
+    fontSizeDown.className = 'sr-font-size-btn';
+    fontSizeDown.textContent = 'A\u2212';
+    fontSizeDown.setAttribute('aria-label', 'Decrease text size');
+    this.elements.fontSizeDown = fontSizeDown;
+
+    const fontSizeValue = document.createElement('span');
+    fontSizeValue.className = 'sr-font-size-value';
+    fontSizeValue.textContent = (this.settings.fontSize || FONT_SIZE_DEFAULT) + 'px';
+    fontSizeValue.setAttribute('aria-live', 'polite');
+    this.elements.fontSizeValue = fontSizeValue;
+
+    const fontSizeUp = document.createElement('button');
+    fontSizeUp.className = 'sr-font-size-btn';
+    fontSizeUp.textContent = 'A+';
+    fontSizeUp.setAttribute('aria-label', 'Increase text size');
+    this.elements.fontSizeUp = fontSizeUp;
+
+    fontSizeControls.appendChild(fontSizeDown);
+    fontSizeControls.appendChild(fontSizeValue);
+    fontSizeControls.appendChild(fontSizeUp);
+
+    fontSizeRow.appendChild(fontSizeLabel);
+    fontSizeRow.appendChild(fontSizeControls);
+    fontSizeArea.appendChild(fontSizeRow);
+
     // Progress area
     const progressArea = document.createElement('div');
     progressArea.className = 'sr-progress-area';
@@ -485,6 +553,7 @@ export class RSVPOverlay {
     card.appendChild(context);
     card.appendChild(controls);
     card.appendChild(sliderArea);
+    card.appendChild(fontSizeArea);
     card.appendChild(progressArea);
 
     backdrop.appendChild(card);
@@ -519,6 +588,14 @@ export class RSVPOverlay {
       const value = parseInt(this.elements.slider.value, 10);
       this.state.wpm = clampWpm(value);
       this.elements.wpmLabel.textContent = this.state.wpm + ' wpm';
+    });
+
+    this.elements.fontSizeDown.addEventListener('click', () => {
+      this.adjustFontSize(-FONT_SIZE_STEP);
+    });
+
+    this.elements.fontSizeUp.addEventListener('click', () => {
+      this.adjustFontSize(FONT_SIZE_STEP);
     });
 
     this.elements.backdrop.addEventListener('click', (e) => {
