@@ -38,12 +38,26 @@ async function syncSettingsFromNative() {
         }
       }
       await browser.storage.sync.set(filtered);
+      await browser.storage.local.set({
+        lastSyncStatus: 'ok',
+        lastSyncTime: Date.now(),
+      });
       console.log('[SpeedReader] Settings synced from native app');
     } else if (response) {
       console.warn('[SpeedReader] Native response missing expected fields:', JSON.stringify(response));
+      await browser.storage.local.set({
+        lastSyncStatus: 'error',
+        lastSyncTime: Date.now(),
+        lastSyncError: 'Native response missing expected fields',
+      });
     }
   } catch (error) {
     console.error('[SpeedReader] Failed to sync native settings:', error);
+    await browser.storage.local.set({
+      lastSyncStatus: 'error',
+      lastSyncTime: Date.now(),
+      lastSyncError: error.message || String(error),
+    });
     // Not fatal — extension will use browser.storage.sync defaults
   }
 }
@@ -79,6 +93,13 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.warn('[SpeedReader] sync-settings request failed:', err.message || err);
         sendResponse({ ok: false, error: err.message || String(err) });
       });
+    return true; // async response
+  }
+
+  if (message.action === 'get-sync-status') {
+    browser.storage.local.get({ lastSyncStatus: null, lastSyncTime: null, lastSyncError: null })
+      .then(sendResponse)
+      .catch(function() { sendResponse({ lastSyncStatus: null }); });
     return true; // async response
   }
 

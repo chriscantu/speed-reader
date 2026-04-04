@@ -81,6 +81,20 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            if !settings.appGroupAvailable {
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Settings Sync Unavailable", systemImage: "exclamationmark.triangle.fill")
+                            .font(.headline)
+                            .foregroundStyle(.orange)
+                        Text("Your settings won't sync with the Safari extension. Try removing and re-enabling the extension in Settings \u{2192} Apps \u{2192} SpeedReader.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+
             Section {
                 VStack(alignment: .leading) {
                     Text("\(settings.wpm) WPM")

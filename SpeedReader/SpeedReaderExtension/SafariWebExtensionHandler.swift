@@ -28,8 +28,8 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
         case "saveSettings":
             if let settingsData = messageDict["settings"] as? [String: Any] {
-                saveSettingsToAppGroup(settingsData)
-                response.userInfo = [SFExtensionMessageKey: ["status": "ok"]]
+                let savedCount = saveSettingsToAppGroup(settingsData)
+                response.userInfo = [SFExtensionMessageKey: ["status": "ok", "savedCount": savedCount]]
             } else {
                 os_log(.error, "[SpeedReader] saveSettings called without valid 'settings' key")
                 response.userInfo = [SFExtensionMessageKey: ["error": "Missing or invalid settings payload"]]
@@ -62,31 +62,50 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         ]
     }
 
-    private func saveSettingsToAppGroup(_ settings: [String: Any]) {
+    /// Saves settings to App Group UserDefaults. Returns the number of fields that matched expected types.
+    @discardableResult
+    private func saveSettingsToAppGroup(_ settings: [String: Any]) -> Int {
         guard let defaults = UserDefaults(suiteName: SettingsKeys.appGroupID) else {
             os_log(.error, "[SpeedReader] App Group not available for saving settings")
-            return
+            return 0
         }
+
+        var savedCount = 0
 
         if let wpm = settings["wpm"] as? Int {
             defaults.set(SettingsKeys.clamp(wpm, min: SettingsKeys.wpmMin, max: SettingsKeys.wpmMax),
                          forKey: SettingsKeys.wpm)
+            savedCount += 1
         }
         if let font = settings["font"] as? String,
            ReaderFont(rawValue: font) != nil {
             defaults.set(font, forKey: SettingsKeys.font)
+            savedCount += 1
         }
         if let theme = settings["theme"] as? String,
            ReaderTheme(rawValue: theme) != nil {
             defaults.set(theme, forKey: SettingsKeys.theme)
+            savedCount += 1
         }
         if let fontSize = settings["fontSize"] as? Int {
             defaults.set(SettingsKeys.clamp(fontSize, min: SettingsKeys.fontSizeMin, max: SettingsKeys.fontSizeMax),
                          forKey: SettingsKeys.fontSize)
+            savedCount += 1
         }
         if let punctuationPause = settings["punctuationPause"] as? Bool {
             defaults.set(punctuationPause, forKey: SettingsKeys.punctuationPause)
+            savedCount += 1
         }
+
+        if savedCount == 0 && !settings.isEmpty {
+            os_log(
+                .error,
+                "[SpeedReader] saveSettingsToAppGroup: no fields matched expected types (received %d keys). Possible type mismatch at JS/native boundary.",
+                settings.count
+            )
+        }
+
+        return savedCount
     }
 
     private func defaultSettings() -> [String: Any] {

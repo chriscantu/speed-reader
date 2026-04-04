@@ -7,6 +7,9 @@ import SwiftUI
 final class ReaderSettings {
     private let defaults: UserDefaults
 
+    /// True when App Group UserDefaults is available; false means settings won't sync with the extension.
+    private(set) var appGroupAvailable: Bool = false
+
     var wpm: Int = SettingsKeys.Defaults.wpm
     var font: ReaderFont = SettingsKeys.Defaults.font
     var theme: ReaderTheme = SettingsKeys.Defaults.theme
@@ -17,8 +20,10 @@ final class ReaderSettings {
         let store: UserDefaults
         if let injected = defaults {
             store = injected
+            appGroupAvailable = true  // Injected defaults are assumed valid (tests, etc.)
         } else if let groupDefaults = UserDefaults(suiteName: SettingsKeys.appGroupID) {
             store = groupDefaults
+            appGroupAvailable = true
         } else {
             os_log(
                 .error,
@@ -26,6 +31,7 @@ final class ReaderSettings {
                 SettingsKeys.appGroupID
             )
             store = .standard
+            appGroupAvailable = false
         }
 
         self.defaults = store
