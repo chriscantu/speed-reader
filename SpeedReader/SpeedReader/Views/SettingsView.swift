@@ -24,6 +24,9 @@ private struct SliderBoundLabel: View {
     }
 }
 
+/// Matches `--sr-accent: #0891b2` in overlay.css.
+private let orpAccentColor = Color(red: 8 / 255, green: 145 / 255, blue: 178 / 255)
+
 /// Static preview of a sample word with ORP focus-point highlighting,
 /// styled to approximate the RSVP overlay.
 private struct RSVPPreview: View {
@@ -68,7 +71,7 @@ private struct RSVPPreview: View {
         HStack(spacing: 0) {
             Spacer()
             (Text(before).foregroundColor(textColor)
-            + Text(focus).foregroundColor(.red)
+            + Text(focus).foregroundColor(orpAccentColor)
             + Text(after).foregroundColor(textColor))
                 .font(font.font(size: CGFloat(fontSize)))
             Spacer()
