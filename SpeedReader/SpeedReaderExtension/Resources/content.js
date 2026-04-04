@@ -7,6 +7,37 @@ let pendingSelectionMode = false;
 // Mark content script presence for test verification
 document.documentElement.setAttribute('data-speedreader-loaded', 'true');
 
+// Live-reload settings into an open overlay when they change in storage.
+browser.storage.onChanged.addListener(function(changes, area) {
+  if (area !== 'sync' || !overlay || !overlay.host) return;
+  var updated = {};
+  for (var key in changes) {
+    if (changes[key].newValue !== undefined) {
+      updated[key] = changes[key].newValue;
+    }
+  }
+  if (Object.keys(updated).length === 0) return;
+  try {
+    overlay.updateSettings(updated);
+  } catch (e) {
+    console.error('[SpeedReader] Failed to apply live settings update:', e);
+  }
+});
+
+// When Safari returns to foreground, sync settings from native in case
+// the user changed them in the companion app while away.
+// Debounced to at most once per 5 seconds to avoid overhead on tab switches.
+var _lastSyncTime = 0;
+document.addEventListener('visibilitychange', function() {
+  var now = Date.now();
+  if (document.visibilityState === 'visible' && overlay && overlay.host && now - _lastSyncTime > 5000) {
+    _lastSyncTime = now;
+    browser.runtime.sendMessage({ action: 'sync-settings' }).catch(function(err) {
+      console.warn('[SpeedReader] Foreground sync failed:', err.message || err);
+    });
+  }
+});
+
 async function getOverlay() {
   if (overlay) return overlay;
   try {
@@ -80,26 +111,32 @@ async function extractAndLaunch() {
   }
 }
 
+var settingsDefaults = {
+  wpm: 250,
+  font: 'system',
+  theme: 'system',
+  fontSize: 42,
+  punctuationPause: true,
+};
+
 async function getSettings() {
+  // Attempt a fresh sync from native App Group before reading storage,
+  // so the overlay is likely to open with current SwiftUI settings.
   try {
-    var stored = await browser.storage.sync.get({
-      wpm: 250,
-      font: 'system',
-      theme: 'system',
-      fontSize: 42,
-      punctuationPause: true,
-    });
-    return stored;
+    var syncResult = await browser.runtime.sendMessage({ action: 'sync-settings' });
+    if (syncResult && !syncResult.ok) {
+      console.warn('[SpeedReader] Native sync returned failure:', syncResult.error || 'unknown');
+    }
+  } catch (_e) {
+    console.warn('[SpeedReader] Background script unreachable for settings sync:', _e.message || _e);
+  }
+
+  try {
+    return await browser.storage.sync.get(settingsDefaults);
   } catch (e) {
     console.error('[SpeedReader] Failed to load settings:', e);
     showToast('Could not load your settings. Using defaults.');
-    return {
-      wpm: 250,
-      font: 'system',
-      theme: 'system',
-      fontSize: 42,
-      punctuationPause: true,
-    };
+    return settingsDefaults;
   }
 }
 

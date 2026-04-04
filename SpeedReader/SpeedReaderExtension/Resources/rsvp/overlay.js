@@ -1,4 +1,5 @@
 import { RSVPStateMachine } from './state-machine.js';
+import { FONT_SIZE_DEFAULT, clampWpm } from './settings-defaults.js';
 
 export class RSVPOverlay {
   constructor() {
@@ -8,7 +9,7 @@ export class RSVPOverlay {
     this.settings = {
       theme: 'system',
       font: 'system',
-      fontSize: 42,
+      fontSize: FONT_SIZE_DEFAULT,
     };
     this.host = null;
     this.shadow = null;
@@ -37,6 +38,63 @@ export class RSVPOverlay {
     this._bindEvents();
     this._renderWord();
     this._updateProgress();
+  }
+
+  updateSettings(settings) {
+    Object.assign(this.settings, settings);
+
+    if (this.host) {
+      this._syncHostAttr('data-theme', settings.theme);
+      this._syncHostAttr('data-font', settings.font);
+    }
+
+    if (typeof settings.fontSize === 'number' && this.shadow) {
+      this._syncFontSizeOverride(settings.fontSize);
+    }
+
+    // WPM and punctuationPause take effect on the next tick.
+    // Update the state machine and sync the slider UI.
+    if (typeof settings.wpm === 'number') {
+      this.state.wpm = clampWpm(settings.wpm);
+      if (this.elements.wpmLabel) {
+        this.elements.wpmLabel.textContent = this.state.wpm + ' wpm';
+      }
+      if (this.elements.slider) {
+        this.elements.slider.value = this.state.wpm;
+      }
+    }
+    if (settings.punctuationPause !== undefined) {
+      this.state.punctuationPause = settings.punctuationPause;
+    }
+  }
+
+  // Set or remove a host attribute based on whether value is a non-system string.
+  _syncHostAttr(attr, value) {
+    if (value === undefined) return;
+    if (value && value !== 'system') {
+      this.host.setAttribute(attr, value);
+    } else {
+      this.host.removeAttribute(attr);
+    }
+  }
+
+  // Apply or remove the font-size override <style> in the shadow DOM.
+  // Class 'sr-font-override' is used by updateSettings() to find and replace this element.
+  _syncFontSizeOverride(fontSize) {
+    var existing = this.shadow.querySelector('.sr-font-override');
+    if (fontSize !== FONT_SIZE_DEFAULT) {
+      var css = ':host { --sr-word-size: ' + fontSize + 'px; }';
+      if (existing) {
+        existing.textContent = css;
+      } else {
+        var style = document.createElement('style');
+        style.className = 'sr-font-override';
+        style.textContent = css;
+        this.shadow.appendChild(style);
+      }
+    } else if (existing) {
+      existing.remove();
+    }
   }
 
   close() {
@@ -220,12 +278,8 @@ export class RSVPOverlay {
     this.shadow = this.host.attachShadow({ mode: 'closed' });
 
     // Set theme and font attributes
-    if (this.settings.theme && this.settings.theme !== 'system') {
-      this.host.setAttribute('data-theme', this.settings.theme);
-    }
-    if (this.settings.font && this.settings.font !== 'system') {
-      this.host.setAttribute('data-font', this.settings.font);
-    }
+    this._syncHostAttr('data-theme', this.settings.theme);
+    this._syncHostAttr('data-font', this.settings.font);
 
     // Link stylesheet
     const link = document.createElement('link');
@@ -238,10 +292,8 @@ export class RSVPOverlay {
     this.shadow.appendChild(link);
 
     // Override word size if custom
-    if (this.settings.fontSize && this.settings.fontSize !== 42) {
-      const style = document.createElement('style');
-      style.textContent = ':host { --sr-word-size: ' + this.settings.fontSize + 'px; }';
-      this.shadow.appendChild(style);
+    if (this.settings.fontSize && this.settings.fontSize !== FONT_SIZE_DEFAULT) {
+      this._syncFontSizeOverride(this.settings.fontSize);
     }
 
     // Backdrop
@@ -465,7 +517,7 @@ export class RSVPOverlay {
 
     this.elements.slider.addEventListener('input', () => {
       const value = parseInt(this.elements.slider.value, 10);
-      this.state.wpm = Math.max(100, Math.min(600, value));
+      this.state.wpm = clampWpm(value);
       this.elements.wpmLabel.textContent = this.state.wpm + ' wpm';
     });
 

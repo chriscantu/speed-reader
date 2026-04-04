@@ -24,6 +24,11 @@ A free, accessible RSVP speed reader for the web. Built for neurodivergent reade
 - **Context preview on pause** — shows surrounding sentence to help re-orient after losing focus
 - **Punctuation pausing** — period 1.5x delay, comma 1.2x delay for natural reading rhythm
 
+## Code Quality
+
+- **No magic numbers** — Hardcoded values (WPM bounds, default font size, etc.) MUST be defined as named constants in a single location (`SettingsKeys.swift` for Swift, `settings-defaults.js` for JavaScript). Code MUST reference these constants, never inline literals.
+- **Flat control flow** — Avoid deeply nested conditionals. Extract helper functions, use early returns, or restructure with guard clauses to keep nesting at two levels or fewer.
+
 ## Conventions
 
 - **Swift**: follow Swift API Design Guidelines

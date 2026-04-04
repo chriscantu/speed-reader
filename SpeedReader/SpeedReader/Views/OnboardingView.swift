@@ -4,8 +4,7 @@ import SafariServices
 #endif
 
 struct OnboardingView: View {
-    @Binding var extensionEnabled: Bool
-    @Binding var hasChecked: Bool
+    var onComplete: () -> Void
 
     var body: some View {
         VStack(spacing: 32) {
@@ -59,14 +58,11 @@ struct OnboardingView: View {
             #endif
 
             Button("I've enabled it") {
-                checkExtensionStatus()
+                onComplete()
             }
             .foregroundStyle(.secondary)
 
             Spacer()
-        }
-        .onAppear {
-            checkExtensionStatus()
         }
     }
 
@@ -83,23 +79,5 @@ struct OnboardingView: View {
             Text(text)
                 .font(.body)
         }
-    }
-
-    private func checkExtensionStatus() {
-        #if os(macOS)
-        SFSafariExtensionManager.getStateOfSafariExtension(
-            withIdentifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
-        ) { state, _ in
-            DispatchQueue.main.async {
-                hasChecked = true
-                extensionEnabled = state?.isEnabled ?? false
-            }
-        }
-        #else
-        // iOS doesn't have a programmatic way to check extension state.
-        // After user taps "I've enabled it", trust them and show settings.
-        hasChecked = true
-        extensionEnabled = true
-        #endif
     }
 }

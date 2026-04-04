@@ -26,12 +26,21 @@ browser.action.onClicked.addListener(async (tab) => {
 async function syncSettingsFromNative() {
   try {
     var response = await browser.runtime.sendNativeMessage(
-      'application.id',
+      'com.chriscantu.SpeedReader',
       { action: 'getSettings' }
     );
     if (response && response.wpm !== undefined) {
-      await browser.storage.sync.set(response);
+      var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause'];
+      var filtered = {};
+      for (var i = 0; i < allowed.length; i++) {
+        if (response[allowed[i]] !== undefined) {
+          filtered[allowed[i]] = response[allowed[i]];
+        }
+      }
+      await browser.storage.sync.set(filtered);
       console.log('[SpeedReader] Settings synced from native app');
+    } else if (response) {
+      console.warn('[SpeedReader] Native response missing expected fields:', JSON.stringify(response));
     }
   } catch (error) {
     console.error('[SpeedReader] Failed to sync native settings:', error);
@@ -62,8 +71,17 @@ browser.runtime.onInstalled.addListener(() => {
 // Sync settings from native app whenever the service worker starts
 syncSettingsFromNative();
 
-// Test hook — allows querying overlay state from native handler
+// Listen for sync requests from content script and test hooks
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'sync-settings') {
+    syncSettingsFromNative().then(() => sendResponse({ ok: true }))
+      .catch(function(err) {
+        console.warn('[SpeedReader] sync-settings request failed:', err.message || err);
+        sendResponse({ ok: false, error: err.message || String(err) });
+      });
+    return true; // async response
+  }
+
   if (message.action === 'test-get-state') {
     browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]) {

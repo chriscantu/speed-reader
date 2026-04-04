@@ -1,12 +1,13 @@
 import { processText, calculateDelay, wpmToDelay } from './word-processor.js';
 import { splitWordAtFocus } from './focus-point.js';
+import { WPM_DEFAULT, clampWpm } from './settings-defaults.js';
 
 export class RSVPStateMachine {
   constructor() {
     this.words = [];
     this.currentIndex = 0;
     this.isPlaying = false;
-    this.wpm = 250;
+    this.wpm = WPM_DEFAULT;
     this.punctuationPause = true;
   }
 
@@ -14,7 +15,7 @@ export class RSVPStateMachine {
     this.words = processText(text);
     this.currentIndex = 0;
     this.isPlaying = false;
-    this.wpm = Math.max(100, Math.min(600, settings.wpm ?? 250));
+    this.wpm = clampWpm(settings.wpm ?? WPM_DEFAULT);
     this.punctuationPause = settings.punctuationPause ?? true;
   }
 
@@ -88,7 +89,7 @@ export class RSVPStateMachine {
   }
 
   adjustWpm(delta) {
-    this.wpm = Math.max(100, Math.min(600, this.wpm + delta));
+    this.wpm = clampWpm(this.wpm + delta);
     return this.wpm;
   }
 

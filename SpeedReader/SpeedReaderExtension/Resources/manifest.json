@@ -28,6 +28,7 @@
         "overlay.css",
         "overlay.js",
         "state-machine.js",
+        "settings-defaults.js",
         "word-processor.js",
         "focus-point.js",
         "Readability.js",
