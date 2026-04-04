@@ -22,6 +22,7 @@
   --sr-card-radius: 16px;
   --sr-font-family: -apple-system, system-ui, 'Helvetica Neue', sans-serif;
   --sr-word-size: 42px;
+  --sr-word-area-height: 194px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -129,12 +130,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: calc(var(--sr-word-size) * 1.6 + 40px);
+  height: var(--sr-word-area-height);
   border-top: 1px solid var(--sr-border);
   border-bottom: 1px solid var(--sr-border);
   cursor: pointer;
   overflow: hidden;
-  transition: height 0.15s ease;
 }
 
 .sr-focus-marker {
@@ -438,10 +438,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sr-word-area {
-    transition: none;
-  }
-
   .sr-progress-fill {
     transition: none;
   }
