@@ -100,7 +100,8 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         if savedCount == 0 && !settings.isEmpty {
             os_log(
                 .error,
-                "[SpeedReader] saveSettingsToAppGroup: no fields matched expected types (received %d keys). Possible type mismatch at JS/native boundary.",
+                "[SpeedReader] saveSettingsToAppGroup: 0 of %d keys matched expected types. "
+                + "Possible type mismatch at JS/native boundary.",
                 settings.count
             )
         }
