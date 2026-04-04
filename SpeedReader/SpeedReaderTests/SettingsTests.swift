@@ -76,6 +76,156 @@ final class SettingsTests: XCTestCase {
         XCTAssertTrue(settings.appGroupAvailable, "Injected defaults should report App Group as available")
     }
 
+    // MARK: - Init with pre-populated out-of-range UserDefaults
+
+    func testInitClampsWPMBelowMinimum() {
+        let store = makeDefaults()
+        store.set(50, forKey: SettingsKeys.wpm)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.wpm, SettingsKeys.wpmMin)
+    }
+
+    func testInitClampsWPMAboveMaximum() {
+        let store = makeDefaults()
+        store.set(999, forKey: SettingsKeys.wpm)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.wpm, SettingsKeys.wpmMax)
+    }
+
+    func testInitClampsFontSizeBelowMinimum() {
+        let store = makeDefaults()
+        store.set(10, forKey: SettingsKeys.fontSize)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.fontSize, SettingsKeys.fontSizeMin)
+    }
+
+    func testInitClampsFontSizeAboveMaximum() {
+        let store = makeDefaults()
+        store.set(200, forKey: SettingsKeys.fontSize)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.fontSize, SettingsKeys.fontSizeMax)
+    }
+
+    func testInitFallsBackForInvalidFontRawValue() {
+        let store = makeDefaults()
+        store.set("comic-sans", forKey: SettingsKeys.font)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.font, SettingsKeys.Defaults.font)
+    }
+
+    func testInitFallsBackForInvalidThemeRawValue() {
+        let store = makeDefaults()
+        store.set("neon-pink", forKey: SettingsKeys.theme)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.theme, SettingsKeys.Defaults.theme)
+    }
+
+    func testInitFallsBackWhenWPMStoredAsWrongType() {
+        let store = makeDefaults()
+        store.set("not-a-number", forKey: SettingsKeys.wpm)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.wpm, SettingsKeys.Defaults.wpm)
+    }
+
+    func testInitFallsBackWhenFontSizeStoredAsWrongType() {
+        let store = makeDefaults()
+        store.set("big", forKey: SettingsKeys.fontSize)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.fontSize, SettingsKeys.Defaults.fontSize)
+    }
+
+    func testInitFallsBackWhenPunctuationPauseStoredAsWrongType() {
+        let store = makeDefaults()
+        store.set("yes", forKey: SettingsKeys.punctuationPause)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.punctuationPause, SettingsKeys.Defaults.punctuationPause)
+    }
+
+    // MARK: - saveSettings type checking and clamping
+
+    func testSaveSettingsWithValidPayloadSavesAllFields() {
+        let store = makeDefaults()
+        let payload: [String: Any] = [
+            "wpm": 300,
+            "font": "opendyslexic",
+            "theme": "dark",
+            "fontSize": 36,
+            "punctuationPause": false,
+        ]
+        let count = SettingsKeys.saveSettings(payload, to: store)
+        XCTAssertEqual(count, 5)
+        XCTAssertEqual(store.integer(forKey: SettingsKeys.wpm), 300)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.font), "opendyslexic")
+        XCTAssertEqual(store.string(forKey: SettingsKeys.theme), "dark")
+        XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), 36)
+        XCTAssertFalse(store.bool(forKey: SettingsKeys.punctuationPause))
+    }
+
+    func testSaveSettingsWithAllWrongTypesSavesZero() {
+        let store = makeDefaults()
+        let payload: [String: Any] = [
+            "wpm": "fast",
+            "font": 42,
+            "theme": true,
+            "fontSize": "big",
+            "punctuationPause": 1,
+        ]
+        let count = SettingsKeys.saveSettings(payload, to: store)
+        XCTAssertEqual(count, 0)
+    }
+
+    func testSaveSettingsWithPartialMismatchSavesOnlyValid() {
+        let store = makeDefaults()
+        let payload: [String: Any] = [
+            "wpm": 200,           // valid
+            "font": 42,           // wrong type
+            "theme": "dark",      // valid
+            "fontSize": "big",    // wrong type
+            "punctuationPause": true,  // valid
+        ]
+        let count = SettingsKeys.saveSettings(payload, to: store)
+        XCTAssertEqual(count, 3)
+        XCTAssertEqual(store.integer(forKey: SettingsKeys.wpm), 200)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.theme), "dark")
+        XCTAssertTrue(store.bool(forKey: SettingsKeys.punctuationPause))
+    }
+
+    func testSaveSettingsRejectsInvalidFontRawValue() {
+        let store = makeDefaults()
+        let payload: [String: Any] = ["font": "comic-sans"]
+        let count = SettingsKeys.saveSettings(payload, to: store)
+        XCTAssertEqual(count, 0)
+    }
+
+    func testSaveSettingsRejectsInvalidThemeRawValue() {
+        let store = makeDefaults()
+        let payload: [String: Any] = ["theme": "neon-pink"]
+        let count = SettingsKeys.saveSettings(payload, to: store)
+        XCTAssertEqual(count, 0)
+    }
+
+    func testSaveSettingsClampsWPMToValidRange() {
+        let store = makeDefaults()
+        let count = SettingsKeys.saveSettings(["wpm": 9999], to: store)
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(store.integer(forKey: SettingsKeys.wpm), SettingsKeys.wpmMax)
+    }
+
+    func testSaveSettingsClampsFontSizeToValidRange() {
+        let store = makeDefaults()
+        let count = SettingsKeys.saveSettings(["fontSize": 1], to: store)
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), SettingsKeys.fontSizeMin)
+    }
+
+    func testSaveSettingsWithEmptyPayloadReturnsZero() {
+        let store = makeDefaults()
+        let count = SettingsKeys.saveSettings([:], to: store)
+        XCTAssertEqual(count, 0)
+    }
+
+    // MARK: - Persistence round-trip
+
     func testSettingsPersistAcrossInstances() {
         let store = makeDefaults()
         let first = ReaderSettings(defaults: store)
