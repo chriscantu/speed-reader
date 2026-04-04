@@ -54,6 +54,18 @@
   --sr-font-family: 'OpenDyslexic', sans-serif;
 }
 
+:host([data-font="newYork"]) {
+  --sr-font-family: 'New York', 'Iowan Old Style', Georgia, serif;
+}
+
+:host([data-font="georgia"]) {
+  --sr-font-family: Georgia, 'Times New Roman', serif;
+}
+
+:host([data-font="menlo"]) {
+  --sr-font-family: Menlo, 'Courier New', monospace;
+}
+
 * {
   margin: 0;
   padding: 0;
