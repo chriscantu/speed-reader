@@ -1,11 +1,87 @@
 import SwiftUI
 
+/// Returns a SwiftUI Font for a given ReaderFont at the specified size.
+extension ReaderFont {
+    func font(size: CGFloat) -> Font {
+        switch self {
+        case .system: return .system(size: size, weight: .regular)
+        case .openDyslexic: return .custom("OpenDyslexic", size: size)
+        }
+    }
+}
+
+/// Small label used for slider min/max value annotations.
+private struct SliderBoundLabel: View {
+    let value: Int
+
+    var body: some View {
+        Text("\(value)")
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+    }
+}
+
+/// Static preview of a sample word with ORP focus-point highlighting,
+/// styled to approximate the RSVP overlay.
+private struct RSVPPreview: View {
+    let font: ReaderFont
+    let fontSize: Int
+    let theme: ReaderTheme
+
+    private let word = "knowledge"
+
+    /// ORP focus index: 0 for short words (≤3 chars), floor(length * 0.3) otherwise.
+    /// Matches calculateFocusPoint() in focus-point.js.
+    private var focusIndex: Int {
+        word.count <= 3 ? 0 : Int(floor(Double(word.count) * 0.3))
+    }
+
+    private var before: String { String(word.prefix(focusIndex)) }
+    private var focus: String { String(word[word.index(word.startIndex, offsetBy: focusIndex)]) }
+    private var after: String { String(word.suffix(word.count - focusIndex - 1)) }
+
+    private var backgroundColor: Color {
+        switch theme {
+        case .dark: return Color.black
+        case .light: return Color.white
+        case .system:
+            #if os(macOS)
+            return Color(nsColor: .windowBackgroundColor)
+            #else
+            return Color(uiColor: .systemBackground)
+            #endif
+        }
+    }
+
+    private var textColor: Color {
+        switch theme {
+        case .dark: return Color.white
+        case .light: return Color.black
+        case .system: return Color.primary
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Spacer()
+            (Text(before).foregroundColor(textColor)
+            + Text(focus).foregroundColor(.red)
+            + Text(after).foregroundColor(textColor))
+                .font(font.font(size: CGFloat(fontSize)))
+            Spacer()
+        }
+        .padding(.vertical, 24)
+        .background(backgroundColor)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
 struct SettingsView: View {
     @Environment(ReaderSettings.self) private var settings
 
     var body: some View {
         Form {
-            Section("Reading Speed") {
+            Section {
                 VStack(alignment: .leading) {
                     Text("\(settings.wpm) WPM")
                         .font(.headline)
@@ -20,6 +96,10 @@ struct SettingsView: View {
                         step: 25
                     ) {
                         Text("Words per minute")
+                    } minimumValueLabel: {
+                        SliderBoundLabel(value: SettingsKeys.wpmMin)
+                    } maximumValueLabel: {
+                        SliderBoundLabel(value: SettingsKeys.wpmMax)
                     }
                 }
 
@@ -27,9 +107,15 @@ struct SettingsView: View {
                     get: { settings.punctuationPause },
                     set: { settings.setPunctuationPause($0) }
                 ))
+            } header: {
+                Text("Reading Speed")
+            } footer: {
+                Text("Pauses briefly on periods, commas, and other punctuation for easier comprehension.")
             }
 
             Section("Appearance") {
+                RSVPPreview(font: settings.font, fontSize: settings.fontSize, theme: settings.theme)
+
                 Picker("Font", selection: Binding(
                     get: { settings.font },
                     set: { settings.setFont($0) }
@@ -60,15 +146,21 @@ struct SettingsView: View {
                         step: 2
                     ) {
                         Text("Font size")
+                    } minimumValueLabel: {
+                        SliderBoundLabel(value: SettingsKeys.fontSizeMin)
+                    } maximumValueLabel: {
+                        SliderBoundLabel(value: SettingsKeys.fontSizeMax)
                     }
                 }
             }
 
-            Section("How to Use") {
-                Label("Navigate to any article in Safari", systemImage: "safari")
-                Label("Tap the SpeedReader icon in the toolbar", systemImage: "hand.tap")
-                Label("Tap anywhere to pause, Space on Mac", systemImage: "pause.circle")
-                Label("Use ← → to skip between sentences", systemImage: "arrow.left.arrow.right")
+            Section {
+                DisclosureGroup("How to Use") {
+                    Label("Navigate to any article in Safari", systemImage: "safari")
+                    Label("Tap the SpeedReader icon in the toolbar", systemImage: "hand.tap")
+                    Label("Tap anywhere to pause, Space on Mac", systemImage: "pause.circle")
+                    Label("Use ← → to skip between sentences", systemImage: "arrow.left.arrow.right")
+                }
             }
         }
         .navigationTitle("SpeedReader")
