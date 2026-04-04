@@ -232,6 +232,8 @@ window.addEventListener('message', function(event) {
       result.hasPrev = overlay.elements.prevBtn !== undefined;
       result.hasNext = overlay.elements.nextBtn !== undefined;
       result.hasClose = overlay.shadow.querySelector('.sr-close') !== null;
+      result.theme = overlay.host.getAttribute('data-theme') || 'system';
+      result.font = overlay.host.getAttribute('data-font') || 'default';
     }
     // Post result back to page context
     window.postMessage({ type: 'speedreader-test-result', data: result }, '*');
@@ -246,6 +248,26 @@ window.addEventListener('message', function(event) {
 
   if (event.data.type === 'speedreader-test-next') {
     if (overlay) overlay.nextSentence();
+  }
+
+  if (event.data.type === 'speedreader-test-dispatch') {
+    var action = event.data.action;
+    var payload = event.data.payload || {};
+    var overlayActions = ['set-theme', 'set-font', 'set-wpm'];
+
+    if (overlayActions.indexOf(action) !== -1 && !overlay) {
+      console.warn('[SpeedReader] dispatch ' + action + ' ignored: overlay not open');
+    } else if (action === 'keydown') {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: payload.key, bubbles: true }));
+    } else if (action === 'set-theme') {
+      overlay.updateSettings({ theme: payload.theme });
+    } else if (action === 'set-font') {
+      overlay.updateSettings({ font: payload.font });
+    } else if (action === 'set-wpm') {
+      overlay.updateSettings({ wpm: payload.wpm });
+    } else {
+      console.warn('[SpeedReader] Unknown dispatch action:', action);
+    }
   }
 });
 

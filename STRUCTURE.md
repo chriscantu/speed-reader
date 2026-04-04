@@ -42,10 +42,17 @@ ios-speed-reader/
 │   │
 │   └── SpeedReader.xcodeproj           # Xcode project file
 │
+├── tests/
+│   ├── js/                             # Unit tests (JS, Node.js test runner)
+│   └── regression/                     # Regression tests (Node.js test runner)
+│
 ├── docs/
 │   ├── superpowers/
 │   │   └── specs/                      # Design specs
 │   └── plans/                          # Implementation plans (one per feature)
+│
+├── scripts/
+│   └── lib/                            # Safari driver and shared test infra
 │
 ├── CLAUDE.md                           # Claude Code project instructions
 ├── PRINCIPLES.md                       # Design decisions, conventions, workflow
@@ -78,6 +85,9 @@ ios-speed-reader/
 | Design specs | `docs/superpowers/specs/` |
 | Implementation plans | `docs/plans/` |
 | App assets | `SpeedReader/SpeedReader/Assets.xcassets` |
+| Unit tests (JS) | `tests/js/` |
+| Regression tests | `tests/regression/` |
+| Safari driver (test infra) | `scripts/lib/` |
 
 ## Build & Run
 

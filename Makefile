@@ -23,4 +23,4 @@ lint-all: lint-js lint-swift
 ci: lint-all test-all
 
 test-regression:
-	./scripts/regression-test.sh
+	node --test --test-concurrency=1 tests/regression/*.test.js
