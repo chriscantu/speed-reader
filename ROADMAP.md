@@ -14,7 +14,7 @@
 - [x] SwiftUI container app with settings + onboarding
 - [x] Keyboard shortcuts on Mac (Space, arrows, ESC)
 
-## v1.1 — Test Coverage & Hardening
+### Hardening (pre-release)
 
 - [x] RSVPOverlay state machine tests (play/pause/nav/wpm clamping) — extracted to `rsvp/state-machine.js`
 - [ ] Content script decision tree tests (selection priority, Readability fallback, error paths)

@@ -3,6 +3,7 @@
 
 let overlay = null;
 let pendingSelectionMode = false;
+let _syncWarningShown = false;
 
 // Mark content script presence for test verification
 document.documentElement.setAttribute('data-speedreader-loaded', 'true');
@@ -122,13 +123,21 @@ var settingsDefaults = {
 async function getSettings() {
   // Attempt a fresh sync from native App Group before reading storage,
   // so the overlay is likely to open with current SwiftUI settings.
+  var syncFailed = false;
   try {
     var syncResult = await browser.runtime.sendMessage({ action: 'sync-settings' });
     if (syncResult && !syncResult.ok) {
       console.warn('[SpeedReader] Native sync returned failure:', syncResult.error || 'unknown');
+      syncFailed = true;
     }
   } catch (_e) {
     console.warn('[SpeedReader] Background script unreachable for settings sync:', _e.message || _e);
+    syncFailed = true;
+  }
+
+  if (syncFailed && !_syncWarningShown) {
+    _syncWarningShown = true;
+    showToast('Settings may be out of date. Open the SpeedReader app to sync.');
   }
 
   try {
