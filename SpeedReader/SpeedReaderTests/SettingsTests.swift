@@ -51,13 +51,13 @@ final class SettingsTests: XCTestCase {
     func testFontSizeClampedToMinimum() {
         let settings = makeSettings()
         settings.setFontSize(10)
-        XCTAssertEqual(settings.fontSize, 28)
+        XCTAssertEqual(settings.fontSize, 24)
     }
 
     func testFontSizeClampedToMaximum() {
         let settings = makeSettings()
         settings.setFontSize(100)
-        XCTAssertEqual(settings.fontSize, 64)
+        XCTAssertEqual(settings.fontSize, 96)
     }
 
     func testAppGroupAvailableWithInjectedDefaults() {
@@ -276,5 +276,42 @@ final class SettingsTests: XCTestCase {
             XCTAssertEqual(count, 1, "Expected \(rawValue) to be accepted")
             XCTAssertEqual(store.string(forKey: SettingsKeys.font), rawValue)
         }
+    }
+
+    // MARK: - Widened font size bounds
+
+    func testFontSizeAccepts24() {
+        let settings = makeSettings()
+        settings.setFontSize(24)
+        XCTAssertEqual(settings.fontSize, 24)
+    }
+
+    func testFontSizeAccepts96() {
+        let settings = makeSettings()
+        settings.setFontSize(96)
+        XCTAssertEqual(settings.fontSize, 96)
+    }
+
+    func testFontSizeClampedToNewMinimum() {
+        let settings = makeSettings()
+        settings.setFontSize(10)
+        XCTAssertEqual(settings.fontSize, 24)
+    }
+
+    func testFontSizeClampedToNewMaximum() {
+        let settings = makeSettings()
+        settings.setFontSize(200)
+        XCTAssertEqual(settings.fontSize, 96)
+    }
+
+    func testSaveSettingsClampsFontSizeToNewRange() {
+        let store = makeDefaults()
+        let countLow = SettingsKeys.saveSettings(["fontSize": 10], to: store)
+        XCTAssertEqual(countLow, 1)
+        XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), 24)
+
+        let countHigh = SettingsKeys.saveSettings(["fontSize": 200], to: store)
+        XCTAssertEqual(countHigh, 1)
+        XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), 96)
     }
 }

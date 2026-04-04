@@ -67,8 +67,8 @@ enum SettingsKeys {
     static let wpmRange = Double(wpmMin)...Double(wpmMax)
 
     /// Font size bounds
-    static let fontSizeMin = 28
-    static let fontSizeMax = 64
+    static let fontSizeMin = 24
+    static let fontSizeMax = 96
 
     /// Font size range for sliders
     static let fontSizeRange = Double(fontSizeMin)...Double(fontSizeMax)
