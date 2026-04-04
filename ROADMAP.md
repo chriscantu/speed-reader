@@ -27,7 +27,7 @@
 - [x] `syncSettingsFromNative` — surface sync failure to user (e.g., store lastSyncStatus flag)
 - [x] Selection read failure — show toast when selection is ignored due to API error
 - [x] App Group unavailable — surface visible warning in SwiftUI app when settings won't sync
-- [ ] Full regression test infrastructure — `make send`-style command router, scripted assertions for all overlay states, keyboard shortcuts, WPM changes, theme switching, multi-platform coverage
+- [x] Full regression test infrastructure — modular Node.js suite with Safari driver, dispatch command router, keyboard/WPM/theme/font coverage, manual iOS/iPadOS checklist
 
 ## v2 — Enhanced Navigation
 
