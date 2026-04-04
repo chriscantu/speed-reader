@@ -22,6 +22,10 @@
   --sr-card-radius: 16px;
   --sr-font-family: -apple-system, system-ui, 'Helvetica Neue', sans-serif;
   --sr-word-size: 42px;
+  /* Fixed height to prevent layout shift during RSVP playback.
+     Sized to fit max font (96px * 1.6 line-height + focus marker + padding).
+     Mobile override in @media (max-width: 480px) below. */
+  --sr-word-area-height: 194px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -125,8 +129,11 @@
 }
 
 .sr-word-area {
-  text-align: center;
-  padding: 36px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: var(--sr-word-area-height);
   border-top: 1px solid var(--sr-border);
   border-bottom: 1px solid var(--sr-border);
   cursor: pointer;
@@ -144,7 +151,8 @@
   font-weight: 300;
   letter-spacing: 2px;
   font-family: var(--sr-font-family);
-  word-break: break-all;
+  white-space: nowrap;
+  transform-origin: center;
 }
 
 .sr-word-before,
@@ -381,6 +389,11 @@
 }
 
 @media (max-width: 480px) {
+  :host {
+    /* Smaller word area on mobile — fits fonts up to ~60px comfortably. */
+    --sr-word-area-height: 120px;
+  }
+
   .sr-card {
     width: calc(100vw - 24px);
     padding: 16px;

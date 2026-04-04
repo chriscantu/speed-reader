@@ -185,6 +185,7 @@ export class RSVPOverlay {
       this.elements.fontSizeValue.textContent = newSize + 'px';
     }
     this._persistFontSize(newSize);
+    this._scaleWordToFit();
   }
 
   // Persist to browser.storage.sync (extension's source of truth) AND relay to
@@ -226,6 +227,24 @@ export class RSVPOverlay {
     }
     if (this.elements.wordAfter) {
       this.elements.wordAfter.textContent = parts.after;
+    }
+    this._scaleWordToFit();
+  }
+
+  // Scale the word container down when the text overflows the word area width.
+  // Uses CSS transform so layout dimensions stay stable.
+  _scaleWordToFit() {
+    const container = this.elements.wordContainer;
+    const area = this.elements.wordArea;
+    if (!container || !area) return;
+
+    // Reset any previous scale so measurements reflect true size.
+    container.style.transform = '';
+    const areaWidth = area.clientWidth;
+    const textWidth = container.scrollWidth;
+    if (textWidth > areaWidth) {
+      const scale = Math.max(areaWidth / textWidth, 0.3);
+      container.style.transform = 'scale(' + scale + ')';
     }
   }
 
@@ -382,6 +401,7 @@ export class RSVPOverlay {
     wordContainer.appendChild(wordBefore);
     wordContainer.appendChild(wordFocus);
     wordContainer.appendChild(wordAfter);
+    this.elements.wordContainer = wordContainer;
 
     wordArea.appendChild(focusMarker);
     wordArea.appendChild(wordContainer);
