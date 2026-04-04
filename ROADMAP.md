@@ -41,7 +41,6 @@
 
 - [x] Font picker — curated set (San Francisco, OpenDyslexic, New York, Georgia, Menlo)
 - [x] Font size stepper in overlay (A−/A+, 24–96px)
-- [ ] Font weight and contrast controls
 - [ ] Background color options (cream/pastel for dyslexic readers)
 - [ ] Configurable chunk size (1, 2, or 3 words at a time)
 
