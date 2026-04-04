@@ -26,7 +26,7 @@ browser.action.onClicked.addListener(async (tab) => {
 async function syncSettingsFromNative() {
   try {
     var response = await browser.runtime.sendNativeMessage(
-      'application.id',
+      'com.chriscantu.SpeedReader',
       { action: 'getSettings' }
     );
     if (response && response.wpm !== undefined) {
@@ -62,8 +62,14 @@ browser.runtime.onInstalled.addListener(() => {
 // Sync settings from native app whenever the service worker starts
 syncSettingsFromNative();
 
-// Test hook — allows querying overlay state from native handler
+// Listen for sync requests from content script and test hooks
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'sync-settings') {
+    syncSettingsFromNative().then(() => sendResponse({ ok: true }))
+      .catch(() => sendResponse({ ok: false }));
+    return true; // async response
+  }
+
   if (message.action === 'test-get-state') {
     browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]) {

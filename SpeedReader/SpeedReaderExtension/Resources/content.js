@@ -7,6 +7,24 @@ let pendingSelectionMode = false;
 // Mark content script presence for test verification
 document.documentElement.setAttribute('data-speedreader-loaded', 'true');
 
+// Live-reload settings into an open overlay when they change in storage.
+browser.storage.onChanged.addListener(function(changes, area) {
+  if (area !== 'sync' || !overlay || !overlay.host) return;
+  var updated = {};
+  for (var key in changes) {
+    updated[key] = changes[key].newValue;
+  }
+  overlay.updateSettings(updated);
+});
+
+// When Safari returns to foreground, sync settings from native in case
+// the user changed them in the companion app while away.
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible' && overlay && overlay.host) {
+    browser.runtime.sendMessage({ action: 'sync-settings' }).catch(function() {});
+  }
+});
+
 async function getOverlay() {
   if (overlay) return overlay;
   try {
@@ -80,26 +98,29 @@ async function extractAndLaunch() {
   }
 }
 
+var settingsDefaults = {
+  wpm: 250,
+  font: 'system',
+  theme: 'system',
+  fontSize: 42,
+  punctuationPause: true,
+};
+
 async function getSettings() {
+  // Request a fresh sync from native App Group before reading storage.
+  // This ensures the overlay always opens with the latest SwiftUI settings.
   try {
-    var stored = await browser.storage.sync.get({
-      wpm: 250,
-      font: 'system',
-      theme: 'system',
-      fontSize: 42,
-      punctuationPause: true,
-    });
-    return stored;
+    await browser.runtime.sendMessage({ action: 'sync-settings' });
+  } catch (_e) {
+    // Background script unreachable — proceed with cached values
+  }
+
+  try {
+    return await browser.storage.sync.get(settingsDefaults);
   } catch (e) {
     console.error('[SpeedReader] Failed to load settings:', e);
     showToast('Could not load your settings. Using defaults.');
-    return {
-      wpm: 250,
-      font: 'system',
-      theme: 'system',
-      fontSize: 42,
-      punctuationPause: true,
-    };
+    return settingsDefaults;
   }
 }
 

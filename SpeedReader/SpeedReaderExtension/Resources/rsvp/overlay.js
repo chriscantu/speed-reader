@@ -39,6 +39,59 @@ export class RSVPOverlay {
     this._updateProgress();
   }
 
+  updateSettings(settings) {
+    Object.assign(this.settings, settings);
+
+    // Update visual properties on the live DOM
+    if (this.host) {
+      if (settings.theme !== undefined) {
+        if (settings.theme && settings.theme !== 'system') {
+          this.host.setAttribute('data-theme', settings.theme);
+        } else {
+          this.host.removeAttribute('data-theme');
+        }
+      }
+      if (settings.font !== undefined) {
+        if (settings.font && settings.font !== 'system') {
+          this.host.setAttribute('data-font', settings.font);
+        } else {
+          this.host.removeAttribute('data-font');
+        }
+      }
+    }
+
+    // Update font size CSS variable — reflows the current word immediately
+    if (settings.fontSize !== undefined && this.shadow) {
+      var existing = this.shadow.querySelector('.sr-font-override');
+      if (settings.fontSize !== 42) {
+        if (existing) {
+          existing.textContent = ':host { --sr-word-size: ' + settings.fontSize + 'px; }';
+        } else {
+          var style = document.createElement('style');
+          style.className = 'sr-font-override';
+          style.textContent = ':host { --sr-word-size: ' + settings.fontSize + 'px; }';
+          this.shadow.appendChild(style);
+        }
+      } else if (existing) {
+        existing.remove();
+      }
+    }
+
+    // WPM and punctuationPause are read per-tick — just update the state machine
+    if (settings.wpm !== undefined) {
+      this.state.wpm = Math.max(100, Math.min(600, settings.wpm));
+      if (this.elements.wpmLabel) {
+        this.elements.wpmLabel.textContent = this.state.wpm + ' wpm';
+      }
+      if (this.elements.slider) {
+        this.elements.slider.value = this.state.wpm;
+      }
+    }
+    if (settings.punctuationPause !== undefined) {
+      this.state.punctuationPause = settings.punctuationPause;
+    }
+  }
+
   close() {
     this.pause();
     if (this.host && this.host.parentNode) {
@@ -240,6 +293,7 @@ export class RSVPOverlay {
     // Override word size if custom
     if (this.settings.fontSize && this.settings.fontSize !== 42) {
       const style = document.createElement('style');
+      style.className = 'sr-font-override';
       style.textContent = ':host { --sr-word-size: ' + this.settings.fontSize + 'px; }';
       this.shadow.appendChild(style);
     }
