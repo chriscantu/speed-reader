@@ -1,7 +1,28 @@
 import SwiftUI
 
-/// Live preview of a single word with ORP focus-point highlighting,
-/// matching the RSVP overlay experience.
+/// Returns a SwiftUI Font for a given ReaderFont at the specified size.
+extension ReaderFont {
+    func font(size: CGFloat) -> Font {
+        switch self {
+        case .system: return .system(size: size, weight: .regular)
+        case .openDyslexic: return .custom("OpenDyslexic", size: size)
+        }
+    }
+}
+
+/// Small label used for slider min/max value annotations.
+private struct SliderBoundLabel: View {
+    let value: Int
+
+    var body: some View {
+        Text("\(value)")
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+    }
+}
+
+/// Static preview of a sample word with ORP focus-point highlighting,
+/// styled to approximate the RSVP overlay.
 private struct RSVPPreview: View {
     let font: ReaderFont
     let fontSize: Int
@@ -9,8 +30,11 @@ private struct RSVPPreview: View {
 
     private let word = "knowledge"
 
-    /// ORP: for words > 3 chars, focus index is floor(length * 0.3).
-    private var focusIndex: Int { Int(floor(Double(word.count) * 0.3)) }
+    /// ORP focus index: 0 for short words (≤3 chars), floor(length * 0.3) otherwise.
+    /// Matches calculateFocusPoint() in focus-point.js.
+    private var focusIndex: Int {
+        word.count <= 3 ? 0 : Int(floor(Double(word.count) * 0.3))
+    }
 
     private var before: String { String(word.prefix(focusIndex)) }
     private var focus: String { String(word[word.index(word.startIndex, offsetBy: focusIndex)]) }
@@ -73,13 +97,9 @@ struct SettingsView: View {
                     ) {
                         Text("Words per minute")
                     } minimumValueLabel: {
-                        Text("\(SettingsKeys.wpmMin)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                        SliderBoundLabel(value: SettingsKeys.wpmMin)
                     } maximumValueLabel: {
-                        Text("\(SettingsKeys.wpmMax)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                        SliderBoundLabel(value: SettingsKeys.wpmMax)
                     }
                 }
 
@@ -127,13 +147,9 @@ struct SettingsView: View {
                     ) {
                         Text("Font size")
                     } minimumValueLabel: {
-                        Text("\(SettingsKeys.fontSizeMin)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                        SliderBoundLabel(value: SettingsKeys.fontSizeMin)
                     } maximumValueLabel: {
-                        Text("\(SettingsKeys.fontSizeMax)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                        SliderBoundLabel(value: SettingsKeys.fontSizeMax)
                     }
                 }
             }
