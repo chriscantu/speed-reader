@@ -30,6 +30,7 @@ describe('Re-toggle Cycle', () => {
 
     const state = await queryState();
     assert.strictEqual(state.overlayOpen, true);
+    assert.strictEqual(state.currentIndex, 0, 'Expected currentIndex to reset to 0 on re-open');
     assert.ok(state.wordText.length > 0, 'Expected a word after re-open');
     assert.ok(state.wordCount > 0, 'Expected positive word count after re-open');
   });

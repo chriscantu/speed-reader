@@ -253,30 +253,20 @@ window.addEventListener('message', function(event) {
   if (event.data.type === 'speedreader-test-dispatch') {
     var action = event.data.action;
     var payload = event.data.payload || {};
+    var overlayActions = ['set-theme', 'set-font', 'set-wpm'];
 
-    if (action === 'keypress') {
+    if (overlayActions.indexOf(action) !== -1 && !overlay) {
+      console.warn('[SpeedReader] dispatch ' + action + ' ignored: overlay not open');
+    } else if (action === 'keydown') {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: payload.key, bubbles: true }));
-    }
-
-    if (action === 'set-theme' && overlay) {
+    } else if (action === 'set-theme') {
       overlay.updateSettings({ theme: payload.theme });
-    }
-
-    if (action === 'set-font' && overlay) {
+    } else if (action === 'set-font') {
       overlay.updateSettings({ font: payload.font });
-    }
-
-    if (action === 'set-wpm' && overlay) {
+    } else if (action === 'set-wpm') {
       overlay.updateSettings({ wpm: payload.wpm });
-    }
-
-    if (action === 'get-host-attrs') {
-      var attrs = {};
-      if (overlay && overlay.host) {
-        attrs.theme = overlay.host.getAttribute('data-theme') || 'system';
-        attrs.font = overlay.host.getAttribute('data-font') || 'default';
-      }
-      window.postMessage({ type: 'speedreader-test-result', data: attrs }, '*');
+    } else {
+      console.warn('[SpeedReader] Unknown dispatch action:', action);
     }
   }
 });

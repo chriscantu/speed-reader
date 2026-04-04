@@ -1,7 +1,7 @@
 // tests/regression/08-font.test.js
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { setupTestPage, ensureOverlayOpen, queryState, dispatch } from './helpers.js';
+import { setupTestPage, ensureOverlayOpen, queryState, dispatch, waitFor } from './helpers.js';
 
 describe('Font Switching', () => {
   before(async () => {
@@ -11,7 +11,7 @@ describe('Font Switching', () => {
 
   it('set-font opendyslexic applies data-font attribute', async () => {
     dispatch('set-font', { font: 'opendyslexic' });
-    await new Promise(r => setTimeout(r, 300));
+    await waitFor(async () => (await queryState()).font === 'opendyslexic', { timeout: 3000 });
 
     const state = await queryState();
     assert.strictEqual(state.font, 'opendyslexic');
@@ -19,12 +19,11 @@ describe('Font Switching', () => {
 
   it('set-font system removes data-font attribute', async () => {
     dispatch('set-font', { font: 'system' });
-    await new Promise(r => setTimeout(r, 300));
+    // _syncHostAttr removes the attribute when value is 'system',
+    // so getAttribute returns null and query handler falls back to 'default'.
+    await waitFor(async () => (await queryState()).font === 'default', { timeout: 3000 });
 
     const state = await queryState();
-    assert.ok(
-      state.font === 'default' || state.font === 'system',
-      `Expected default or system, got: ${state.font}`
-    );
+    assert.strictEqual(state.font, 'default');
   });
 });

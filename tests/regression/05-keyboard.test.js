@@ -11,7 +11,7 @@ describe('Keyboard Shortcuts', () => {
   });
 
   it('Space toggles play', async () => {
-    dispatch('keypress', { key: ' ' });
+    dispatch('keydown', { key: ' ' });
     await waitFor(async () => (await queryState()).isPlaying === true, { timeout: 3000 });
 
     const state = await queryState();
@@ -19,7 +19,7 @@ describe('Keyboard Shortcuts', () => {
   });
 
   it('Space toggles pause', async () => {
-    dispatch('keypress', { key: ' ' });
+    dispatch('keydown', { key: ' ' });
     await waitFor(async () => (await queryState()).isPlaying === false, { timeout: 3000 });
 
     const state = await queryState();
@@ -30,8 +30,8 @@ describe('Keyboard Shortcuts', () => {
     const before = await queryState();
     const idxBefore = before.currentIndex;
 
-    dispatch('keypress', { key: 'ArrowRight' });
-    await new Promise(r => setTimeout(r, 300));
+    dispatch('keydown', { key: 'ArrowRight' });
+    await waitFor(async () => (await queryState()).currentIndex !== idxBefore, { timeout: 3000 });
 
     const after = await queryState();
     assert.ok(after.currentIndex !== idxBefore,
@@ -42,8 +42,8 @@ describe('Keyboard Shortcuts', () => {
     const before = await queryState();
     const idxBefore = before.currentIndex;
 
-    dispatch('keypress', { key: 'ArrowLeft' });
-    await new Promise(r => setTimeout(r, 300));
+    dispatch('keydown', { key: 'ArrowLeft' });
+    await waitFor(async () => (await queryState()).currentIndex < idxBefore, { timeout: 3000 });
 
     const after = await queryState();
     assert.ok(after.currentIndex < idxBefore,
@@ -53,29 +53,29 @@ describe('Keyboard Shortcuts', () => {
   it('ArrowUp increases WPM by 25', async () => {
     const before = await queryState();
     const wpmBefore = before.wpm;
+    const expectedWpm = Math.min(600, wpmBefore + 25);
 
-    dispatch('keypress', { key: 'ArrowUp' });
-    await new Promise(r => setTimeout(r, 300));
+    dispatch('keydown', { key: 'ArrowUp' });
+    await waitFor(async () => (await queryState()).wpm === expectedWpm, { timeout: 3000 });
 
     const after = await queryState();
-    const expectedWpm = Math.min(600, wpmBefore + 25);
     assert.strictEqual(after.wpm, expectedWpm);
   });
 
   it('ArrowDown decreases WPM by 25', async () => {
     const before = await queryState();
     const wpmBefore = before.wpm;
+    const expectedWpm = Math.max(100, wpmBefore - 25);
 
-    dispatch('keypress', { key: 'ArrowDown' });
-    await new Promise(r => setTimeout(r, 300));
+    dispatch('keydown', { key: 'ArrowDown' });
+    await waitFor(async () => (await queryState()).wpm === expectedWpm, { timeout: 3000 });
 
     const after = await queryState();
-    const expectedWpm = Math.max(100, wpmBefore - 25);
     assert.strictEqual(after.wpm, expectedWpm);
   });
 
   it('Escape closes the overlay', async () => {
-    dispatch('keypress', { key: 'Escape' });
+    dispatch('keydown', { key: 'Escape' });
     await waitFor(async () => (await queryState()).overlayOpen === false, { timeout: 3000 });
 
     const state = await queryState();

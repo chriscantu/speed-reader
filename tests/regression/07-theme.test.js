@@ -1,7 +1,7 @@
 // tests/regression/07-theme.test.js
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { setupTestPage, ensureOverlayOpen, queryState, dispatch } from './helpers.js';
+import { setupTestPage, ensureOverlayOpen, queryState, dispatch, waitFor } from './helpers.js';
 
 describe('Theme Switching', () => {
   before(async () => {
@@ -11,7 +11,7 @@ describe('Theme Switching', () => {
 
   it('set-theme dark applies data-theme attribute', async () => {
     dispatch('set-theme', { theme: 'dark' });
-    await new Promise(r => setTimeout(r, 300));
+    await waitFor(async () => (await queryState()).theme === 'dark', { timeout: 3000 });
 
     const state = await queryState();
     assert.strictEqual(state.theme, 'dark');
@@ -19,7 +19,7 @@ describe('Theme Switching', () => {
 
   it('set-theme light applies data-theme attribute', async () => {
     dispatch('set-theme', { theme: 'light' });
-    await new Promise(r => setTimeout(r, 300));
+    await waitFor(async () => (await queryState()).theme === 'light', { timeout: 3000 });
 
     const state = await queryState();
     assert.strictEqual(state.theme, 'light');
@@ -27,7 +27,7 @@ describe('Theme Switching', () => {
 
   it('set-theme system removes data-theme attribute', async () => {
     dispatch('set-theme', { theme: 'system' });
-    await new Promise(r => setTimeout(r, 300));
+    await waitFor(async () => (await queryState()).theme === 'system', { timeout: 3000 });
 
     const state = await queryState();
     assert.strictEqual(state.theme, 'system');

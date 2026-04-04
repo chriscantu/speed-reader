@@ -1,7 +1,7 @@
 // tests/regression/04-navigation.test.js
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { setupTestPage, ensureOverlayOpen, ensurePaused, queryState, execJS } from './helpers.js';
+import { setupTestPage, ensureOverlayOpen, ensurePaused, queryState, execJS, waitFor } from './helpers.js';
 
 describe('Navigation', () => {
   before(async () => {
@@ -15,7 +15,7 @@ describe('Navigation', () => {
     const wordBefore = before.wordText;
 
     execJS("window.postMessage({type: 'speedreader-test-next'}, '*')");
-    await new Promise(r => setTimeout(r, 300));
+    await waitFor(async () => (await queryState()).wordText !== wordBefore, { timeout: 3000 });
 
     const after = await queryState();
     assert.notStrictEqual(after.wordText, wordBefore,
@@ -24,7 +24,10 @@ describe('Navigation', () => {
 
   it('navigation while paused stays paused', async () => {
     execJS("window.postMessage({type: 'speedreader-test-next'}, '*')");
-    await new Promise(r => setTimeout(r, 300));
+    await waitFor(async () => {
+      const s = await queryState();
+      return s.currentIndex > 0;
+    }, { timeout: 3000 });
 
     const state = await queryState();
     assert.strictEqual(state.isPlaying, false);

@@ -1,9 +1,10 @@
 // scripts/lib/safari-driver.js
 // Safari automation bridge — wraps osascript for Node.js regression tests.
-// NOTE: Uses execSync intentionally — osascript is a local-only test tool,
-// not production code. No user input reaches these commands.
+// Uses execFileSync to avoid shell interpolation — osascript arguments are
+// passed directly, not through a shell. This is a local-only test tool;
+// no user input reaches these commands.
 
-import { execSync, execFileSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 const TEST_URL = 'https://en.wikipedia.org/wiki/Speed_reading';
 
@@ -12,8 +13,8 @@ const TEST_URL = 'https://en.wikipedia.org/wiki/Speed_reading';
  * Returns the string result. Throws on osascript failure.
  */
 export function execJS(jsCode) {
-  // Use execFileSync to avoid shell quoting issues entirely.
-  // Passes the AppleScript as an argument, not through shell interpolation.
+  // Escape backslashes and double quotes for the AppleScript string literal.
+  // execFileSync passes the argument directly to osascript (no shell).
   const appleScript = `tell application "Safari" to do JavaScript "${jsCode.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}" in document 1`;
   try {
     const result = execFileSync('osascript', ['-e', appleScript], {
@@ -28,12 +29,15 @@ export function execJS(jsCode) {
 }
 
 /**
- * Navigate Safari to a URL and wait for the page to load.
+ * Navigate Safari to a URL and wait for the new page to load.
+ * Marks the old page, waits for the marker to disappear (new page loaded),
+ * then waits for document.readyState === 'complete'.
  */
 export async function navigate(url = TEST_URL) {
   // Mark current page so we can detect when navigation actually starts
   execJS('document.__srNavPending = true');
-  execFileSync('osascript', ['-e', `tell application "Safari" to set URL of document 1 to "${url}"`], {
+  const safeUrl = url.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  execFileSync('osascript', ['-e', `tell application "Safari" to set URL of document 1 to "${safeUrl}"`], {
     encoding: 'utf-8', timeout: 10000,
   });
   execFileSync('osascript', ['-e', 'tell application "Safari" to activate'], {
@@ -45,8 +49,13 @@ export async function navigate(url = TEST_URL) {
       const marker = execJS('document.__srNavPending');
       // If marker still exists, we're on the old page
       if (marker === 'true') return false;
-    } catch {
-      // execJS may throw during page transition — that's progress
+    } catch (err) {
+      // Page transition errors are expected (Safari returns error while loading).
+      // Log unexpected errors so they're visible in test output.
+      const msg = err.message || '';
+      if (!msg.includes("Can't get document") && !msg.includes('missing value')) {
+        console.warn(`[safari-driver] navigate poll error: ${msg}`);
+      }
     }
     const state = execJS('document.readyState');
     return state === 'complete';
@@ -56,23 +65,28 @@ export async function navigate(url = TEST_URL) {
 /**
  * Poll a predicate function until it returns true.
  * Predicate can be sync (returns bool) or async (returns Promise<bool>).
+ * On timeout, includes the last error message for diagnostics.
  */
 export async function waitFor(predicate, { timeout = 5000, interval = 200 } = {}) {
   const start = Date.now();
+  let lastError = null;
   while (Date.now() - start < timeout) {
     try {
       const result = await predicate();
       if (result) return;
-    } catch {
-      // predicate threw — keep polling
+    } catch (err) {
+      lastError = err;
     }
     await new Promise(r => setTimeout(r, interval));
   }
-  throw new Error(`waitFor timed out after ${timeout}ms`);
+  const detail = lastError ? `\nLast error: ${lastError.message}` : '';
+  throw new Error(`waitFor timed out after ${timeout}ms${detail}`);
 }
 
 /**
  * Query overlay state via the content script's speedreader-test-query handler.
+ * Registers a one-shot message listener in the page context, triggers the
+ * query via postMessage, then polls until the response arrives.
  * Returns a parsed object with overlay state fields.
  */
 export async function queryState() {
@@ -107,11 +121,14 @@ export async function queryState() {
 /**
  * Send a generic dispatch command to the content script.
  * Uses the speedreader-test-dispatch postMessage type.
+ * Fire-and-forget — callers must verify effects via queryState/waitFor.
  */
 export function dispatch(action, payload = {}) {
   const msg = JSON.stringify({ type: 'speedreader-test-dispatch', action, payload });
-  // No manual quote escaping — execJS handles it via execFileSync
-  execJS("window.postMessage(" + msg + ", '*')");
+  // Use JSON.parse inside the JS string to keep data separate from code,
+  // avoiding double-escaping issues with quotes/backslashes in payloads.
+  const escaped = msg.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  execJS("window.postMessage(JSON.parse('" + escaped + "'), '*')");
 }
 
 /**

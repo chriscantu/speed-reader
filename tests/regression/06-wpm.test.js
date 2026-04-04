@@ -1,7 +1,7 @@
 // tests/regression/06-wpm.test.js
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { setupTestPage, ensureOverlayOpen, queryState, dispatch } from './helpers.js';
+import { setupTestPage, ensureOverlayOpen, queryState, dispatch, waitFor } from './helpers.js';
 
 describe('WPM Controls', () => {
   before(async () => {
@@ -11,7 +11,7 @@ describe('WPM Controls', () => {
 
   it('set-wpm dispatches to 400 and updates state', async () => {
     dispatch('set-wpm', { wpm: 400 });
-    await new Promise(r => setTimeout(r, 300));
+    await waitFor(async () => (await queryState()).wpm === 400, { timeout: 3000 });
 
     const state = await queryState();
     assert.strictEqual(state.wpm, 400);
@@ -20,10 +20,10 @@ describe('WPM Controls', () => {
 
   it('ArrowUp from 600 stays clamped at 600', async () => {
     dispatch('set-wpm', { wpm: 600 });
-    await new Promise(r => setTimeout(r, 200));
+    await waitFor(async () => (await queryState()).wpm === 600, { timeout: 3000 });
 
-    dispatch('keypress', { key: 'ArrowUp' });
-    await new Promise(r => setTimeout(r, 300));
+    dispatch('keydown', { key: 'ArrowUp' });
+    await waitFor(async () => (await queryState()).wpm === 600, { timeout: 3000 });
 
     const state = await queryState();
     assert.strictEqual(state.wpm, 600);
@@ -32,10 +32,10 @@ describe('WPM Controls', () => {
 
   it('ArrowDown from 100 stays clamped at 100', async () => {
     dispatch('set-wpm', { wpm: 100 });
-    await new Promise(r => setTimeout(r, 200));
+    await waitFor(async () => (await queryState()).wpm === 100, { timeout: 3000 });
 
-    dispatch('keypress', { key: 'ArrowDown' });
-    await new Promise(r => setTimeout(r, 300));
+    dispatch('keydown', { key: 'ArrowDown' });
+    await waitFor(async () => (await queryState()).wpm === 100, { timeout: 3000 });
 
     const state = await queryState();
     assert.strictEqual(state.wpm, 100);
@@ -44,7 +44,7 @@ describe('WPM Controls', () => {
 
   it('restores WPM to default after test', async () => {
     dispatch('set-wpm', { wpm: 250 });
-    await new Promise(r => setTimeout(r, 200));
+    await waitFor(async () => (await queryState()).wpm === 250, { timeout: 3000 });
 
     const state = await queryState();
     assert.strictEqual(state.wpm, 250);

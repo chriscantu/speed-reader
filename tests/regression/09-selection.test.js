@@ -1,6 +1,6 @@
 // tests/regression/09-selection.test.js
-// NOTE: Programmatic text selection via osascript is not visible to the content
-// script (Safari isolates the page world from the content script world).
+// NOTE: Programmatic text selection set via osascript's 'do JavaScript' does
+// not reliably propagate to the content script's window.getSelection() in Safari.
 // This test verifies the Readability extraction fallback path instead.
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
