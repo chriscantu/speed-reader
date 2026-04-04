@@ -22,6 +22,9 @@
   --sr-card-radius: 16px;
   --sr-font-family: -apple-system, system-ui, 'Helvetica Neue', sans-serif;
   --sr-word-size: 42px;
+  /* Fixed height to prevent layout shift during RSVP playback.
+     Sized to fit max font (96px * 1.6 line-height + focus marker + padding).
+     Mobile override in @media (max-width: 480px) below. */
   --sr-word-area-height: 194px;
 }
 
@@ -149,6 +152,7 @@
   letter-spacing: 2px;
   font-family: var(--sr-font-family);
   white-space: nowrap;
+  transform-origin: center;
 }
 
 .sr-word-before,
@@ -386,6 +390,7 @@
 
 @media (max-width: 480px) {
   :host {
+    /* Smaller word area on mobile — fits fonts up to ~60px comfortably. */
     --sr-word-area-height: 120px;
   }
 

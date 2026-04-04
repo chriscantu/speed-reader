@@ -243,9 +243,8 @@ export class RSVPOverlay {
     const areaWidth = area.clientWidth;
     const textWidth = container.scrollWidth;
     if (textWidth > areaWidth) {
-      const scale = areaWidth / textWidth;
+      const scale = Math.max(areaWidth / textWidth, 0.3);
       container.style.transform = 'scale(' + scale + ')';
-      container.style.transformOrigin = 'center';
     }
   }
 
