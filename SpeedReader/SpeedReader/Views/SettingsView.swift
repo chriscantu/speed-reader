@@ -6,6 +6,9 @@ extension ReaderFont {
         switch self {
         case .system: return .system(size: size, weight: .regular)
         case .openDyslexic: return .custom("OpenDyslexic", size: size)
+        case .newYork: return .custom("NewYork", size: size)
+        case .georgia: return .custom("Georgia", size: size)
+        case .menlo: return .custom("Menlo", size: size)
         }
     }
 }

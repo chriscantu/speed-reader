@@ -242,4 +242,39 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(second.fontSize, 36)
         XCTAssertFalse(second.punctuationPause)
     }
+
+    // MARK: - New font cases
+
+    func testNewYorkFontRoundTrips() {
+        let store = makeDefaults()
+        let settings = ReaderSettings(defaults: store)
+        settings.setFont(.newYork)
+        let reloaded = ReaderSettings(defaults: store)
+        XCTAssertEqual(reloaded.font, .newYork)
+    }
+
+    func testGeorgiaFontRoundTrips() {
+        let store = makeDefaults()
+        let settings = ReaderSettings(defaults: store)
+        settings.setFont(.georgia)
+        let reloaded = ReaderSettings(defaults: store)
+        XCTAssertEqual(reloaded.font, .georgia)
+    }
+
+    func testMenloFontRoundTrips() {
+        let store = makeDefaults()
+        let settings = ReaderSettings(defaults: store)
+        settings.setFont(.menlo)
+        let reloaded = ReaderSettings(defaults: store)
+        XCTAssertEqual(reloaded.font, .menlo)
+    }
+
+    func testSaveSettingsAcceptsNewFontRawValues() {
+        let store = makeDefaults()
+        for rawValue in ["newYork", "georgia", "menlo"] {
+            let count = SettingsKeys.saveSettings(["font": rawValue], to: store)
+            XCTAssertEqual(count, 1, "Expected \(rawValue) to be accepted")
+            XCTAssertEqual(store.string(forKey: SettingsKeys.font), rawValue)
+        }
+    }
 }
