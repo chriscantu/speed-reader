@@ -41,6 +41,9 @@ export class RSVPOverlay {
   }
 
   updateSettings(settings) {
+    if (typeof settings.fontSize === 'number') {
+      settings.fontSize = clampFontSize(settings.fontSize);
+    }
     Object.assign(this.settings, settings);
 
     if (this.host) {
@@ -49,8 +52,6 @@ export class RSVPOverlay {
     }
 
     if (typeof settings.fontSize === 'number' && this.shadow) {
-      settings.fontSize = clampFontSize(settings.fontSize);
-      this.settings.fontSize = settings.fontSize;
       this._syncFontSizeOverride(settings.fontSize);
       if (this.elements.fontSizeValue) {
         this.elements.fontSizeValue.textContent = settings.fontSize + 'px';

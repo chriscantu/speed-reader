@@ -30,6 +30,7 @@ async function syncSettingsFromNative() {
       { action: 'getSettings' }
     );
     if (response && response.wpm !== undefined) {
+      // Keep in sync with SETTINGS_KEYS in rsvp/settings-defaults.js
       var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause'];
       var filtered = {};
       for (var i = 0; i < allowed.length; i++) {
@@ -103,6 +104,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ ok: false, error: 'Missing settings payload' });
       return true;
     }
+    // Keep in sync with SETTINGS_KEYS in rsvp/settings-defaults.js
     var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause'];
     var filtered = {};
     for (var i = 0; i < allowed.length; i++) {
@@ -129,7 +131,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'get-sync-status') {
     browser.storage.local.get({ lastSyncStatus: null, lastSyncTime: null, lastSyncError: null })
       .then(sendResponse)
-      .catch(function() { sendResponse({ lastSyncStatus: null }); });
+      .catch(function(err) {
+        console.warn('[SpeedReader] get-sync-status failed:', err.message || err);
+        sendResponse({ lastSyncStatus: null });
+      });
     return true; // async response
   }
 
