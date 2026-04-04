@@ -69,43 +69,7 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             os_log(.error, "[SpeedReader] App Group not available for saving settings")
             return 0
         }
-
-        var savedCount = 0
-
-        if let wpm = settings["wpm"] as? Int {
-            defaults.set(SettingsKeys.clamp(wpm, min: SettingsKeys.wpmMin, max: SettingsKeys.wpmMax),
-                         forKey: SettingsKeys.wpm)
-            savedCount += 1
-        }
-        if let font = settings["font"] as? String,
-           ReaderFont(rawValue: font) != nil {
-            defaults.set(font, forKey: SettingsKeys.font)
-            savedCount += 1
-        }
-        if let theme = settings["theme"] as? String,
-           ReaderTheme(rawValue: theme) != nil {
-            defaults.set(theme, forKey: SettingsKeys.theme)
-            savedCount += 1
-        }
-        if let fontSize = settings["fontSize"] as? Int {
-            defaults.set(SettingsKeys.clamp(fontSize, min: SettingsKeys.fontSizeMin, max: SettingsKeys.fontSizeMax),
-                         forKey: SettingsKeys.fontSize)
-            savedCount += 1
-        }
-        if let punctuationPause = settings["punctuationPause"] as? Bool {
-            defaults.set(punctuationPause, forKey: SettingsKeys.punctuationPause)
-            savedCount += 1
-        }
-
-        if savedCount == 0 && !settings.isEmpty {
-            os_log(
-                .error,
-                "[SpeedReader] saveSettingsToAppGroup: 0/%d keys matched types",
-                settings.count
-            )
-        }
-
-        return savedCount
+        return SettingsKeys.saveSettings(settings, to: defaults)
     }
 
     private func defaultSettings() -> [String: Any] {

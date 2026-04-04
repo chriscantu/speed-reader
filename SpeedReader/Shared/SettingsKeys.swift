@@ -1,4 +1,5 @@
 import Foundation
+import os.log
 
 /// Font options for the RSVP reader.
 enum ReaderFont: String, CaseIterable, Identifiable {
@@ -69,5 +70,45 @@ enum SettingsKeys {
     /// Clamp an integer to a range.
     static func clamp(_ value: Int, min: Int, max: Int) -> Int {
         Swift.max(min, Swift.min(max, value))
+    }
+
+    /// Saves settings to the given UserDefaults store with type checking and clamping.
+    /// Returns the number of fields that matched expected types.
+    @discardableResult
+    static func saveSettings(_ settings: [String: Any], to defaults: UserDefaults) -> Int {
+        var savedCount = 0
+
+        if let wpm = settings["wpm"] as? Int {
+            defaults.set(clamp(wpm, min: wpmMin, max: wpmMax), forKey: SettingsKeys.wpm)
+            savedCount += 1
+        }
+        if let font = settings["font"] as? String,
+           ReaderFont(rawValue: font) != nil {
+            defaults.set(font, forKey: SettingsKeys.font)
+            savedCount += 1
+        }
+        if let theme = settings["theme"] as? String,
+           ReaderTheme(rawValue: theme) != nil {
+            defaults.set(theme, forKey: SettingsKeys.theme)
+            savedCount += 1
+        }
+        if let fontSize = settings["fontSize"] as? Int {
+            defaults.set(clamp(fontSize, min: fontSizeMin, max: fontSizeMax), forKey: SettingsKeys.fontSize)
+            savedCount += 1
+        }
+        if let punctuationPause = settings["punctuationPause"] as? Bool {
+            defaults.set(punctuationPause, forKey: SettingsKeys.punctuationPause)
+            savedCount += 1
+        }
+
+        if savedCount == 0 && !settings.isEmpty {
+            os_log(
+                .error,
+                "[SpeedReader] saveSettings: 0/%d keys matched types",
+                settings.count
+            )
+        }
+
+        return savedCount
     }
 }
