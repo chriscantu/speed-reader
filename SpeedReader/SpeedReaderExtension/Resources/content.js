@@ -60,7 +60,8 @@ async function extractAndLaunch() {
     return; // Toast already shown by getOverlay
   }
 
-  // Gather inputs for the content decision tree
+  // Gather inputs for the content decision tree.
+  // Each source has its own try/catch so failures are isolated and reported independently.
   var selectedText = null;
   var selectionError = false;
   try {
@@ -88,16 +89,24 @@ async function extractAndLaunch() {
   }
 
   // Use extracted decision logic
-  var resolverModule = await import(browser.runtime.getURL('content-resolver.js'));
-  var decision = resolverModule.resolveContent({
-    selectedText: selectedText,
-    selectionError: selectionError,
-    pendingSelectionMode: pendingSelectionMode,
-    article: article,
-    articleError: articleError,
-  });
+  var decision;
+  try {
+    var resolverModule = await import(browser.runtime.getURL('content-resolver.js'));
+    decision = resolverModule.resolveContent({
+      selectedText: selectedText,
+      selectionError: selectionError,
+      pendingSelectionMode: pendingSelectionMode,
+      article: article,
+      articleError: articleError,
+    });
+  } catch (e) {
+    console.error('[SpeedReader] Failed to load content resolver:', e);
+    showToast('Something went wrong. Try reloading the page.');
+    return;
+  }
 
-  if (decision.selectionWarning) {
+  // Only show the selection warning when Readability actually succeeded as fallback
+  if (decision.selectionWarning && decision.action === 'use-article') {
     showToast('Could not read your selection. Extracting full article instead.');
   }
 
@@ -128,7 +137,7 @@ async function extractAndLaunch() {
     return;
   }
 
-  // enter-selection-mode
+  // enter-selection-mode: nothing worked, fall through to manual selection as last resort
   pendingSelectionMode = true;
   showToast("Couldn't extract article. Select text and tap the extension icon again.");
 }

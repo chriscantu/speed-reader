@@ -4,6 +4,8 @@
  *
  * Extracted from extractAndLaunch() for testability — content.js handles
  * the async/side-effect parts, this module handles the branching.
+ * Intentionally pure (no DOM access, no I/O) to enable fast unit testing
+ * without browser mocks.
  *
  * @module content-resolver
  */
@@ -14,15 +16,15 @@
  * @property {boolean} selectionError    - Whether the selection API threw
  * @property {boolean} pendingSelectionMode - Whether we're waiting for user to select text
  * @property {{ textContent: string, title: string }|null} article - Readability result
- * @property {boolean} articleError      - Whether Readability threw or returned empty
+ * @property {boolean} articleError      - Whether the Readability import or parse threw an exception
  */
 
 /**
  * @typedef {Object} ContentDecision
  * @property {'use-selection'|'use-article'|'prompt-selection'|'enter-selection-mode'} action
- * @property {string} [text]            - Content text (for use-selection and use-article)
- * @property {string} [title]           - Article title (for use-article)
- * @property {boolean} [selectionWarning] - True if selection API failed (show warning toast)
+ * @property {string} [text]            - Content text (present only for use-selection and use-article)
+ * @property {string} [title]           - Article title (for use-article; may be empty — caller provides fallback)
+ * @property {boolean} [selectionWarning] - True if selection API failed; omitted when action is use-selection
  */
 
 /**
@@ -38,6 +40,10 @@
  * @returns {ContentDecision}
  */
 export function resolveContent(inputs) {
+  if (!inputs || typeof inputs !== 'object') {
+    return { action: 'enter-selection-mode', selectionWarning: false };
+  }
+
   const {
     selectedText,
     selectionError,

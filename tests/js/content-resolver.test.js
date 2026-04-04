@@ -28,6 +28,7 @@ describe('resolveContent — selection priority', () => {
     }));
     assert.strictEqual(result.action, 'use-selection');
     assert.strictEqual(result.text, 'Selected text');
+    assert.strictEqual(result.selectionWarning, undefined);
   });
 
   it('selection takes priority even in pendingSelectionMode', () => {
@@ -69,7 +70,7 @@ describe('resolveContent — Readability fallback', () => {
     assert.strictEqual(result.title, 'My Article');
   });
 
-  it('uses document title fallback when article has no title', () => {
+  it('uses empty title when article has no title', () => {
     const result = resolveContent(baseInputs({
       article: { textContent: 'Content', title: '' },
     }));
@@ -103,6 +104,13 @@ describe('resolveContent — Readability fallback', () => {
     }));
     assert.strictEqual(result.action, 'enter-selection-mode');
   });
+
+  it('rejects article with missing textContent property', () => {
+    const result = resolveContent(baseInputs({
+      article: { title: 'Title' },
+    }));
+    assert.strictEqual(result.action, 'enter-selection-mode');
+  });
 });
 
 describe('resolveContent — pending selection mode', () => {
@@ -118,6 +126,15 @@ describe('resolveContent — pending selection mode', () => {
     }));
     assert.strictEqual(result.action, 'prompt-selection');
   });
+
+  it('propagates selectionWarning when both pending and selection errored', () => {
+    const result = resolveContent(baseInputs({
+      pendingSelectionMode: true,
+      selectionError: true,
+    }));
+    assert.strictEqual(result.action, 'prompt-selection');
+    assert.strictEqual(result.selectionWarning, true);
+  });
 });
 
 describe('resolveContent — enter selection mode (last resort)', () => {
@@ -128,6 +145,20 @@ describe('resolveContent — enter selection mode (last resort)', () => {
 
   it('does not set selectionWarning when selection did not error', () => {
     const result = resolveContent(baseInputs());
+    assert.strictEqual(result.selectionWarning, false);
+  });
+});
+
+describe('resolveContent — invalid inputs', () => {
+  it('returns enter-selection-mode for undefined input', () => {
+    const result = resolveContent(undefined);
+    assert.strictEqual(result.action, 'enter-selection-mode');
+    assert.strictEqual(result.selectionWarning, false);
+  });
+
+  it('returns enter-selection-mode for null input', () => {
+    const result = resolveContent(null);
+    assert.strictEqual(result.action, 'enter-selection-mode');
     assert.strictEqual(result.selectionWarning, false);
   });
 });
