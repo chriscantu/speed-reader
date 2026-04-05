@@ -10,6 +10,7 @@ export class RSVPOverlay {
       theme: 'system',
       font: 'system',
       fontSize: FONT_SIZE_DEFAULT,
+      alignment: 'orp',
     };
     this.host = null;
     this.shadow = null;
@@ -49,6 +50,9 @@ export class RSVPOverlay {
     if (this.host) {
       this._syncHostAttr('data-theme', settings.theme);
       this._syncHostAttr('data-font', settings.font);
+      if (settings.alignment !== undefined) {
+        this.host.setAttribute('data-alignment', settings.alignment);
+      }
     }
 
     if (typeof settings.fontSize === 'number' && this.shadow) {
@@ -330,6 +334,8 @@ export class RSVPOverlay {
     // Set theme and font attributes
     this._syncHostAttr('data-theme', this.settings.theme);
     this._syncHostAttr('data-font', this.settings.font);
+    // Alignment defaults to 'orp' — always set the attribute so CSS grid activates.
+    this.host.setAttribute('data-alignment', this.settings.alignment || 'orp');
 
     // Link stylesheet
     const link = document.createElement('link');
@@ -379,10 +385,6 @@ export class RSVPOverlay {
     wordArea.setAttribute('aria-live', 'polite');
     this.elements.wordArea = wordArea;
 
-    const focusMarker = document.createElement('div');
-    focusMarker.className = 'sr-focus-marker';
-    focusMarker.textContent = '▼';
-
     const wordContainer = document.createElement('div');
     wordContainer.className = 'sr-word';
 
@@ -403,7 +405,6 @@ export class RSVPOverlay {
     wordContainer.appendChild(wordAfter);
     this.elements.wordContainer = wordContainer;
 
-    wordArea.appendChild(focusMarker);
     wordArea.appendChild(wordContainer);
 
     // Context preview
