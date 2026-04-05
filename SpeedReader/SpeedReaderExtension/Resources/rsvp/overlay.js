@@ -1,5 +1,5 @@
 import { RSVPStateMachine } from './state-machine.js';
-import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, clampWpm, clampFontSize } from './settings-defaults.js';
+import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, ALIGNMENT_DEFAULT, clampWpm, clampFontSize, validateAlignment } from './settings-defaults.js';
 
 export class RSVPOverlay {
   constructor() {
@@ -10,7 +10,7 @@ export class RSVPOverlay {
       theme: 'system',
       font: 'system',
       fontSize: FONT_SIZE_DEFAULT,
-      alignment: 'orp',
+      alignment: ALIGNMENT_DEFAULT,
     };
     this.host = null;
     this.shadow = null;
@@ -50,8 +50,11 @@ export class RSVPOverlay {
     if (this.host) {
       this._syncHostAttr('data-theme', settings.theme);
       this._syncHostAttr('data-font', settings.font);
+      // Alignment bypasses _syncHostAttr intentionally: unlike theme/font,
+      // alignment has no 'system' state — the attribute must always be present
+      // for the CSS grid selector to match.
       if (settings.alignment !== undefined) {
-        this.host.setAttribute('data-alignment', settings.alignment);
+        this.host.setAttribute('data-alignment', validateAlignment(settings.alignment));
       }
     }
 
@@ -334,8 +337,8 @@ export class RSVPOverlay {
     // Set theme and font attributes
     this._syncHostAttr('data-theme', this.settings.theme);
     this._syncHostAttr('data-font', this.settings.font);
-    // Alignment defaults to 'orp' — always set the attribute so CSS grid activates.
-    this.host.setAttribute('data-alignment', this.settings.alignment || 'orp');
+    // Alignment bypasses _syncHostAttr — see comment in updateSettings().
+    this.host.setAttribute('data-alignment', validateAlignment(this.settings.alignment));
 
     // Link stylesheet
     const link = document.createElement('link');

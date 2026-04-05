@@ -171,6 +171,7 @@ final class SettingsTests: XCTestCase {
             "theme": true,
             "fontSize": "big",
             "punctuationPause": 1,
+            "alignment": 42,
         ]
         let count = SettingsKeys.saveSettings(payload, to: store)
         XCTAssertEqual(count, 0)

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   clampFontSize, FONT_SIZE_DEFAULT, FONT_SIZE_MIN, FONT_SIZE_MAX,
   SETTINGS_KEYS, SETTINGS_DEFAULTS,
+  ALIGNMENT_DEFAULT, VALID_ALIGNMENTS, validateAlignment,
 } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/settings-defaults.js';
 
 describe('clampFontSize', () => {
@@ -47,5 +48,42 @@ describe('SETTINGS_KEYS', () => {
 describe('SETTINGS_DEFAULTS', () => {
   it('defaults alignment to orp', () => {
     assert.strictEqual(SETTINGS_DEFAULTS.alignment, 'orp');
+  });
+
+  it('has a default for every key in SETTINGS_KEYS', () => {
+    for (const key of SETTINGS_KEYS) {
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(SETTINGS_DEFAULTS, key),
+        'SETTINGS_DEFAULTS is missing key: ' + key,
+      );
+    }
+  });
+});
+
+describe('validateAlignment', () => {
+  it('returns valid alignment values unchanged', () => {
+    assert.strictEqual(validateAlignment('orp'), 'orp');
+    assert.strictEqual(validateAlignment('center'), 'center');
+  });
+
+  it('returns default for invalid string', () => {
+    assert.strictEqual(validateAlignment('scrambled'), ALIGNMENT_DEFAULT);
+  });
+
+  it('returns default for non-string input', () => {
+    assert.strictEqual(validateAlignment(42), ALIGNMENT_DEFAULT);
+    assert.strictEqual(validateAlignment(undefined), ALIGNMENT_DEFAULT);
+    assert.strictEqual(validateAlignment(null), ALIGNMENT_DEFAULT);
+    assert.strictEqual(validateAlignment(true), ALIGNMENT_DEFAULT);
+  });
+
+  it('returns default for empty string', () => {
+    assert.strictEqual(validateAlignment(''), ALIGNMENT_DEFAULT);
+  });
+
+  it('VALID_ALIGNMENTS contains orp and center', () => {
+    assert.ok(VALID_ALIGNMENTS.includes('orp'));
+    assert.ok(VALID_ALIGNMENTS.includes('center'));
+    assert.strictEqual(VALID_ALIGNMENTS.length, 2);
   });
 });
