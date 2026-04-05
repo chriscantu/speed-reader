@@ -151,14 +151,16 @@ final class SettingsTests: XCTestCase {
             "theme": "dark",
             "fontSize": 36,
             "punctuationPause": false,
+            "alignment": "center",
         ]
         let count = SettingsKeys.saveSettings(payload, to: store)
-        XCTAssertEqual(count, 5)
+        XCTAssertEqual(count, 6)
         XCTAssertEqual(store.integer(forKey: SettingsKeys.wpm), 300)
         XCTAssertEqual(store.string(forKey: SettingsKeys.font), "opendyslexic")
         XCTAssertEqual(store.string(forKey: SettingsKeys.theme), "dark")
         XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), 36)
         XCTAssertFalse(store.bool(forKey: SettingsKeys.punctuationPause))
+        XCTAssertEqual(store.string(forKey: SettingsKeys.alignment), "center")
     }
 
     func testSaveSettingsWithAllWrongTypesSavesZero() {
@@ -169,6 +171,7 @@ final class SettingsTests: XCTestCase {
             "theme": true,
             "fontSize": "big",
             "punctuationPause": 1,
+            "alignment": 42,
         ]
         let count = SettingsKeys.saveSettings(payload, to: store)
         XCTAssertEqual(count, 0)
@@ -234,6 +237,7 @@ final class SettingsTests: XCTestCase {
         first.setTheme(.dark)
         first.setFontSize(36)
         first.setPunctuationPause(false)
+        first.setAlignment(.center)
 
         let second = ReaderSettings(defaults: store)
         XCTAssertEqual(second.wpm, 400)
@@ -241,6 +245,7 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(second.theme, .dark)
         XCTAssertEqual(second.fontSize, 36)
         XCTAssertFalse(second.punctuationPause)
+        XCTAssertEqual(second.alignment, .center)
     }
 
     // MARK: - New font cases
@@ -313,5 +318,42 @@ final class SettingsTests: XCTestCase {
         let countHigh = SettingsKeys.saveSettings(["fontSize": 200], to: store)
         XCTAssertEqual(countHigh, 1)
         XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), 96)
+    }
+
+    // MARK: - Alignment
+
+    func testDefaultAlignment() {
+        let settings = makeSettings()
+        XCTAssertEqual(settings.alignment, .orpAligned)
+    }
+
+    func testAlignmentRoundTrips() {
+        let store = makeDefaults()
+        let settings = ReaderSettings(defaults: store)
+        settings.setAlignment(.center)
+        let reloaded = ReaderSettings(defaults: store)
+        XCTAssertEqual(reloaded.alignment, .center)
+    }
+
+    func testInitFallsBackForInvalidAlignmentRawValue() {
+        let store = makeDefaults()
+        store.set("scrambled", forKey: SettingsKeys.alignment)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.alignment, SettingsKeys.Defaults.alignment)
+    }
+
+    func testSaveSettingsAcceptsValidAlignmentValues() {
+        let store = makeDefaults()
+        for rawValue in ["orp", "center"] {
+            let count = SettingsKeys.saveSettings(["alignment": rawValue], to: store)
+            XCTAssertEqual(count, 1, "Expected '\(rawValue)' to be accepted")
+            XCTAssertEqual(store.string(forKey: SettingsKeys.alignment), rawValue)
+        }
+    }
+
+    func testSaveSettingsRejectsInvalidAlignmentRawValue() {
+        let store = makeDefaults()
+        let count = SettingsKeys.saveSettings(["alignment": "scrambled"], to: store)
+        XCTAssertEqual(count, 0)
     }
 }

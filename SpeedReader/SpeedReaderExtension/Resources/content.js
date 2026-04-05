@@ -148,6 +148,7 @@ var settingsDefaults = {
   theme: 'system',
   fontSize: 42,
   punctuationPause: true,
+  alignment: 'orp',
 };
 
 async function getSettings() {
@@ -235,6 +236,8 @@ window.addEventListener('message', function(event) {
       result.theme = overlay.host.getAttribute('data-theme') || 'system';
       result.font = overlay.host.getAttribute('data-font') || 'default';
       result.fontSize = overlay.settings.fontSize || settingsDefaults.fontSize;
+      result.alignment = overlay.host.getAttribute('data-alignment') || 'orp';
+      result.wordTransform = wordEl ? wordEl.style.transform : '';
     }
     // Post result back to page context
     window.postMessage({ type: 'speedreader-test-result', data: result }, '*');
@@ -254,7 +257,7 @@ window.addEventListener('message', function(event) {
   if (event.data.type === 'speedreader-test-dispatch') {
     var action = event.data.action;
     var payload = event.data.payload || {};
-    var overlayActions = ['set-theme', 'set-font', 'set-wpm', 'set-font-size'];
+    var overlayActions = ['set-theme', 'set-font', 'set-wpm', 'set-font-size', 'set-alignment'];
 
     if (overlayActions.indexOf(action) !== -1 && !overlay) {
       console.warn('[SpeedReader] dispatch ' + action + ' ignored: overlay not open');
@@ -268,6 +271,8 @@ window.addEventListener('message', function(event) {
       overlay.updateSettings({ wpm: payload.wpm });
     } else if (action === 'set-font-size') {
       overlay.updateSettings({ fontSize: payload.fontSize });
+    } else if (action === 'set-alignment') {
+      overlay.updateSettings({ alignment: payload.alignment });
     } else {
       console.warn('[SpeedReader] Unknown dispatch action:', action);
     }

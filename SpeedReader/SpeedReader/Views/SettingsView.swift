@@ -33,6 +33,7 @@ private struct RSVPPreview: View {
     let font: ReaderFont
     let fontSize: Int
     let theme: ReaderTheme
+    let alignment: ReaderAlignment
 
     private let word = "knowledge"
 
@@ -68,13 +69,29 @@ private struct RSVPPreview: View {
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            Spacer()
-            (Text(before).foregroundColor(textColor)
-            + Text(focus).foregroundColor(orpAccentColor)
-            + Text(after).foregroundColor(textColor))
+        Group {
+            if alignment == .orpAligned {
+                HStack(spacing: 0) {
+                    Text(before)
+                        .foregroundColor(textColor)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    Text(focus)
+                        .foregroundColor(orpAccentColor)
+                    Text(after)
+                        .foregroundColor(textColor)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
                 .font(font.font(size: CGFloat(fontSize)))
-            Spacer()
+            } else {
+                HStack(spacing: 0) {
+                    Spacer()
+                    (Text(before).foregroundColor(textColor)
+                    + Text(focus).foregroundColor(orpAccentColor)
+                    + Text(after).foregroundColor(textColor))
+                        .font(font.font(size: CGFloat(fontSize)))
+                    Spacer()
+                }
+            }
         }
         .padding(.vertical, 24)
         .background(backgroundColor)
@@ -138,7 +155,13 @@ struct SettingsView: View {
             }
 
             Section("Appearance") {
-                RSVPPreview(font: settings.font, fontSize: settings.fontSize, theme: settings.theme)
+                RSVPPreview(
+                    font: settings.font,
+                    fontSize: settings.fontSize,
+                    theme: settings.theme,
+                    alignment: settings.alignment
+                )
+                    .accessibilityHidden(true)
 
                 Picker("Font", selection: Binding(
                     get: { settings.font },
@@ -155,6 +178,15 @@ struct SettingsView: View {
                 )) {
                     ForEach(ReaderTheme.allCases) { theme in
                         Text(theme.displayName).tag(theme)
+                    }
+                }
+
+                Picker("Word Alignment", selection: Binding(
+                    get: { settings.alignment },
+                    set: { settings.setAlignment($0) }
+                )) {
+                    ForEach(ReaderAlignment.allCases) { alignment in
+                        Text(alignment.displayName).tag(alignment)
                     }
                 }
 

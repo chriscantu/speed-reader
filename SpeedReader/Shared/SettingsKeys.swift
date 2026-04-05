@@ -39,6 +39,21 @@ enum ReaderTheme: String, CaseIterable, Identifiable {
     }
 }
 
+/// Alignment options for the RSVP word display.
+enum ReaderAlignment: String, CaseIterable, Identifiable {
+    case orpAligned = "orp"
+    case center = "center"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .orpAligned: return "Focus Lock (ORP)"
+        case .center: return "Centered"
+        }
+    }
+}
+
 /// Constants for App Group settings shared between the app and extension.
 enum SettingsKeys {
     /// App Group identifier — must match the entitlements file.
@@ -49,6 +64,7 @@ enum SettingsKeys {
     static let theme = "sr_theme"
     static let fontSize = "sr_fontSize"
     static let punctuationPause = "sr_punctuationPause"
+    static let alignment = "sr_alignment"
 
     /// Default values — typed enum cases prevent drift from raw values.
     enum Defaults {
@@ -57,6 +73,7 @@ enum SettingsKeys {
         static let theme: ReaderTheme = .system
         static let fontSize = 42
         static let punctuationPause = true
+        static let alignment: ReaderAlignment = .orpAligned
     }
 
     /// WPM bounds
@@ -104,6 +121,11 @@ enum SettingsKeys {
         }
         if let punctuationPause = settings["punctuationPause"] as? Bool {
             defaults.set(punctuationPause, forKey: SettingsKeys.punctuationPause)
+            savedCount += 1
+        }
+        if let alignment = settings["alignment"] as? String,
+           ReaderAlignment(rawValue: alignment) != nil {
+            defaults.set(alignment, forKey: SettingsKeys.alignment)
             savedCount += 1
         }
 

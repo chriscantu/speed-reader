@@ -31,7 +31,7 @@ async function syncSettingsFromNative() {
     );
     if (response && response.wpm !== undefined) {
       // Keep in sync with SETTINGS_KEYS in rsvp/settings-defaults.js
-      var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause'];
+      var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause', 'alignment'];
       var filtered = {};
       for (var i = 0; i < allowed.length; i++) {
         if (response[allowed[i]] !== undefined) {
@@ -74,6 +74,7 @@ browser.runtime.onInstalled.addListener(() => {
           theme: 'system',
           fontSize: 42,
           punctuationPause: true,
+          alignment: 'orp',
         });
       }
     })
@@ -105,7 +106,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true;
     }
     // Keep in sync with SETTINGS_KEYS in rsvp/settings-defaults.js
-    var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause'];
+    var allowed = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause', 'alignment'];
     var filtered = {};
     for (var i = 0; i < allowed.length; i++) {
       if (raw[allowed[i]] !== undefined) {

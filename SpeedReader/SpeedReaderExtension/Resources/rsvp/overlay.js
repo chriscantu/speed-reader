@@ -1,5 +1,5 @@
 import { RSVPStateMachine } from './state-machine.js';
-import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, clampWpm, clampFontSize } from './settings-defaults.js';
+import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, ALIGNMENT_DEFAULT, clampWpm, clampFontSize, validateAlignment } from './settings-defaults.js';
 
 export class RSVPOverlay {
   constructor() {
@@ -10,6 +10,7 @@ export class RSVPOverlay {
       theme: 'system',
       font: 'system',
       fontSize: FONT_SIZE_DEFAULT,
+      alignment: ALIGNMENT_DEFAULT,
     };
     this.host = null;
     this.shadow = null;
@@ -49,6 +50,12 @@ export class RSVPOverlay {
     if (this.host) {
       this._syncHostAttr('data-theme', settings.theme);
       this._syncHostAttr('data-font', settings.font);
+      // Alignment bypasses _syncHostAttr intentionally: unlike theme/font,
+      // alignment has no 'system' state — the attribute must always be present
+      // for the CSS grid selector to match.
+      if (settings.alignment !== undefined) {
+        this.host.setAttribute('data-alignment', validateAlignment(settings.alignment));
+      }
     }
 
     if (typeof settings.fontSize === 'number' && this.shadow) {
@@ -330,6 +337,8 @@ export class RSVPOverlay {
     // Set theme and font attributes
     this._syncHostAttr('data-theme', this.settings.theme);
     this._syncHostAttr('data-font', this.settings.font);
+    // Alignment bypasses _syncHostAttr — see comment in updateSettings().
+    this.host.setAttribute('data-alignment', validateAlignment(this.settings.alignment));
 
     // Link stylesheet
     const link = document.createElement('link');
@@ -379,10 +388,6 @@ export class RSVPOverlay {
     wordArea.setAttribute('aria-live', 'polite');
     this.elements.wordArea = wordArea;
 
-    const focusMarker = document.createElement('div');
-    focusMarker.className = 'sr-focus-marker';
-    focusMarker.textContent = '▼';
-
     const wordContainer = document.createElement('div');
     wordContainer.className = 'sr-word';
 
@@ -403,7 +408,6 @@ export class RSVPOverlay {
     wordContainer.appendChild(wordAfter);
     this.elements.wordContainer = wordContainer;
 
-    wordArea.appendChild(focusMarker);
     wordArea.appendChild(wordContainer);
 
     // Context preview
