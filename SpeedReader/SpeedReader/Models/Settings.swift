@@ -15,6 +15,7 @@ final class ReaderSettings {
     var theme: ReaderTheme = SettingsKeys.Defaults.theme
     var fontSize: Int = SettingsKeys.Defaults.fontSize
     var punctuationPause: Bool = SettingsKeys.Defaults.punctuationPause
+    var alignment: ReaderAlignment = SettingsKeys.Defaults.alignment
 
     init(defaults: UserDefaults? = nil) {
         let store: UserDefaults
@@ -70,6 +71,12 @@ final class ReaderSettings {
         defaults.set(punctuationPause, forKey: SettingsKeys.punctuationPause)
     }
 
+    /// Sets alignment and persists to UserDefaults.
+    func setAlignment(_ value: ReaderAlignment) {
+        alignment = value
+        defaults.set(alignment.rawValue, forKey: SettingsKeys.alignment)
+    }
+
     private func loadFromDefaults(_ store: UserDefaults) {
         let loadedWpm = store.object(forKey: SettingsKeys.wpm) as? Int
             ?? SettingsKeys.Defaults.wpm
@@ -91,5 +98,9 @@ final class ReaderSettings {
 
         punctuationPause = store.object(forKey: SettingsKeys.punctuationPause) as? Bool
             ?? SettingsKeys.Defaults.punctuationPause
+
+        let alignmentRaw = store.string(forKey: SettingsKeys.alignment)
+            ?? SettingsKeys.Defaults.alignment.rawValue
+        alignment = ReaderAlignment(rawValue: alignmentRaw) ?? SettingsKeys.Defaults.alignment
     }
 }
