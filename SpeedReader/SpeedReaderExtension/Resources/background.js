@@ -74,6 +74,7 @@ browser.runtime.onInstalled.addListener(() => {
           theme: 'system',
           fontSize: 42,
           punctuationPause: true,
+          alignment: 'orp',
         });
       }
     })

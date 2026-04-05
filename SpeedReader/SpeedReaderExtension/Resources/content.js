@@ -148,6 +148,7 @@ var settingsDefaults = {
   theme: 'system',
   fontSize: 42,
   punctuationPause: true,
+  alignment: 'orp',
 };
 
 async function getSettings() {

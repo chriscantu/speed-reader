@@ -59,6 +59,8 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             "fontSize": defaults.object(forKey: SettingsKeys.fontSize) ?? SettingsKeys.Defaults.fontSize,
             "punctuationPause": defaults.object(forKey: SettingsKeys.punctuationPause)
                 ?? SettingsKeys.Defaults.punctuationPause,
+            "alignment": defaults.string(forKey: SettingsKeys.alignment)
+                ?? SettingsKeys.Defaults.alignment.rawValue,
         ]
     }
 
@@ -79,6 +81,7 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             "theme": SettingsKeys.Defaults.theme.rawValue,
             "fontSize": SettingsKeys.Defaults.fontSize,
             "punctuationPause": SettingsKeys.Defaults.punctuationPause,
+            "alignment": SettingsKeys.Defaults.alignment.rawValue,
         ]
     }
 }
