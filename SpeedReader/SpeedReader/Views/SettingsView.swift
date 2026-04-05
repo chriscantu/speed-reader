@@ -155,7 +155,12 @@ struct SettingsView: View {
             }
 
             Section("Appearance") {
-                RSVPPreview(font: settings.font, fontSize: settings.fontSize, theme: settings.theme, alignment: settings.alignment)
+                RSVPPreview(
+                    font: settings.font,
+                    fontSize: settings.fontSize,
+                    theme: settings.theme,
+                    alignment: settings.alignment
+                )
                     .accessibilityHidden(true)
 
                 Picker("Font", selection: Binding(
