@@ -168,10 +168,12 @@
 
 :host([data-alignment="orp"]) .sr-word-before {
   text-align: right;
+  overflow: visible;
 }
 
 :host([data-alignment="orp"]) .sr-word-after {
   text-align: left;
+  overflow: visible;
 }
 
 .sr-context {

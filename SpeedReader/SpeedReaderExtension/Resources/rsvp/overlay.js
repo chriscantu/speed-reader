@@ -248,7 +248,16 @@ export class RSVPOverlay {
     // Reset any previous scale so measurements reflect true size.
     container.style.transform = '';
     const areaWidth = area.clientWidth;
-    const textWidth = container.scrollWidth;
+    // In ORP grid mode, the container has width:100% so scrollWidth === clientWidth
+    // even when text overflows. Measure the actual span widths instead.
+    var textWidth;
+    if (this.settings.alignment === 'orp' && this.elements.wordBefore) {
+      textWidth = (this.elements.wordBefore.scrollWidth || 0)
+        + (this.elements.wordFocus.scrollWidth || 0)
+        + (this.elements.wordAfter.scrollWidth || 0);
+    } else {
+      textWidth = container.scrollWidth;
+    }
     if (textWidth > areaWidth) {
       const scale = Math.max(areaWidth / textWidth, 0.3);
       container.style.transform = 'scale(' + scale + ')';
