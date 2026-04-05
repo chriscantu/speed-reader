@@ -1,6 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { clampFontSize, FONT_SIZE_DEFAULT, FONT_SIZE_MIN, FONT_SIZE_MAX } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/settings-defaults.js';
+import {
+  clampFontSize, FONT_SIZE_DEFAULT, FONT_SIZE_MIN, FONT_SIZE_MAX,
+  SETTINGS_KEYS, SETTINGS_DEFAULTS,
+} from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/settings-defaults.js';
 
 describe('clampFontSize', () => {
   it('returns value within range unchanged', () => {
@@ -32,5 +35,17 @@ describe('clampFontSize', () => {
     assert.strictEqual(clampFontSize('big'), FONT_SIZE_DEFAULT);
     assert.strictEqual(clampFontSize(undefined), FONT_SIZE_DEFAULT);
     assert.strictEqual(clampFontSize(null), FONT_SIZE_DEFAULT);
+  });
+});
+
+describe('SETTINGS_KEYS', () => {
+  it('includes alignment', () => {
+    assert.ok(SETTINGS_KEYS.includes('alignment'));
+  });
+});
+
+describe('SETTINGS_DEFAULTS', () => {
+  it('defaults alignment to orp', () => {
+    assert.strictEqual(SETTINGS_DEFAULTS.alignment, 'orp');
   });
 });
