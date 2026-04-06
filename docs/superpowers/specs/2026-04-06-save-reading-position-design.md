@@ -136,8 +136,8 @@ This matches the mental model from podcast and audiobook players — pick up whe
 
 Pure functions (except storage I/O):
 
-- `normalizeUrl(url)` — URL normalization (internal, not exported)
-- `hashText(text)` — first+last 100 chars to hash string (internal, not exported)
+- `normalizeUrl(url)` — URL normalization (exported for testability, not used by callers)
+- `hashText(text)` — first+last 100 chars to hash string (exported for testability, not used by callers)
 - `save(url, text, index, total)` — normalize + hash internally, upsert entry + LRU eviction
 - `restore(url, text)` — normalize + hash internally, returns saved index or null
 - `clear(url)` — normalize internally, removes entry (called on playback complete)
