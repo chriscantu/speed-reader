@@ -148,4 +148,8 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }).then(sendResponse).catch(() => sendResponse({ error: 'Could not reach content script' }));
     return true; // async response
   }
+
+  if (message.action === 'analytics-event') {
+    console.debug('[SpeedReader]', message.event, message.data);
+  }
 });
