@@ -372,6 +372,61 @@ describe('RSVPStateMachine', () => {
     });
   });
 
+  describe('timeElapsed and timeRemaining', () => {
+    it('returns 0 elapsed and full remaining at start', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { wpm: 240 }); // 4 words, 240wpm = 4 words/sec = 1 sec total
+      assert.strictEqual(sm.timeElapsed(), 0);
+      assert.strictEqual(sm.timeRemaining(), 1);
+    });
+
+    it('returns correct times at midpoint', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four five six.', { wpm: 300 }); // 6 words at 300wpm
+      sm.currentIndex = 3; // halfway
+      // elapsed: ceil(3 / 300 * 60) = ceil(0.6) = 1
+      assert.strictEqual(sm.timeElapsed(), 1);
+      // remaining: ceil(3 / 300 * 60) = ceil(0.6) = 1
+      assert.strictEqual(sm.timeRemaining(), 1);
+    });
+
+    it('returns full elapsed and 0 remaining at end', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { wpm: 240 });
+      sm.currentIndex = 4; // past last word
+      assert.strictEqual(sm.timeRemaining(), 0);
+      assert.strictEqual(sm.timeElapsed(), 1);
+    });
+
+    it('updates when wpm changes', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four five six seven eight nine ten.', { wpm: 300 });
+      // 10 words at 300wpm = 2 sec total
+      assert.strictEqual(sm.timeRemaining(), 2);
+      sm.wpm = 600;
+      // 10 words at 600wpm = 1 sec total
+      assert.strictEqual(sm.timeRemaining(), 1);
+    });
+
+    it('elapsed + remaining equals total time', () => {
+      const sm = new RSVPStateMachine();
+      // Use values that divide evenly to avoid rounding issues
+      sm.init('One two three four five six.', { wpm: 120 }); // 6 words at 120wpm = 3 sec
+      sm.currentIndex = 2; // 2 elapsed, 4 remaining
+      // elapsed: ceil(2/120*60) = ceil(1) = 1
+      // remaining: ceil(4/120*60) = ceil(2) = 2
+      // total: ceil(6/120*60) = ceil(3) = 3
+      assert.strictEqual(sm.timeElapsed() + sm.timeRemaining(), 3);
+    });
+
+    it('returns 0 for both when words array is empty', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('');
+      assert.strictEqual(sm.timeElapsed(), 0);
+      assert.strictEqual(sm.timeRemaining(), 0);
+    });
+  });
+
   describe('contextSentence', () => {
     it('returns words in current sentence with highlight index', () => {
       const sm = new RSVPStateMachine();

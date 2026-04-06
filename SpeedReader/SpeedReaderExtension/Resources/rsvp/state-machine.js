@@ -97,6 +97,18 @@ export class RSVPStateMachine {
     this.currentIndex = Math.max(0, Math.min(index, this.words.length - 1));
   }
 
+  timeElapsed() {
+    if (this.words.length === 0) return 0;
+    return Math.ceil((this.currentIndex / this.wpm) * 60);
+  }
+
+  timeRemaining() {
+    if (this.words.length === 0) return 0;
+    const wordsLeft = this.words.length - this.currentIndex;
+    if (wordsLeft <= 0) return 0;
+    return Math.ceil((wordsLeft / this.wpm) * 60);
+  }
+
   adjustWpm(delta) {
     this.wpm = clampWpm(this.wpm + delta);
     return this.wpm;
