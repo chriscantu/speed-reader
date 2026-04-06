@@ -1,6 +1,6 @@
 import { RSVPStateMachine } from './state-machine.js';
 import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, ALIGNMENT_DEFAULT, clampWpm, clampFontSize, validateAlignment } from './settings-defaults.js';
-import { restore } from './reading-position.js';
+import { save, restore, clear } from './reading-position.js';
 
 export class RSVPOverlay {
   constructor() {
@@ -127,6 +127,7 @@ export class RSVPOverlay {
   }
 
   close() {
+    this._savePosition();
     this.pause();
     if (this.host && this.host.parentNode) {
       this.host.parentNode.removeChild(this.host);
@@ -134,6 +135,8 @@ export class RSVPOverlay {
     this.host = null;
     this.shadow = null;
     this.elements = {};
+    this._url = '';
+    this._text = '';
     if (this._boundKeyHandler) {
       document.removeEventListener('keydown', this._boundKeyHandler);
       this._boundKeyHandler = null;
@@ -155,6 +158,7 @@ export class RSVPOverlay {
     }
     this._updatePlayButton();
     this._showContext();
+    this._savePosition();
   }
 
   togglePlayPause() {
@@ -225,6 +229,14 @@ export class RSVPOverlay {
     });
   }
 
+  _savePosition() {
+    if (!this._url || this.state.currentIndex === 0) return;
+    save(this._url, this._text, this.state.currentIndex, this.state.words.length)
+      .catch(function(err) {
+        console.warn('[SpeedReader] Failed to save reading position:', err.message || err);
+      });
+  }
+
   _startLoop() {
     this._renderWord();
     this._updateProgress();
@@ -232,6 +244,11 @@ export class RSVPOverlay {
     const result = this.state.tick();
     if (result.done) {
       this.pause();
+      if (this._url) {
+        clear(this._url).catch(function(err) {
+          console.warn('[SpeedReader] Failed to clear reading position:', err.message || err);
+        });
+      }
       return;
     }
 
