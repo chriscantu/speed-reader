@@ -349,31 +349,17 @@
   font-variant-numeric: tabular-nums;
 }
 
-.sr-progress-area {
+.sr-scrubber-area {
   margin-top: 12px;
 }
 
-.sr-progress-labels {
+.sr-scrubber-labels {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
   color: var(--sr-text-muted);
-  margin-bottom: 4px;
-}
-
-.sr-progress-track {
-  background: var(--sr-border);
-  border-radius: 4px;
-  height: 4px;
-  overflow: hidden;
-}
-
-.sr-progress-fill {
-  background: var(--sr-accent);
-  border-radius: 4px;
-  height: 4px;
-  width: 0%;
-  transition: width 0.1s linear;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
 }
 
 .sr-toast {
@@ -456,10 +442,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sr-progress-fill {
-    transition: none;
-  }
-
   .sr-toast {
     transition: none;
   }
