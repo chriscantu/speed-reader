@@ -1,6 +1,28 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeUrl, hashText } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/reading-position.js';
+
+// Mock browser.storage.local for save/restore/clear tests
+let mockStorage = {};
+globalThis.browser = {
+  storage: {
+    local: {
+      get: async (keys) => {
+        const result = {};
+        if (typeof keys === 'string') {
+          result[keys] = mockStorage[keys];
+        } else if (Array.isArray(keys)) {
+          for (const k of keys) result[k] = mockStorage[k];
+        } else if (typeof keys === 'object') {
+          for (const k in keys) result[k] = mockStorage[k] ?? keys[k];
+        }
+        return result;
+      },
+      set: async (items) => { Object.assign(mockStorage, items); },
+    },
+  },
+};
+
+import { normalizeUrl, hashText, save, restore, clear } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/reading-position.js';
 
 describe('normalizeUrl', () => {
   it('returns protocol + host + path unchanged for clean URLs', () => {
@@ -83,5 +105,121 @@ describe('hashText', () => {
   it('handles empty string', () => {
     const hash = hashText('');
     assert.strictEqual(typeof hash, 'string');
+  });
+});
+
+describe('save', () => {
+  it('stores position for a URL', async () => {
+    mockStorage = {};
+    await save('https://example.com/article', 'Some article text here', 50, 200);
+    const stored = mockStorage.readingPositions;
+    assert.ok(stored);
+    const key = Object.keys(stored)[0];
+    assert.strictEqual(stored[key].index, 50);
+    assert.strictEqual(stored[key].total, 200);
+    assert.ok(stored[key].textHash);
+    assert.ok(stored[key].timestamp);
+  });
+
+  it('updates existing entry for same URL', async () => {
+    mockStorage = {};
+    await save('https://example.com/article', 'Some text', 50, 200);
+    await save('https://example.com/article', 'Some text', 100, 200);
+    const stored = mockStorage.readingPositions;
+    const keys = Object.keys(stored);
+    assert.strictEqual(keys.length, 1);
+    assert.strictEqual(stored[keys[0]].index, 100);
+  });
+
+  it('does not save when index is 0', async () => {
+    mockStorage = {};
+    await save('https://example.com/article', 'Some text', 0, 200);
+    const stored = mockStorage.readingPositions;
+    assert.strictEqual(stored, undefined);
+  });
+
+  it('evicts oldest entry when exceeding MAX_ENTRIES', async () => {
+    mockStorage = {};
+    const positions = {};
+    for (let i = 0; i < 100; i++) {
+      positions['https://example.com/page' + i] = {
+        index: 10, total: 100, textHash: 'abc', timestamp: 1000 + i,
+      };
+    }
+    mockStorage = { readingPositions: positions };
+    await save('https://example.com/new-page', 'New article text', 5, 50);
+    const stored = mockStorage.readingPositions;
+    assert.strictEqual(Object.keys(stored).length, 100);
+    assert.strictEqual(stored['https://example.com/page0'], undefined);
+    assert.ok(stored['https://example.com/new-page']);
+  });
+});
+
+describe('restore', () => {
+  it('returns saved index for matching URL and text', async () => {
+    mockStorage = {};
+    const text = 'The quick brown fox jumps over the lazy dog.';
+    await save('https://example.com/article', text, 42, 200);
+    const index = await restore('https://example.com/article', text);
+    assert.strictEqual(index, 42);
+  });
+
+  it('returns null when no entry exists', async () => {
+    mockStorage = {};
+    const index = await restore('https://example.com/missing', 'Some text');
+    assert.strictEqual(index, null);
+  });
+
+  it('returns null when text hash does not match', async () => {
+    mockStorage = {};
+    await save('https://example.com/article', 'Original text', 42, 200);
+    const index = await restore('https://example.com/article', 'Completely different text');
+    assert.strictEqual(index, null);
+  });
+
+  it('returns null when saved index exceeds total words', async () => {
+    mockStorage = {};
+    const url = 'https://example.com/article';
+    const text = 'Short text';
+    mockStorage = {
+      readingPositions: {
+        [normalizeUrl(url)]: {
+          index: 500, total: 200, textHash: hashText(text), timestamp: Date.now(),
+        },
+      },
+    };
+    const index = await restore(url, text);
+    assert.strictEqual(index, null);
+  });
+
+  it('normalizes URL before lookup', async () => {
+    mockStorage = {};
+    await save('https://example.com/article', 'Some text', 42, 200);
+    const index = await restore('https://example.com/article?utm_source=twitter#section', 'Some text');
+    assert.strictEqual(index, 42);
+  });
+});
+
+describe('clear', () => {
+  it('removes entry for a URL', async () => {
+    mockStorage = {};
+    await save('https://example.com/article', 'Some text', 42, 200);
+    await clear('https://example.com/article');
+    const stored = mockStorage.readingPositions;
+    assert.strictEqual(Object.keys(stored).length, 0);
+  });
+
+  it('does nothing when URL has no entry', async () => {
+    mockStorage = { readingPositions: {} };
+    await clear('https://example.com/missing');
+    assert.strictEqual(Object.keys(mockStorage.readingPositions).length, 0);
+  });
+
+  it('normalizes URL before clearing', async () => {
+    mockStorage = {};
+    await save('https://example.com/article', 'Some text', 42, 200);
+    await clear('https://example.com/article?utm_source=twitter');
+    const stored = mockStorage.readingPositions;
+    assert.strictEqual(Object.keys(stored).length, 0);
   });
 });
