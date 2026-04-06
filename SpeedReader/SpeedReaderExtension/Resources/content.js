@@ -112,7 +112,7 @@ async function extractAndLaunch() {
 
   if (decision.action === 'use-selection') {
     try {
-      reader.open(decision.text, document.title, await getSettings());
+      await reader.open(decision.text, document.title, await getSettings(), window.location.href);
       pendingSelectionMode = false;
     } catch (e) {
       console.error('[SpeedReader] Failed to open reader with selection:', e);
@@ -124,7 +124,7 @@ async function extractAndLaunch() {
   if (decision.action === 'use-article') {
     try {
       var settings = await getSettings();
-      reader.open(decision.text, decision.title || document.title, settings);
+      await reader.open(decision.text, decision.title || document.title, settings, window.location.href);
     } catch (e) {
       console.error('[SpeedReader] Failed to open reader with article:', e);
       showToast('Something went wrong. Try reloading the page.');

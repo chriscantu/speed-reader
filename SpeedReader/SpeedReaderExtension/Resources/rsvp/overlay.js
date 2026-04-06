@@ -1,5 +1,6 @@
 import { RSVPStateMachine } from './state-machine.js';
 import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, ALIGNMENT_DEFAULT, clampWpm, clampFontSize, validateAlignment } from './settings-defaults.js';
+import { restore } from './reading-position.js';
 
 export class RSVPOverlay {
   constructor() {
@@ -19,13 +20,15 @@ export class RSVPOverlay {
     this._scrubFromIndex = undefined;
   }
 
-  open(text, title, settings = {}) {
+  async open(text, title, settings = {}, url = '') {
     if (this.host) {
       this.close();
     }
 
     Object.assign(this.settings, settings);
     this.title = title || '';
+    this._url = url;
+    this._text = text;
     this.state.init(text, {
       wpm: settings.wpm,
       punctuationPause: settings.punctuationPause ?? true,
@@ -34,6 +37,18 @@ export class RSVPOverlay {
     if (this.state.words.length === 0) {
       this._showPageToast('No readable content found.');
       return;
+    }
+
+    // Restore saved reading position if available
+    if (url) {
+      try {
+        const savedIndex = await restore(url, text);
+        if (savedIndex !== null) {
+          this.state.seekTo(savedIndex);
+        }
+      } catch (e) {
+        console.warn('[SpeedReader] Failed to restore reading position:', e.message || e);
+      }
     }
 
     this._createDOM();
