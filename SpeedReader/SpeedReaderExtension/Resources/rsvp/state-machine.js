@@ -88,6 +88,15 @@ export class RSVPStateMachine {
     }
   }
 
+  seekTo(index) {
+    this.pause();
+    if (this.words.length === 0) {
+      this.currentIndex = 0;
+      return;
+    }
+    this.currentIndex = Math.max(0, Math.min(index, this.words.length - 1));
+  }
+
   adjustWpm(delta) {
     this.wpm = clampWpm(this.wpm + delta);
     return this.wpm;

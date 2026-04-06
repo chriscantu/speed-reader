@@ -333,6 +333,45 @@ describe('RSVPStateMachine', () => {
     });
   });
 
+  describe('seekTo', () => {
+    it('sets currentIndex to the given value', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four five.');
+      sm.seekTo(3);
+      assert.strictEqual(sm.currentIndex, 3);
+    });
+
+    it('clamps to 0 when given a negative index', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(-5);
+      assert.strictEqual(sm.currentIndex, 0);
+    });
+
+    it('clamps to last valid index when given index beyond words length', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(999);
+      assert.strictEqual(sm.currentIndex, 2); // 3 words, last index is 2
+    });
+
+    it('pauses playback when seeking', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four five.');
+      sm.play();
+      assert.strictEqual(sm.isPlaying, true);
+      sm.seekTo(2);
+      assert.strictEqual(sm.isPlaying, false);
+    });
+
+    it('works correctly when words array is empty', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('');
+      sm.seekTo(5);
+      assert.strictEqual(sm.currentIndex, 0);
+    });
+  });
+
   describe('contextSentence', () => {
     it('returns words in current sentence with highlight index', () => {
       const sm = new RSVPStateMachine();
