@@ -68,30 +68,22 @@ private struct RSVPPreview: View {
         }
     }
 
+    // Concatenated Text so minimumScaleFactor applies uniformly to all parts.
+    // ORP centering is approximate in this preview — the overlay uses CSS grid
+    // for precise focus-letter centering during actual reading.
+    private var wordText: Text {
+        Text(before).foregroundColor(textColor)
+        + Text(focus).foregroundColor(orpAccentColor)
+        + Text(after).foregroundColor(textColor)
+    }
+
     var body: some View {
         Group {
-            if alignment == .orpAligned {
-                HStack(spacing: 0) {
-                    Text(before)
-                        .foregroundColor(textColor)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                    Text(focus)
-                        .foregroundColor(orpAccentColor)
-                    Text(after)
-                        .foregroundColor(textColor)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
+            wordText
                 .font(font.font(size: CGFloat(fontSize)))
-            } else {
-                HStack(spacing: 0) {
-                    Spacer()
-                    (Text(before).foregroundColor(textColor)
-                    + Text(focus).foregroundColor(orpAccentColor)
-                    + Text(after).foregroundColor(textColor))
-                        .font(font.font(size: CGFloat(fontSize)))
-                    Spacer()
-                }
-            }
+                .lineLimit(1)
+                .minimumScaleFactor(0.3)
+                .frame(maxWidth: .infinity)
         }
         .padding(.vertical, 24)
         .background(backgroundColor)

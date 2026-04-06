@@ -333,6 +333,135 @@ describe('RSVPStateMachine', () => {
     });
   });
 
+  describe('seekTo', () => {
+    it('sets currentIndex to the given value', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four five.');
+      sm.seekTo(3);
+      assert.strictEqual(sm.currentIndex, 3);
+    });
+
+    it('clamps to 0 when given a negative index', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(-5);
+      assert.strictEqual(sm.currentIndex, 0);
+    });
+
+    it('clamps to last valid index when given index beyond words length', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(999);
+      assert.strictEqual(sm.currentIndex, 2); // 3 words, last index is 2
+    });
+
+    it('pauses playback when seeking', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four five.');
+      sm.play();
+      assert.strictEqual(sm.isPlaying, true);
+      sm.seekTo(2);
+      assert.strictEqual(sm.isPlaying, false);
+    });
+
+    it('works correctly when words array is empty', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('');
+      sm.seekTo(5);
+      assert.strictEqual(sm.currentIndex, 0);
+    });
+
+    it('accepts the last valid index without clamping', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(2); // words.length - 1
+      assert.strictEqual(sm.currentIndex, 2);
+    });
+
+    it('clamps words.length to last valid index', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(3); // words.length — tick() can leave currentIndex here
+      assert.strictEqual(sm.currentIndex, 2);
+    });
+
+    it('ignores NaN index without corrupting state', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.currentIndex = 1;
+      sm.seekTo(NaN);
+      assert.strictEqual(sm.currentIndex, 1); // unchanged
+    });
+
+    it('ignores non-integer index', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.currentIndex = 1;
+      sm.seekTo(1.5);
+      assert.strictEqual(sm.currentIndex, 1); // unchanged
+    });
+
+    it('leaves isPlaying false when already paused', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(1);
+      assert.strictEqual(sm.isPlaying, false);
+      assert.strictEqual(sm.currentIndex, 1);
+    });
+  });
+
+  describe('timeElapsed and timeRemaining', () => {
+    it('returns 0 elapsed and full remaining at start', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { wpm: 240 }); // 4 words, 240wpm = 4 words/sec = 1 sec total
+      assert.strictEqual(sm.timeElapsed(), 0);
+      assert.strictEqual(sm.timeRemaining(), 1);
+    });
+
+    it('returns correct times at midpoint', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four five six.', { wpm: 300 }); // 6 words at 300wpm
+      sm.currentIndex = 3; // halfway
+      // elapsed: ceil(3 / 300 * 60) = ceil(0.6) = 1
+      assert.strictEqual(sm.timeElapsed(), 1);
+      // remaining: ceil(3 / 300 * 60) = ceil(0.6) = 1
+      assert.strictEqual(sm.timeRemaining(), 1);
+    });
+
+    it('returns full elapsed and 0 remaining at end', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { wpm: 240 });
+      sm.currentIndex = 4; // past last word
+      assert.strictEqual(sm.timeRemaining(), 0);
+      assert.strictEqual(sm.timeElapsed(), 1);
+    });
+
+    it('updates when wpm changes', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four five six seven eight nine ten.', { wpm: 300 });
+      // 10 words at 300wpm = 2 sec total
+      assert.strictEqual(sm.timeRemaining(), 2);
+      sm.wpm = 600;
+      // 10 words at 600wpm = 1 sec total
+      assert.strictEqual(sm.timeRemaining(), 1);
+    });
+
+    it('timeRemaining reaches 0 at end and timeElapsed equals total duration', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { wpm: 240 }); // 4 words at 240wpm = 1 sec
+      sm.currentIndex = sm.words.length;
+      assert.strictEqual(sm.timeRemaining(), 0);
+      assert.strictEqual(sm.timeElapsed(), Math.ceil((sm.words.length / sm.wpm) * 60));
+    });
+
+    it('returns 0 for both when words array is empty', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('');
+      assert.strictEqual(sm.timeElapsed(), 0);
+      assert.strictEqual(sm.timeRemaining(), 0);
+    });
+  });
+
   describe('contextSentence', () => {
     it('returns words in current sentence with highlight index', () => {
       const sm = new RSVPStateMachine();
