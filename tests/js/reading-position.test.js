@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeUrl } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/reading-position.js';
+import { normalizeUrl, hashText } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/reading-position.js';
 
 describe('normalizeUrl', () => {
   it('returns protocol + host + path unchanged for clean URLs', () => {
@@ -32,5 +32,56 @@ describe('normalizeUrl', () => {
   });
   it('removes ? when all params are tracking params', () => {
     assert.strictEqual(normalizeUrl('https://example.com/article?utm_source=twitter'), 'https://example.com/article');
+  });
+});
+
+describe('hashText', () => {
+  it('returns a string', () => {
+    assert.strictEqual(typeof hashText('Hello world'), 'string');
+  });
+
+  it('returns same hash for same text', () => {
+    const text = 'The quick brown fox jumps over the lazy dog.';
+    assert.strictEqual(hashText(text), hashText(text));
+  });
+
+  it('returns different hash for different text', () => {
+    assert.notStrictEqual(
+      hashText('Article about cats'),
+      hashText('Article about dogs')
+    );
+  });
+
+  it('uses first and last 100 chars for long text', () => {
+    const prefix = 'A'.repeat(100);
+    const suffix = 'Z'.repeat(100);
+    const text1 = prefix + 'MIDDLE_ONE' + suffix;
+    const text2 = prefix + 'MIDDLE_TWO' + suffix;
+    assert.strictEqual(hashText(text1), hashText(text2));
+  });
+
+  it('detects changes in first 100 chars', () => {
+    const suffix = 'Z'.repeat(100);
+    const text1 = 'A'.repeat(100) + 'middle' + suffix;
+    const text2 = 'B'.repeat(100) + 'middle' + suffix;
+    assert.notStrictEqual(hashText(text1), hashText(text2));
+  });
+
+  it('detects changes in last 100 chars', () => {
+    const prefix = 'A'.repeat(100);
+    const text1 = prefix + 'middle' + 'Y'.repeat(100);
+    const text2 = prefix + 'middle' + 'Z'.repeat(100);
+    assert.notStrictEqual(hashText(text1), hashText(text2));
+  });
+
+  it('handles short text (under 200 chars)', () => {
+    const hash = hashText('short');
+    assert.strictEqual(typeof hash, 'string');
+    assert.ok(hash.length > 0);
+  });
+
+  it('handles empty string', () => {
+    const hash = hashText('');
+    assert.strictEqual(typeof hash, 'string');
   });
 });

@@ -20,3 +20,15 @@ export function normalizeUrl(rawUrl) {
   }
   return result;
 }
+
+export function hashText(text) {
+  const sample = text.length <= 200
+    ? text
+    : text.slice(0, 100) + text.slice(-100);
+  // djb2 hash
+  let hash = 5381;
+  for (let i = 0; i < sample.length; i++) {
+    hash = ((hash << 5) + hash + sample.charCodeAt(i)) >>> 0;
+  }
+  return hash.toString(36);
+}
