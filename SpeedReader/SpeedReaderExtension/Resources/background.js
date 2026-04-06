@@ -149,7 +149,9 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // async response
   }
 
+  // Fire-and-forget: no response needed. Logged for development visibility only.
   if (message.action === 'analytics-event') {
-    console.debug('[SpeedReader]', message.event, message.data);
+    console.log('[SpeedReader] analytics:', message.event, message.data);
+    return;
   }
 });

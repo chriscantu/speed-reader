@@ -67,7 +67,7 @@ export class RSVPOverlay {
     }
 
     // WPM and punctuationPause take effect on the next tick.
-    // Update the state machine and sync the slider UI.
+    // Update the state machine and sync the WPM slider UI.
     if (typeof settings.wpm === 'number') {
       this.state.wpm = clampWpm(settings.wpm);
       if (this.elements.wpmLabel) {
@@ -256,12 +256,15 @@ export class RSVPOverlay {
     }
   }
 
+  // Converts whole seconds to 'm:ss' format. Returns '0:00' for invalid input.
   _formatTime(seconds) {
-    var mins = Math.floor(seconds / 60);
-    var secs = seconds % 60;
+    if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
     return mins + ':' + (secs < 10 ? '0' : '') + secs;
   }
 
+  // Syncs scrubber position and elapsed/remaining time labels to current state.
   _updateProgress() {
     if (this.elements.scrubber) {
       this.elements.scrubber.value = this.state.currentIndex;
@@ -574,7 +577,7 @@ export class RSVPOverlay {
 
     const scrubber = document.createElement('input');
     scrubber.type = 'range';
-    scrubber.className = 'sr-slider';
+    scrubber.className = 'sr-scrubber';
     scrubber.min = '0';
     scrubber.max = String(Math.max(0, this.state.words.length - 1));
     scrubber.value = '0';
@@ -650,7 +653,9 @@ export class RSVPOverlay {
     }, { passive: true });
 
     this.elements.scrubber.addEventListener('input', () => {
+      if (this.timerId !== null) { this.pause(); }
       const index = parseInt(this.elements.scrubber.value, 10);
+      if (isNaN(index)) return;
       this.state.seekTo(index);
       this._renderWord();
       this._updateProgress();
@@ -660,6 +665,8 @@ export class RSVPOverlay {
     this.elements.scrubber.addEventListener('change', () => {
       const toIndex = this.state.currentIndex;
       const fromIndex = this._scrubFromIndex !== undefined ? this._scrubFromIndex : toIndex;
+      this._scrubFromIndex = undefined;
+      if (!Number.isFinite(fromIndex) || !Number.isFinite(toIndex)) return;
       if (fromIndex !== toIndex) {
         browser.runtime.sendMessage({
           action: 'analytics-event',
@@ -672,10 +679,14 @@ export class RSVPOverlay {
             totalWords: this.state.words.length,
           },
         }).catch(function(err) {
-          console.warn('[SpeedReader] Failed to send scrub analytics:', err.message || err);
+          const msg = err.message || String(err);
+          if (msg.includes('Receiving end does not exist') || msg.includes('Extension context invalidated')) {
+            console.log('[SpeedReader] analytics skipped: background worker not available');
+          } else {
+            console.error('[SpeedReader] Failed to send scrub analytics:', msg);
+          }
         });
       }
-      this._scrubFromIndex = undefined;
     });
 
     this.elements.backdrop.addEventListener('click', (e) => {

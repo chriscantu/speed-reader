@@ -370,6 +370,44 @@ describe('RSVPStateMachine', () => {
       sm.seekTo(5);
       assert.strictEqual(sm.currentIndex, 0);
     });
+
+    it('accepts the last valid index without clamping', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(2); // words.length - 1
+      assert.strictEqual(sm.currentIndex, 2);
+    });
+
+    it('clamps words.length to last valid index', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(3); // words.length — tick() can leave currentIndex here
+      assert.strictEqual(sm.currentIndex, 2);
+    });
+
+    it('ignores NaN index without corrupting state', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.currentIndex = 1;
+      sm.seekTo(NaN);
+      assert.strictEqual(sm.currentIndex, 1); // unchanged
+    });
+
+    it('ignores non-integer index', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.currentIndex = 1;
+      sm.seekTo(1.5);
+      assert.strictEqual(sm.currentIndex, 1); // unchanged
+    });
+
+    it('leaves isPlaying false when already paused', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.');
+      sm.seekTo(1);
+      assert.strictEqual(sm.isPlaying, false);
+      assert.strictEqual(sm.currentIndex, 1);
+    });
   });
 
   describe('timeElapsed and timeRemaining', () => {
@@ -408,15 +446,12 @@ describe('RSVPStateMachine', () => {
       assert.strictEqual(sm.timeRemaining(), 1);
     });
 
-    it('elapsed + remaining equals total time', () => {
+    it('timeRemaining reaches 0 at end and timeElapsed equals total duration', () => {
       const sm = new RSVPStateMachine();
-      // Use values that divide evenly to avoid rounding issues
-      sm.init('One two three four five six.', { wpm: 120 }); // 6 words at 120wpm = 3 sec
-      sm.currentIndex = 2; // 2 elapsed, 4 remaining
-      // elapsed: ceil(2/120*60) = ceil(1) = 1
-      // remaining: ceil(4/120*60) = ceil(2) = 2
-      // total: ceil(6/120*60) = ceil(3) = 3
-      assert.strictEqual(sm.timeElapsed() + sm.timeRemaining(), 3);
+      sm.init('One two three four.', { wpm: 240 }); // 4 words at 240wpm = 1 sec
+      sm.currentIndex = sm.words.length;
+      assert.strictEqual(sm.timeRemaining(), 0);
+      assert.strictEqual(sm.timeElapsed(), Math.ceil((sm.words.length / sm.wpm) * 60));
     });
 
     it('returns 0 for both when words array is empty', () => {
