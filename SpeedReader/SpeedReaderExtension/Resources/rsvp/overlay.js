@@ -18,6 +18,7 @@ export class RSVPOverlay {
     this.elements = {};
     this._boundKeyHandler = null;
     this._scrubFromIndex = undefined;
+    this._autoSaveTimerId = null;
   }
 
   async open(text, title, settings = {}, url = '') {
@@ -128,6 +129,7 @@ export class RSVPOverlay {
 
   close() {
     this._savePosition();
+    this._stopAutoSave();
     this.pause();
     if (this.host && this.host.parentNode) {
       this.host.parentNode.removeChild(this.host);
@@ -148,6 +150,7 @@ export class RSVPOverlay {
     this._updatePlayButton();
     this._hideContext();
     this._startLoop();
+    this._startAutoSave();
   }
 
   pause() {
@@ -156,6 +159,7 @@ export class RSVPOverlay {
       clearTimeout(this.timerId);
       this.timerId = null;
     }
+    this._stopAutoSave();
     this._updatePlayButton();
     this._showContext();
     this._savePosition();
@@ -235,6 +239,20 @@ export class RSVPOverlay {
       .catch(function(err) {
         console.warn('[SpeedReader] Failed to save reading position:', err.message || err);
       });
+  }
+
+  _startAutoSave() {
+    this._stopAutoSave();
+    this._autoSaveTimerId = setInterval(() => {
+      this._savePosition();
+    }, 30000);
+  }
+
+  _stopAutoSave() {
+    if (this._autoSaveTimerId !== null) {
+      clearInterval(this._autoSaveTimerId);
+      this._autoSaveTimerId = null;
+    }
   }
 
   _startLoop() {
