@@ -82,6 +82,8 @@ private struct RSVPPreview: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .font(font.font(size: CGFloat(fontSize)))
+                .lineLimit(1)
+                .minimumScaleFactor(0.3)
             } else {
                 HStack(spacing: 0) {
                     Spacer()
@@ -89,6 +91,8 @@ private struct RSVPPreview: View {
                     + Text(focus).foregroundColor(orpAccentColor)
                     + Text(after).foregroundColor(textColor))
                         .font(font.font(size: CGFloat(fontSize)))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.3)
                     Spacer()
                 }
             }
