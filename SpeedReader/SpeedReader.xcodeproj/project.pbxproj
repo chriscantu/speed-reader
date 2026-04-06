@@ -7,41 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		02E2FE0E2F7F6F9E007CB358 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE082F7F6F9E007CB358 /* Settings.swift */; };
-		02E2FE0F2F7F6F9E007CB358 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE0C2F7F6F9E007CB358 /* SettingsView.swift */; };
-		02E2FE102F7F6F9E007CB358 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE0B2F7F6F9E007CB358 /* OnboardingView.swift */; };
-		02E2FE112F7F6F9E007CB358 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE0A2F7F6F9E007CB358 /* ContentView.swift */; };
 		02E2FE312F7F7065007CB358 /* SpeedReaderExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 02E2FE192F7F7065007CB358 /* SpeedReaderExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		0989A66035529726AA8D3585 /* toolbar-icon-16.png in Resources */ = {isa = PBXBuildFile; fileRef = 4586AA0F45F69A2D1FC767DC /* toolbar-icon-16.png */; };
-		0AD203D7953EA09F2C6B7B07 /* overlay.css in Resources */ = {isa = PBXBuildFile; fileRef = 08A86BDA6B48DD89677FDA88 /* overlay.css */; };
-		10A2A1E3E8D6D194B037DDC9 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 2662E9DB546F37F248F0DE75 /* manifest.json */; };
-		36D5E08F108FB92A242E4979 /* SpeedReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0597FC2C9EB996C1C0D68C /* SpeedReaderApp.swift */; };
-		4096BCD140BB50A6E096992D /* overlay.js in Resources */ = {isa = PBXBuildFile; fileRef = 15596D479A5D0D7345265215 /* overlay.js */; };
-		48FCA143BF399C387037D81B /* icon-512.png in Resources */ = {isa = PBXBuildFile; fileRef = B2205A307F3EF0C111669CE3 /* icon-512.png */; };
-		5CA2565520B2E716D3A553BE /* icon-96.png in Resources */ = {isa = PBXBuildFile; fileRef = 0091ABB7D83EA546A908A891 /* icon-96.png */; };
 		697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60576CF8DFF855A5FBC03458 /* SettingsTests.swift */; };
-		788CF3F0745CACC88B6FD3A5 /* icon-128.png in Resources */ = {isa = PBXBuildFile; fileRef = CDA736A75407BDAE1865E723 /* icon-128.png */; };
-		7AE95D2EE93DB5249B5A178D /* toolbar-icon-38.png in Resources */ = {isa = PBXBuildFile; fileRef = 88A4B6630BB0B8A463E914FF /* toolbar-icon-38.png */; };
-		82122095B9DA95903C1FE117 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57270C891B5A8607F4D7800E /* SafariWebExtensionHandler.swift */; };
 		8583EC8C5846A9425A341FF0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C47E9825806A930B7A8484 /* Cocoa.framework */; };
 		8C9DEF341921D79BD47B1A7C /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
-		911C4EA4CA18B73F30A21BB4 /* icon-48.png in Resources */ = {isa = PBXBuildFile; fileRef = 78F0C821786D5C099708EEF6 /* icon-48.png */; };
-		960D360CC604419E248D2FD7 /* word-processor.js in Resources */ = {isa = PBXBuildFile; fileRef = 4DFBFC19ACD7105EA7C06AF3 /* word-processor.js */; };
-		999A0B7B3E9CF6018D8A0ADF /* icon-256.png in Resources */ = {isa = PBXBuildFile; fileRef = 2DA726110F99D7F38B30E0C3 /* icon-256.png */; };
-		9BBBF3E66EBBBFF67255B557 /* focus-point.js in Resources */ = {isa = PBXBuildFile; fileRef = 72D243DCA7839B0A1128F247 /* focus-point.js */; };
-		A02C1E7DD3352C9E28B80F91 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 155C7D23A470E05538BC8787 /* content.js */; };
-		A47CDB11F84049FC292C6B66 /* toolbar-icon-19.png in Resources */ = {isa = PBXBuildFile; fileRef = 64C4F798A63CCC4C2CF9EFAE /* toolbar-icon-19.png */; };
-		A504339B9FF7DC5BF5CD9B27 /* OpenDyslexic-Regular.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 4B0A632B0E777E5FFA671453 /* OpenDyslexic-Regular.woff2 */; };
-		A51B026E2FB7F1F9030AE110 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 336BA88D6062B640644E045E /* background.js */; };
 		AA0000000000000000000001 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE082F7F6F9E007CB358 /* Settings.swift */; };
 		AA0000000000000000000002 /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
 		ABC84A71AB9B9F43D28F006A /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
-		C046EB48F426B4E631D272B6 /* Readability.js in Resources */ = {isa = PBXBuildFile; fileRef = 113712A7066B13702A2D6917 /* Readability.js */; };
-		C39DA992C82EB5842E7DFD6D /* toolbar-icon-48.png in Resources */ = {isa = PBXBuildFile; fileRef = 042E566B2DEE5872585FEB36 /* toolbar-icon-48.png */; };
-		D34F1079F9E7ADE93DFE7C7A /* toolbar-icon-32.png in Resources */ = {isa = PBXBuildFile; fileRef = 3C69FA3A05A6044A0054D95C /* toolbar-icon-32.png */; };
 		DAB8DCFD212EBA275AADDF48 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7C9932756921056EBA7A59 /* SafariServices.framework */; };
-		E42B3C02D637304DA72F12DC /* icon-64.png in Resources */ = {isa = PBXBuildFile; fileRef = BA31BAC0466DEE4171A83080 /* icon-64.png */; };
-		F0569B338845840B71B6D212 /* toolbar-icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = CAFFEE1258C20D75FFDA8F4F /* toolbar-icon-72.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -440,27 +413,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A51B026E2FB7F1F9030AE110 /* background.js in Resources */,
-				A02C1E7DD3352C9E28B80F91 /* content.js in Resources */,
-				A504339B9FF7DC5BF5CD9B27 /* OpenDyslexic-Regular.woff2 in Resources */,
-				788CF3F0745CACC88B6FD3A5 /* icon-128.png in Resources */,
-				999A0B7B3E9CF6018D8A0ADF /* icon-256.png in Resources */,
-				911C4EA4CA18B73F30A21BB4 /* icon-48.png in Resources */,
-				48FCA143BF399C387037D81B /* icon-512.png in Resources */,
-				E42B3C02D637304DA72F12DC /* icon-64.png in Resources */,
-				5CA2565520B2E716D3A553BE /* icon-96.png in Resources */,
-				0989A66035529726AA8D3585 /* toolbar-icon-16.png in Resources */,
-				A47CDB11F84049FC292C6B66 /* toolbar-icon-19.png in Resources */,
-				D34F1079F9E7ADE93DFE7C7A /* toolbar-icon-32.png in Resources */,
-				7AE95D2EE93DB5249B5A178D /* toolbar-icon-38.png in Resources */,
-				C39DA992C82EB5842E7DFD6D /* toolbar-icon-48.png in Resources */,
-				F0569B338845840B71B6D212 /* toolbar-icon-72.png in Resources */,
-				C046EB48F426B4E631D272B6 /* Readability.js in Resources */,
-				10A2A1E3E8D6D194B037DDC9 /* manifest.json in Resources */,
-				9BBBF3E66EBBBFF67255B557 /* focus-point.js in Resources */,
-				0AD203D7953EA09F2C6B7B07 /* overlay.css in Resources */,
-				4096BCD140BB50A6E096992D /* overlay.js in Resources */,
-				960D360CC604419E248D2FD7 /* word-processor.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -478,12 +430,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				02E2FE0E2F7F6F9E007CB358 /* Settings.swift in Sources */,
-				02E2FE0F2F7F6F9E007CB358 /* SettingsView.swift in Sources */,
-				02E2FE102F7F6F9E007CB358 /* OnboardingView.swift in Sources */,
-				02E2FE112F7F6F9E007CB358 /* ContentView.swift in Sources */,
 				8C9DEF341921D79BD47B1A7C /* SettingsKeys.swift in Sources */,
-				36D5E08F108FB92A242E4979 /* SpeedReaderApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -492,7 +439,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABC84A71AB9B9F43D28F006A /* SettingsKeys.swift in Sources */,
-				82122095B9DA95903C1FE117 /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
