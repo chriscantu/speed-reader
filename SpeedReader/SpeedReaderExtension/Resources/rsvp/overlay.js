@@ -16,6 +16,7 @@ export class RSVPOverlay {
     this.shadow = null;
     this.elements = {};
     this._boundKeyHandler = null;
+    this._scrubFromIndex = undefined;
   }
 
   open(text, title, settings = {}) {
@@ -634,6 +635,49 @@ export class RSVPOverlay {
       this.adjustFontSize(FONT_SIZE_STEP);
     });
 
+    this.elements.scrubber.addEventListener('mousedown', () => {
+      this._scrubFromIndex = this.state.currentIndex;
+      if (this.state.isPlaying) {
+        this.pause();
+      }
+    });
+
+    this.elements.scrubber.addEventListener('touchstart', () => {
+      this._scrubFromIndex = this.state.currentIndex;
+      if (this.state.isPlaying) {
+        this.pause();
+      }
+    }, { passive: true });
+
+    this.elements.scrubber.addEventListener('input', () => {
+      const index = parseInt(this.elements.scrubber.value, 10);
+      this.state.seekTo(index);
+      this._renderWord();
+      this._updateProgress();
+      this._showContext();
+    });
+
+    this.elements.scrubber.addEventListener('change', () => {
+      const toIndex = this.state.currentIndex;
+      const fromIndex = this._scrubFromIndex !== undefined ? this._scrubFromIndex : toIndex;
+      if (fromIndex !== toIndex) {
+        browser.runtime.sendMessage({
+          action: 'analytics-event',
+          event: 'scrub',
+          data: {
+            direction: toIndex < fromIndex ? 'backward' : 'forward',
+            distance: Math.abs(toIndex - fromIndex),
+            fromIndex: fromIndex,
+            toIndex: toIndex,
+            totalWords: this.state.words.length,
+          },
+        }).catch(function(err) {
+          console.warn('[SpeedReader] Failed to send scrub analytics:', err.message || err);
+        });
+      }
+      this._scrubFromIndex = undefined;
+    });
+
     this.elements.backdrop.addEventListener('click', (e) => {
       if (e.target === this.elements.backdrop) {
         this.close();
@@ -651,10 +695,12 @@ export class RSVPOverlay {
           this.close();
           break;
         case 'ArrowLeft':
+          if (e.target === this.elements.scrubber) break;
           e.preventDefault();
           this.prevSentence();
           break;
         case 'ArrowRight':
+          if (e.target === this.elements.scrubber) break;
           e.preventDefault();
           this.nextSentence();
           break;
