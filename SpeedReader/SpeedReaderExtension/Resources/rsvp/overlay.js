@@ -255,13 +255,21 @@ export class RSVPOverlay {
     }
   }
 
+  _formatTime(seconds) {
+    var mins = Math.floor(seconds / 60);
+    var secs = seconds % 60;
+    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+
   _updateProgress() {
-    const p = this.state.progress();
-    if (this.elements.progressFill) {
-      this.elements.progressFill.style.width = p.percent + '%';
+    if (this.elements.scrubber) {
+      this.elements.scrubber.value = this.state.currentIndex;
     }
-    if (this.elements.progressLabel) {
-      this.elements.progressLabel.textContent = p.percent + '%';
+    if (this.elements.timeElapsed) {
+      this.elements.timeElapsed.textContent = this._formatTime(this.state.timeElapsed());
+    }
+    if (this.elements.timeRemaining) {
+      this.elements.timeRemaining.textContent = '-' + this._formatTime(this.state.timeRemaining());
     }
   }
 
@@ -545,34 +553,35 @@ export class RSVPOverlay {
     fontSizeRow.appendChild(fontSizeControls);
     fontSizeArea.appendChild(fontSizeRow);
 
-    // Progress area
-    const progressArea = document.createElement('div');
-    progressArea.className = 'sr-progress-area';
+    // Scrubber area
+    const scrubberArea = document.createElement('div');
+    scrubberArea.className = 'sr-scrubber-area';
 
-    const progressLabels = document.createElement('div');
-    progressLabels.className = 'sr-progress-labels';
+    const scrubberLabels = document.createElement('div');
+    scrubberLabels.className = 'sr-scrubber-labels';
 
-    const progressLabel = document.createElement('span');
-    progressLabel.textContent = '0%';
-    this.elements.progressLabel = progressLabel;
+    const timeElapsed = document.createElement('span');
+    timeElapsed.textContent = '0:00';
+    this.elements.timeElapsed = timeElapsed;
 
-    const wordsCountLabel = document.createElement('span');
-    wordsCountLabel.textContent = this.state.words.length + ' words';
+    const timeRemaining = document.createElement('span');
+    timeRemaining.textContent = '-' + this._formatTime(this.state.timeRemaining());
+    this.elements.timeRemaining = timeRemaining;
 
-    progressLabels.appendChild(progressLabel);
-    progressLabels.appendChild(wordsCountLabel);
+    scrubberLabels.appendChild(timeElapsed);
+    scrubberLabels.appendChild(timeRemaining);
 
-    const progressTrack = document.createElement('div');
-    progressTrack.className = 'sr-progress-track';
+    const scrubber = document.createElement('input');
+    scrubber.type = 'range';
+    scrubber.className = 'sr-slider';
+    scrubber.min = '0';
+    scrubber.max = String(Math.max(0, this.state.words.length - 1));
+    scrubber.value = '0';
+    scrubber.setAttribute('aria-label', 'Reading position');
+    this.elements.scrubber = scrubber;
 
-    const progressFill = document.createElement('div');
-    progressFill.className = 'sr-progress-fill';
-    this.elements.progressFill = progressFill;
-
-    progressTrack.appendChild(progressFill);
-
-    progressArea.appendChild(progressLabels);
-    progressArea.appendChild(progressTrack);
+    scrubberArea.appendChild(scrubberLabels);
+    scrubberArea.appendChild(scrubber);
 
     // Assemble card
     card.appendChild(header);
@@ -581,7 +590,7 @@ export class RSVPOverlay {
     card.appendChild(controls);
     card.appendChild(sliderArea);
     card.appendChild(fontSizeArea);
-    card.appendChild(progressArea);
+    card.appendChild(scrubberArea);
 
     backdrop.appendChild(card);
     this.shadow.appendChild(backdrop);
