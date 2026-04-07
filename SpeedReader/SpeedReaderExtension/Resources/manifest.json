@@ -32,9 +32,10 @@
         "word-processor.js",
         "focus-point.js",
         "reading-position.js",
+        "chunk-builder.js",
         "content-resolver.js",
         "Readability.js",
-        "OpenDyslexic-Regular.woff2"
+        "fonts/OpenDyslexic-Regular.woff2"
       ],
       "matches": ["<all_urls>"]
     }
