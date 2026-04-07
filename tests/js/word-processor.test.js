@@ -75,6 +75,18 @@ describe('processText', () => {
     // Dr. triggers sentence boundary (same as current behavior for abbreviations)
     assert.deepStrictEqual(sentenceStarts, ['Dr.[Smith]', 'gave']);
   });
+
+  it('does not detect sentence boundary on bare brackets without punctuation', () => {
+    const result = processText('see [10] for details');
+    const sentenceStarts = result.filter(w => w.sentenceStart).map(w => w.text);
+    assert.deepStrictEqual(sentenceStarts, ['see']);
+  });
+
+  it('detects sentence boundary with mixed bracket and quote trailing', () => {
+    const result = processText('retention.[10]" The next');
+    const sentenceStarts = result.filter(w => w.sentenceStart).map(w => w.text);
+    assert.deepStrictEqual(sentenceStarts, ['retention.[10]"', 'The']);
+  });
 });
 
 describe('calculateDelay', () => {
@@ -140,6 +152,18 @@ describe('calculateDelay', () => {
   it('returns 1.5x delay for exclamation followed by closing paren', () => {
     const delay = calculateDelay('wow!)', baseDelay);
     assert.strictEqual(delay, Math.round(baseDelay * 1.5));
+  });
+
+  it('returns 1.2x delay for mid-word period followed by comma (e.g.)', () => {
+    assert.strictEqual(calculateDelay('e.g.,', baseDelay), Math.round(baseDelay * 1.2));
+  });
+
+  it('returns 1.2x delay for mid-word periods followed by colon (U.S.:)', () => {
+    assert.strictEqual(calculateDelay('U.S.:', baseDelay), Math.round(baseDelay * 1.2));
+  });
+
+  it('returns base delay for bare brackets without punctuation', () => {
+    assert.strictEqual(calculateDelay('[10]', baseDelay), baseDelay);
   });
 });
 

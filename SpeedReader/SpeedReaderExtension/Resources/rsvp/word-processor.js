@@ -1,5 +1,5 @@
-// Matches sentence-ending punctuation (.!?) optionally followed by
-// closing brackets, parens, or quotes — e.g. "retention.[10]" or 'said."'
+// Matches sentence-ending punctuation (.!?) optionally followed by one or more
+// bracket groups [x], paren groups (x), or individual closing marks ("'»)}])
 const SENTENCE_END_RE = /[.!?](\[[^\]]*\]|\([^)]*\)|["'»)}\]])*$/;
 
 /**
@@ -30,9 +30,10 @@ export function processText(text) {
 
 /**
  * Calculates display duration for a word based on punctuation.
- * Period/question/exclamation = 1.5x, comma/colon/semicolon = 1.2x.
+ * Sentence-ending punctuation (possibly followed by closing brackets/quotes) = 1.5x,
+ * comma/colon/semicolon = 1.2x.
  *
- * @param {string} word - The word text (may include trailing punctuation)
+ * @param {string} word - The word text (may include trailing punctuation and closing marks)
  * @param {number} baseDelay - Base delay in ms (derived from WPM)
  * @returns {number} Adjusted delay in ms
  */
