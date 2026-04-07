@@ -8,10 +8,13 @@ export const FONT_SIZE_DEFAULT = 42;
 export const FONT_SIZE_MIN = 24;
 export const FONT_SIZE_MAX = 96;
 export const FONT_SIZE_STEP = 2;
+export const CHUNK_SIZE_DEFAULT = 1;
+export const CHUNK_SIZE_MIN = 1;
+export const CHUNK_SIZE_MAX = 3;
 export const ALIGNMENT_DEFAULT = 'orp';
 export const VALID_ALIGNMENTS = ['orp', 'center'];
 
-export const SETTINGS_KEYS = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause', 'alignment'];
+export const SETTINGS_KEYS = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause', 'alignment', 'chunkSize'];
 
 export const SETTINGS_DEFAULTS = {
   wpm: WPM_DEFAULT,
@@ -20,6 +23,7 @@ export const SETTINGS_DEFAULTS = {
   fontSize: FONT_SIZE_DEFAULT,
   punctuationPause: true,
   alignment: ALIGNMENT_DEFAULT,
+  chunkSize: CHUNK_SIZE_DEFAULT,
 };
 
 export function clampWpm(value) {
@@ -35,4 +39,9 @@ export function clampFontSize(value) {
 export function validateAlignment(value) {
   if (typeof value === 'string' && VALID_ALIGNMENTS.includes(value)) return value;
   return ALIGNMENT_DEFAULT;
+}
+
+export function clampChunkSize(value) {
+  if (typeof value !== 'number' || isNaN(value)) return CHUNK_SIZE_DEFAULT;
+  return Math.max(CHUNK_SIZE_MIN, Math.min(CHUNK_SIZE_MAX, value));
 }
