@@ -36,6 +36,7 @@ export class RSVPOverlay {
     this.state.init(text, {
       wpm: settings.wpm,
       punctuationPause: settings.punctuationPause ?? true,
+      chunkSize: settings.chunkSize,
     });
 
     if (this.state.words.length === 0) {
@@ -60,6 +61,7 @@ export class RSVPOverlay {
     this._bindEvents();
     this._renderWord();
     this._updateProgress();
+    this._maybeShowTip();
   }
 
   updateSettings(settings) {
@@ -99,6 +101,12 @@ export class RSVPOverlay {
     }
     if (settings.punctuationPause !== undefined) {
       this.state.punctuationPause = settings.punctuationPause;
+    }
+    if (typeof settings.chunkSize === 'number') {
+      this.state.rebuildChunks(settings.chunkSize);
+      this.pause();
+      this._renderWord();
+      this._updateProgress();
     }
   }
 
@@ -149,6 +157,7 @@ export class RSVPOverlay {
   }
 
   play() {
+    this._dismissTip();
     this.state.play();
     this._updatePlayButton();
     this._hideContext();
@@ -284,16 +293,32 @@ export class RSVPOverlay {
   }
 
   _renderWord() {
-    const parts = this.state.currentWord();
-    if (this.elements.wordBefore) {
-      this.elements.wordBefore.textContent = parts.before;
+    const display = this.state.currentDisplay();
+
+    if (display.isChunk) {
+      // Chunk mode: hide ORP spans, show plain text
+      if (this.elements.wordBefore) this.elements.wordBefore.textContent = '';
+      if (this.elements.wordFocus) this.elements.wordFocus.textContent = '';
+      if (this.elements.wordAfter) this.elements.wordAfter.textContent = '';
+      if (this.elements.chunkText) {
+        this.elements.chunkText.textContent = display.text;
+        this.elements.chunkText.style.display = '';
+      }
+    } else {
+      // ORP mode: hide chunk span, show split word
+      if (this.elements.chunkText) this.elements.chunkText.style.display = 'none';
+      if (this.elements.wordBefore) this.elements.wordBefore.textContent = display.before;
+      if (this.elements.wordFocus) this.elements.wordFocus.textContent = display.focus;
+      if (this.elements.wordAfter) this.elements.wordAfter.textContent = display.after;
     }
-    if (this.elements.wordFocus) {
-      this.elements.wordFocus.textContent = parts.focus;
+
+    // Chunk mode forces centered alignment — ORP anchor has no meaning with plain text
+    if (display.isChunk) {
+      this.host.setAttribute('data-alignment', 'center');
+    } else {
+      this.host.setAttribute('data-alignment', validateAlignment(this.settings.alignment));
     }
-    if (this.elements.wordAfter) {
-      this.elements.wordAfter.textContent = parts.after;
-    }
+
     this._scaleWordToFit();
   }
 
@@ -307,7 +332,10 @@ export class RSVPOverlay {
     // Reset any previous scale so measurements reflect true size.
     container.style.transform = '';
     const areaWidth = area.clientWidth;
-    const textWidth = container.scrollWidth;
+    // Use scrollWidth for grid/block layouts, but fall back to
+    // getBoundingClientRect for max-content containers (chunk mode)
+    // where scrollWidth may be clamped by the flex parent.
+    const textWidth = Math.max(container.scrollWidth, container.getBoundingClientRect().width);
     if (textWidth > areaWidth) {
       const scale = Math.max(areaWidth / textWidth, 0.3);
       container.style.transform = 'scale(' + scale + ')';
@@ -359,7 +387,12 @@ export class RSVPOverlay {
       if (i > 0) {
         contentEl.appendChild(document.createTextNode(' '));
       }
-      if (i === ctx.highlightIndex) {
+
+      const isHighlighted = ctx.highlightRange
+        ? (i >= ctx.highlightRange.start && i <= ctx.highlightRange.end)
+        : (i === ctx.highlightIndex);
+
+      if (isHighlighted) {
         const highlight = document.createElement('span');
         highlight.className = 'sr-context-highlight';
         highlight.textContent = ctx.words[i];
@@ -374,6 +407,27 @@ export class RSVPOverlay {
     if (this.elements.context) {
       this.elements.context.setAttribute('data-visible', 'false');
     }
+  }
+
+  async _maybeShowTip() {
+    try {
+      const result = await browser.storage.sync.get({ sr_chunkSizeTipSeen: false });
+      if (result.sr_chunkSizeTipSeen) return;
+      if (this.elements.tipBanner) {
+        this.elements.tipBanner.setAttribute('data-visible', 'true');
+      }
+    } catch (e) {
+      console.warn('[SpeedReader] Tip check failed:', e.message || e);
+    }
+  }
+
+  _dismissTip() {
+    if (this.elements.tipBanner) {
+      this.elements.tipBanner.setAttribute('data-visible', 'false');
+    }
+    browser.storage.sync.set({ sr_chunkSizeTipSeen: true }).catch((e) => {
+      console.warn('[SpeedReader] Failed to persist tip dismissal:', e.message || e);
+    });
   }
 
   _showPageToast(message) {
@@ -473,9 +527,15 @@ export class RSVPOverlay {
     wordAfter.className = 'sr-word-after';
     this.elements.wordAfter = wordAfter;
 
+    const chunkText = document.createElement('span');
+    chunkText.className = 'sr-chunk-text';
+    chunkText.style.display = 'none';
+    this.elements.chunkText = chunkText;
+
     wordContainer.appendChild(wordBefore);
     wordContainer.appendChild(wordFocus);
     wordContainer.appendChild(wordAfter);
+    wordContainer.appendChild(chunkText);
     this.elements.wordContainer = wordContainer;
 
     wordArea.appendChild(wordContainer);
@@ -495,6 +555,24 @@ export class RSVPOverlay {
 
     context.appendChild(contextLabel);
     context.appendChild(contextContent);
+
+    // Tip banner (shown once)
+    const tipBanner = document.createElement('div');
+    tipBanner.className = 'sr-tip-banner';
+    tipBanner.setAttribute('data-visible', 'false');
+
+    const tipText = document.createElement('span');
+    tipText.textContent = 'Tip: Try reading 2\u20133 words at a time. Change \u201CWords per flash\u201D in Settings.';
+
+    const tipDismiss = document.createElement('button');
+    tipDismiss.className = 'sr-tip-dismiss';
+    tipDismiss.textContent = 'Got it';
+    tipDismiss.setAttribute('aria-label', 'Dismiss tip');
+
+    tipBanner.appendChild(tipText);
+    tipBanner.appendChild(tipDismiss);
+    this.elements.tipBanner = tipBanner;
+    this.elements.tipDismiss = tipDismiss;
 
     // Controls
     const controls = document.createElement('div');
@@ -649,6 +727,7 @@ export class RSVPOverlay {
     card.appendChild(header);
     card.appendChild(wordArea);
     card.appendChild(context);
+    card.appendChild(tipBanner);
     card.appendChild(controls);
     card.appendChild(sliderArea);
     card.appendChild(fontSizeArea);
@@ -752,6 +831,13 @@ export class RSVPOverlay {
         this.close();
       }
     });
+
+    if (this.elements.tipDismiss) {
+      this.elements.tipDismiss.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this._dismissTip();
+      });
+    }
 
     this._boundKeyHandler = (e) => {
       switch (e.key) {

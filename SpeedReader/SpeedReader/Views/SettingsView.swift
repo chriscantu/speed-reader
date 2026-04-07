@@ -34,6 +34,7 @@ private struct RSVPPreview: View {
     let fontSize: Int
     let theme: ReaderTheme
     let alignment: ReaderAlignment
+    let chunkSize: Int
 
     private let word = "knowledge"
 
@@ -79,11 +80,20 @@ private struct RSVPPreview: View {
 
     var body: some View {
         Group {
-            wordText
-                .font(font.font(size: CGFloat(fontSize)))
-                .lineLimit(1)
-                .minimumScaleFactor(0.3)
-                .frame(maxWidth: .infinity)
+            if chunkSize > 1 {
+                Text(chunkSize == 2 ? "the quick" : "the quick brown")
+                    .foregroundColor(textColor)
+                    .font(font.font(size: CGFloat(fontSize)))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.3)
+                    .frame(maxWidth: .infinity)
+            } else {
+                wordText
+                    .font(font.font(size: CGFloat(fontSize)))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.3)
+                    .frame(maxWidth: .infinity)
+            }
         }
         .padding(.vertical, 24)
         .background(backgroundColor)
@@ -140,6 +150,16 @@ struct SettingsView: View {
                     get: { settings.punctuationPause },
                     set: { settings.setPunctuationPause($0) }
                 ))
+
+                Picker("Words per flash", selection: Binding(
+                    get: { settings.chunkSize },
+                    set: { settings.setChunkSize($0) }
+                )) {
+                    Text("1").tag(1)
+                    Text("2").tag(2)
+                    Text("3").tag(3)
+                }
+                .pickerStyle(.segmented)
             } header: {
                 Text("Reading Speed")
             } footer: {
@@ -151,7 +171,8 @@ struct SettingsView: View {
                     font: settings.font,
                     fontSize: settings.fontSize,
                     theme: settings.theme,
-                    alignment: settings.alignment
+                    alignment: settings.alignment,
+                    chunkSize: settings.chunkSize
                 )
                     .accessibilityHidden(true)
 

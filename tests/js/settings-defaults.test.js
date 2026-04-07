@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   clampFontSize, FONT_SIZE_DEFAULT, FONT_SIZE_MIN, FONT_SIZE_MAX,
+  clampChunkSize, CHUNK_SIZE_DEFAULT, CHUNK_SIZE_MIN, CHUNK_SIZE_MAX,
   SETTINGS_KEYS, SETTINGS_DEFAULTS,
   ALIGNMENT_DEFAULT, VALID_ALIGNMENTS, validateAlignment,
 } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/settings-defaults.js';
@@ -85,5 +86,34 @@ describe('validateAlignment', () => {
     assert.ok(VALID_ALIGNMENTS.includes('orp'));
     assert.ok(VALID_ALIGNMENTS.includes('center'));
     assert.strictEqual(VALID_ALIGNMENTS.length, 2);
+  });
+});
+
+describe('clampChunkSize', () => {
+  it('returns default for non-number input', () => {
+    assert.strictEqual(clampChunkSize('two'), CHUNK_SIZE_DEFAULT);
+    assert.strictEqual(clampChunkSize(NaN), CHUNK_SIZE_DEFAULT);
+    assert.strictEqual(clampChunkSize(undefined), CHUNK_SIZE_DEFAULT);
+  });
+
+  it('clamps below minimum to minimum', () => {
+    assert.strictEqual(clampChunkSize(0), CHUNK_SIZE_MIN);
+    assert.strictEqual(clampChunkSize(-1), CHUNK_SIZE_MIN);
+  });
+
+  it('clamps above maximum to maximum', () => {
+    assert.strictEqual(clampChunkSize(4), CHUNK_SIZE_MAX);
+    assert.strictEqual(clampChunkSize(99), CHUNK_SIZE_MAX);
+  });
+
+  it('accepts boundary values', () => {
+    assert.strictEqual(clampChunkSize(CHUNK_SIZE_MIN), CHUNK_SIZE_MIN);
+    assert.strictEqual(clampChunkSize(CHUNK_SIZE_MAX), CHUNK_SIZE_MAX);
+  });
+
+  it('rounds floats to nearest integer', () => {
+    assert.strictEqual(clampChunkSize(1.5), 2);
+    assert.strictEqual(clampChunkSize(2.7), 3);
+    assert.strictEqual(clampChunkSize(0.6), 1);
   });
 });

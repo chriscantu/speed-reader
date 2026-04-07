@@ -16,6 +16,7 @@ final class ReaderSettings {
     var fontSize: Int = SettingsKeys.Defaults.fontSize
     var punctuationPause: Bool = SettingsKeys.Defaults.punctuationPause
     var alignment: ReaderAlignment = SettingsKeys.Defaults.alignment
+    var chunkSize: Int = SettingsKeys.Defaults.chunkSize
 
     init(defaults: UserDefaults? = nil) {
         let store: UserDefaults
@@ -77,6 +78,12 @@ final class ReaderSettings {
         defaults.set(alignment.rawValue, forKey: SettingsKeys.alignment)
     }
 
+    /// Sets chunk size, clamped to valid range, and persists to UserDefaults.
+    func setChunkSize(_ value: Int) {
+        chunkSize = SettingsKeys.clamp(value, min: SettingsKeys.chunkSizeMin, max: SettingsKeys.chunkSizeMax)
+        defaults.set(chunkSize, forKey: SettingsKeys.chunkSize)
+    }
+
     private func loadFromDefaults(_ store: UserDefaults) {
         let loadedWpm = store.object(forKey: SettingsKeys.wpm) as? Int
             ?? SettingsKeys.Defaults.wpm
@@ -102,5 +109,11 @@ final class ReaderSettings {
         let alignmentRaw = store.string(forKey: SettingsKeys.alignment)
             ?? SettingsKeys.Defaults.alignment.rawValue
         alignment = ReaderAlignment(rawValue: alignmentRaw) ?? SettingsKeys.Defaults.alignment
+
+        let loadedChunkSize = store.object(forKey: SettingsKeys.chunkSize) as? Int
+            ?? SettingsKeys.Defaults.chunkSize
+        chunkSize = SettingsKeys.clamp(
+            loadedChunkSize, min: SettingsKeys.chunkSizeMin, max: SettingsKeys.chunkSizeMax
+        )
     }
 }

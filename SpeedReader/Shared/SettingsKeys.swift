@@ -65,6 +65,7 @@ enum SettingsKeys {
     static let fontSize = "sr_fontSize"
     static let punctuationPause = "sr_punctuationPause"
     static let alignment = "sr_alignment"
+    static let chunkSize = "sr_chunkSize"
 
     /// Default values — typed enum cases prevent drift from raw values.
     enum Defaults {
@@ -74,6 +75,7 @@ enum SettingsKeys {
         static let fontSize = 42
         static let punctuationPause = true
         static let alignment: ReaderAlignment = .orpAligned
+        static let chunkSize = 1
     }
 
     /// WPM bounds
@@ -89,6 +91,10 @@ enum SettingsKeys {
 
     /// Font size range for sliders
     static let fontSizeRange = Double(fontSizeMin)...Double(fontSizeMax)
+
+    /// Chunk size bounds
+    static let chunkSizeMin = 1
+    static let chunkSizeMax = 3
 
     /// Clamp an integer to a range.
     static func clamp(_ value: Int, min: Int, max: Int) -> Int {
@@ -126,6 +132,10 @@ enum SettingsKeys {
         if let alignment = settings["alignment"] as? String,
            ReaderAlignment(rawValue: alignment) != nil {
             defaults.set(alignment, forKey: SettingsKeys.alignment)
+            savedCount += 1
+        }
+        if let chunkSize = settings["chunkSize"] as? Int {
+            defaults.set(clamp(chunkSize, min: chunkSizeMin, max: chunkSizeMax), forKey: SettingsKeys.chunkSize)
             savedCount += 1
         }
 
