@@ -61,6 +61,8 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 ?? SettingsKeys.Defaults.punctuationPause,
             "alignment": defaults.string(forKey: SettingsKeys.alignment)
                 ?? SettingsKeys.Defaults.alignment.rawValue,
+            "chunkSize": defaults.object(forKey: SettingsKeys.chunkSize)
+                ?? SettingsKeys.Defaults.chunkSize,
         ]
     }
 
@@ -82,6 +84,7 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             "fontSize": SettingsKeys.Defaults.fontSize,
             "punctuationPause": SettingsKeys.Defaults.punctuationPause,
             "alignment": SettingsKeys.Defaults.alignment.rawValue,
+            "chunkSize": SettingsKeys.Defaults.chunkSize,
         ]
     }
 }

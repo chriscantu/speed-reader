@@ -81,7 +81,7 @@ private struct RSVPPreview: View {
     var body: some View {
         Group {
             if chunkSize > 1 {
-                Text("the quick brown")
+                Text(chunkSize == 2 ? "the quick" : "the quick brown")
                     .foregroundColor(textColor)
                     .font(font.font(size: CGFloat(fontSize)))
                     .lineLimit(1)
