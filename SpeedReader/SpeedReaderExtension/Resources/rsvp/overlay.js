@@ -61,6 +61,7 @@ export class RSVPOverlay {
     this._bindEvents();
     this._renderWord();
     this._updateProgress();
+    this._maybeShowTip();
   }
 
   updateSettings(settings) {
@@ -156,6 +157,7 @@ export class RSVPOverlay {
   }
 
   play() {
+    this._dismissTip();
     this.state.play();
     this._updatePlayButton();
     this._hideContext();
@@ -404,6 +406,25 @@ export class RSVPOverlay {
     }
   }
 
+  async _maybeShowTip() {
+    try {
+      const result = await browser.storage.sync.get({ sr_chunkSizeTipSeen: false });
+      if (result.sr_chunkSizeTipSeen) return;
+      if (this.elements.tipBanner) {
+        this.elements.tipBanner.setAttribute('data-visible', 'true');
+      }
+    } catch (_e) {
+      // Silently skip tip if storage fails
+    }
+  }
+
+  _dismissTip() {
+    if (this.elements.tipBanner) {
+      this.elements.tipBanner.setAttribute('data-visible', 'false');
+    }
+    browser.storage.sync.set({ sr_chunkSizeTipSeen: true }).catch(() => {});
+  }
+
   _showPageToast(message) {
     const toast = document.createElement('div');
     toast.style.cssText = [
@@ -529,6 +550,24 @@ export class RSVPOverlay {
 
     context.appendChild(contextLabel);
     context.appendChild(contextContent);
+
+    // Tip banner (shown once)
+    const tipBanner = document.createElement('div');
+    tipBanner.className = 'sr-tip-banner';
+    tipBanner.setAttribute('data-visible', 'false');
+
+    const tipText = document.createElement('span');
+    tipText.textContent = 'Tip: Try reading 2\u20133 words at a time. Change \u201CWords per flash\u201D in Settings.';
+
+    const tipDismiss = document.createElement('button');
+    tipDismiss.className = 'sr-tip-dismiss';
+    tipDismiss.textContent = 'Got it';
+    tipDismiss.setAttribute('aria-label', 'Dismiss tip');
+
+    tipBanner.appendChild(tipText);
+    tipBanner.appendChild(tipDismiss);
+    this.elements.tipBanner = tipBanner;
+    this.elements.tipDismiss = tipDismiss;
 
     // Controls
     const controls = document.createElement('div');
@@ -683,6 +722,7 @@ export class RSVPOverlay {
     card.appendChild(header);
     card.appendChild(wordArea);
     card.appendChild(context);
+    card.appendChild(tipBanner);
     card.appendChild(controls);
     card.appendChild(sliderArea);
     card.appendChild(fontSizeArea);
@@ -786,6 +826,13 @@ export class RSVPOverlay {
         this.close();
       }
     });
+
+    if (this.elements.tipDismiss) {
+      this.elements.tipDismiss.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this._dismissTip();
+      });
+    }
 
     this._boundKeyHandler = (e) => {
       switch (e.key) {

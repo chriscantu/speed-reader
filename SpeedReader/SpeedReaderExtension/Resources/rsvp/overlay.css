@@ -216,6 +216,39 @@
   background: rgba(61, 53, 32, 0.8);
 }
 
+.sr-tip-banner {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  margin: 0 16px;
+  border-radius: 8px;
+  background: var(--sr-accent, #0891b2);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.sr-tip-banner[data-visible="true"] {
+  display: flex;
+}
+
+.sr-tip-dismiss {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.sr-tip-dismiss:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 .sr-controls {
   display: flex;
   align-items: center;
