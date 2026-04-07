@@ -163,11 +163,13 @@
   color: var(--sr-text);
 }
 
-/* In chunk mode (centered alignment), reset the word container to inline
-   so _scaleWordToFit can measure true text width without grid interference. */
+/* In centered/chunk mode, let the word container size to its content
+   so _scaleWordToFit can measure true text width for scaling. */
 :host([data-alignment="center"]) .sr-word {
-  display: inline-block;
+  display: block;
+  width: max-content;
   min-width: auto;
+  max-width: none;
 }
 
 /* ORP-aligned: focus letter locked at horizontal center via CSS grid. */

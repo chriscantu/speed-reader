@@ -332,7 +332,10 @@ export class RSVPOverlay {
     // Reset any previous scale so measurements reflect true size.
     container.style.transform = '';
     const areaWidth = area.clientWidth;
-    const textWidth = container.scrollWidth;
+    // Use scrollWidth for grid/block layouts, but fall back to
+    // getBoundingClientRect for max-content containers (chunk mode)
+    // where scrollWidth may be clamped by the flex parent.
+    const textWidth = Math.max(container.scrollWidth, container.getBoundingClientRect().width);
     if (textWidth > areaWidth) {
       const scale = Math.max(areaWidth / textWidth, 0.3);
       container.style.transform = 'scale(' + scale + ')';
