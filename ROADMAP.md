@@ -26,4 +26,4 @@ Detailed tracking lives in [GitHub Issues](https://github.com/chriscantu/speed-r
 
 **Label:** [`future`](https://github.com/chriscantu/speed-reader/issues?q=is%3Aissue+label%3Afuture)
 
-Saved articles, PDF/ePub import, iCloud sync, share extension, reading stats widget, iframe extraction.
+Saved articles, PDF/ePub import, iCloud sync, share extension, reading stats widget, iframe extraction, cross-device reading position sync (via `browser.storage.sync`).

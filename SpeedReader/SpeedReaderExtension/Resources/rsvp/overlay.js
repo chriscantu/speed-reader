@@ -1,5 +1,6 @@
 import { RSVPStateMachine } from './state-machine.js';
 import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, ALIGNMENT_DEFAULT, clampWpm, clampFontSize, validateAlignment } from './settings-defaults.js';
+import { save, restore, clear } from './reading-position.js';
 
 export class RSVPOverlay {
   constructor() {
@@ -17,15 +18,21 @@ export class RSVPOverlay {
     this.elements = {};
     this._boundKeyHandler = null;
     this._scrubFromIndex = undefined;
+    this._autoSaveTimerId = null;
+    this._url = '';
+    this._text = '';
+    this._savePending = Promise.resolve();
   }
 
-  open(text, title, settings = {}) {
+  async open(text, title, settings = {}, url = '') {
     if (this.host) {
       this.close();
     }
 
     Object.assign(this.settings, settings);
     this.title = title || '';
+    this._url = url;
+    this._text = text;
     this.state.init(text, {
       wpm: settings.wpm,
       punctuationPause: settings.punctuationPause ?? true,
@@ -34,6 +41,19 @@ export class RSVPOverlay {
     if (this.state.words.length === 0) {
       this._showPageToast('No readable content found.');
       return;
+    }
+
+    // Restore saved reading position if available
+    if (url) {
+      try {
+        const savedIndex = await restore(url, text);
+        if (savedIndex !== null) {
+          this.state.seekTo(savedIndex);
+        }
+      } catch (e) {
+        console.warn('[SpeedReader] Failed to restore reading position:', e.message || e);
+        this._showPageToast('Could not restore your reading position. Starting from the beginning.');
+      }
     }
 
     this._createDOM();
@@ -112,6 +132,7 @@ export class RSVPOverlay {
   }
 
   close() {
+    this._stopAutoSave();
     this.pause();
     if (this.host && this.host.parentNode) {
       this.host.parentNode.removeChild(this.host);
@@ -119,6 +140,8 @@ export class RSVPOverlay {
     this.host = null;
     this.shadow = null;
     this.elements = {};
+    this._url = '';
+    this._text = '';
     if (this._boundKeyHandler) {
       document.removeEventListener('keydown', this._boundKeyHandler);
       this._boundKeyHandler = null;
@@ -130,6 +153,7 @@ export class RSVPOverlay {
     this._updatePlayButton();
     this._hideContext();
     this._startLoop();
+    this._startAutoSave();
   }
 
   pause() {
@@ -138,8 +162,10 @@ export class RSVPOverlay {
       clearTimeout(this.timerId);
       this.timerId = null;
     }
+    this._stopAutoSave();
     this._updatePlayButton();
     this._showContext();
+    this._savePosition();
   }
 
   togglePlayPause() {
@@ -210,13 +236,45 @@ export class RSVPOverlay {
     });
   }
 
+  _savePosition() {
+    if (!this._url || this.state.currentIndex === 0) return;
+    this._savePending = this._savePending
+      .then(() => save(this._url, this._text, this.state.currentIndex, this.state.words.length))
+      .catch((err) => {
+        console.warn('[SpeedReader] Failed to save reading position:', err.message || err);
+        this._showPageToast('Could not save your reading position.');
+      });
+  }
+
+  _startAutoSave() {
+    this._stopAutoSave();
+    this._autoSaveTimerId = setInterval(() => {
+      this._savePosition();
+    }, 30000);
+  }
+
+  _stopAutoSave() {
+    if (this._autoSaveTimerId !== null) {
+      clearInterval(this._autoSaveTimerId);
+      this._autoSaveTimerId = null;
+    }
+  }
+
   _startLoop() {
     this._renderWord();
     this._updateProgress();
 
     const result = this.state.tick();
     if (result.done) {
+      const url = this._url;
+      this._url = '';  // prevent pause() from saving a position we're about to clear
       this.pause();
+      if (url) {
+        clear(url).catch((err) => {
+          console.warn('[SpeedReader] Failed to clear reading position:', err.message || err);
+          this._showPageToast('Could not clear saved reading position.');
+        });
+      }
       return;
     }
 
