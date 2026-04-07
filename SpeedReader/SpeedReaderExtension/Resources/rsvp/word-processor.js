@@ -1,3 +1,7 @@
+// Matches sentence-ending punctuation (.!?) optionally followed by one or more
+// bracket groups [x], paren groups (x), or individual closing marks ("'»)}])
+const SENTENCE_END_RE = /[.!?](\[[^\]]*\]|\([^)]*\)|["'»)}\]])*$/;
+
 /**
  * Splits raw text into an array of word objects with metadata.
  * Each word object: { text, index, sentenceStart }
@@ -18,8 +22,7 @@ export function processText(text) {
       sentenceStart: nextIsSentenceStart,
     };
 
-    // Check if this word ends a sentence
-    nextIsSentenceStart = /[.!?]$/.test(word);
+    nextIsSentenceStart = SENTENCE_END_RE.test(word);
 
     return entry;
   });
@@ -27,19 +30,21 @@ export function processText(text) {
 
 /**
  * Calculates display duration for a word based on punctuation.
- * Period/question/exclamation = 1.5x, comma/colon/semicolon = 1.2x.
+ * Sentence-ending punctuation (possibly followed by closing brackets/quotes) = 1.5x,
+ * comma/colon/semicolon = 1.2x.
  *
- * @param {string} word - The word text (may include trailing punctuation)
+ * @param {string} word - The word text (may include trailing punctuation and closing marks)
  * @param {number} baseDelay - Base delay in ms (derived from WPM)
  * @returns {number} Adjusted delay in ms
  */
 export function calculateDelay(word, baseDelay) {
   if (!word) return baseDelay;
-  const lastChar = word[word.length - 1];
 
-  if ('.!?'.includes(lastChar)) {
+  if (SENTENCE_END_RE.test(word)) {
     return Math.round(baseDelay * 1.5);
   }
+
+  const lastChar = word[word.length - 1];
   if (',:;'.includes(lastChar)) {
     return Math.round(baseDelay * 1.2);
   }

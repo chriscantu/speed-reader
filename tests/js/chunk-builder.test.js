@@ -1,17 +1,13 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildChunks } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/chunk-builder.js';
+import { processText } from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/word-processor.js';
 
 describe('buildChunks', () => {
 
-  // Helper: create word objects matching processText() output shape
+  // Helper: delegate to processText() so sentence-boundary logic stays in sync
   function words(texts) {
-    let nextIsSentenceStart = true;
-    return texts.map((text, index) => {
-      const entry = { text, index, sentenceStart: nextIsSentenceStart };
-      nextIsSentenceStart = /[.!?]$/.test(text);
-      return entry;
-    });
+    return processText(texts.join(' '));
   }
 
   describe('chunkSize = 1', () => {
