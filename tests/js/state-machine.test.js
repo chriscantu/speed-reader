@@ -46,7 +46,7 @@ describe('RSVPStateMachine', () => {
     it('resets state on re-init', () => {
       const sm = new RSVPStateMachine();
       sm.init('One two three.');
-      sm.currentIndex = 2;
+      sm.chunkIndex = 2;
       sm.isPlaying = true;
       sm.init('New text here.');
       assert.strictEqual(sm.currentIndex, 0);
@@ -66,7 +66,7 @@ describe('RSVPStateMachine', () => {
     it('resets index to 0 when at end of text', () => {
       const sm = new RSVPStateMachine();
       sm.init('Hello world.');
-      sm.currentIndex = sm.words.length;
+      sm.chunkIndex = sm.chunks.length;
       sm.play();
       assert.strictEqual(sm.currentIndex, 0);
       assert.strictEqual(sm.isPlaying, true);
@@ -75,7 +75,7 @@ describe('RSVPStateMachine', () => {
     it('does not reset index when in the middle of text', () => {
       const sm = new RSVPStateMachine();
       sm.init('Hello world again.');
-      sm.currentIndex = 1;
+      sm.chunkIndex = 1;
       sm.play();
       assert.strictEqual(sm.currentIndex, 1);
     });
@@ -130,7 +130,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('Hello world.', { wpm: 250, punctuationPause: true });
       sm.play();
-      sm.currentIndex = 1;
+      sm.chunkIndex = 1;
       const result = sm.tick();
       assert.strictEqual(result.delay, Math.round(240 * 1.5));
     });
@@ -139,7 +139,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('Hello world.', { wpm: 250, punctuationPause: false });
       sm.play();
-      sm.currentIndex = 1;
+      sm.chunkIndex = 1;
       const result = sm.tick();
       assert.strictEqual(result.delay, 240);
     });
@@ -148,7 +148,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('Hello world.');
       sm.play();
-      sm.currentIndex = sm.words.length - 1;
+      sm.chunkIndex = sm.chunks.length - 1;
       const result = sm.tick();
       assert.strictEqual(result.done, true);
       assert.strictEqual(sm.isPlaying, false);
@@ -158,7 +158,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('Hello world.', { wpm: 250 });
       sm.play();
-      sm.currentIndex = sm.words.length - 1; // "world."
+      sm.chunkIndex = sm.chunks.length - 1; // "world."
       const result = sm.tick();
       assert.strictEqual(result.done, true);
       assert.strictEqual(result.delay, Math.round(240 * 1.5)); // period = 1.5x
@@ -177,7 +177,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('First sentence. Second sentence.');
       sm.play();
-      sm.currentIndex = 3; // "sentence." is index 3
+      sm.chunkIndex = 3; // "sentence." is index 3
       sm.prevSentence();
       assert.strictEqual(sm.currentIndex, 2); // "Second" — start of 2nd sentence
       assert.strictEqual(sm.isPlaying, false);
@@ -187,7 +187,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('First sentence. Second sentence.');
       sm.play();
-      sm.currentIndex = 2; // "Second" — already at sentence start
+      sm.chunkIndex = 2; // "Second" — already at sentence start
       sm.prevSentence();
       assert.strictEqual(sm.currentIndex, 0); // "First" — start of 1st sentence
     });
@@ -196,7 +196,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('First sentence. Second sentence.');
       sm.play();
-      sm.currentIndex = 0;
+      sm.chunkIndex = 0;
       sm.prevSentence();
       assert.strictEqual(sm.currentIndex, 0);
     });
@@ -205,7 +205,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('First sentence. Second sentence.');
       sm.play();
-      sm.currentIndex = 3;
+      sm.chunkIndex = 3;
       sm.prevSentence();
       assert.strictEqual(sm.isPlaying, false);
     });
@@ -216,7 +216,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('First sentence. Second sentence.');
       sm.play();
-      sm.currentIndex = 0;
+      sm.chunkIndex = 0;
       sm.nextSentence();
       assert.strictEqual(sm.currentIndex, 2); // "Second"
       assert.strictEqual(sm.isPlaying, false);
@@ -226,7 +226,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('First sentence. Second sentence.');
       sm.play();
-      sm.currentIndex = 2; // "Second" — start of last sentence
+      sm.chunkIndex = 2; // "Second" — start of last sentence
       sm.nextSentence();
       assert.strictEqual(sm.currentIndex, 2); // no next sentence, stays
     });
@@ -235,7 +235,7 @@ describe('RSVPStateMachine', () => {
       const sm = new RSVPStateMachine();
       sm.init('First sentence. Second sentence.');
       sm.play();
-      sm.currentIndex = 0;
+      sm.chunkIndex = 0;
       sm.nextSentence();
       assert.strictEqual(sm.isPlaying, false);
     });
@@ -277,7 +277,7 @@ describe('RSVPStateMachine', () => {
     it('returns split word at current index', () => {
       const sm = new RSVPStateMachine();
       sm.init('Reading is fun.');
-      sm.currentIndex = 0;
+      sm.chunkIndex = 0;
       const word = sm.currentWord();
       // "Reading" — ORP at floor(7*0.3) = index 2 → "Re" + "a" + "ding"
       assert.strictEqual(word.before, 'Re');
@@ -288,7 +288,7 @@ describe('RSVPStateMachine', () => {
     it('returns empty parts when past end', () => {
       const sm = new RSVPStateMachine();
       sm.init('Hello.');
-      sm.currentIndex = sm.words.length;
+      sm.chunkIndex = sm.chunks.length;
       const word = sm.currentWord();
       assert.strictEqual(word.before, '');
       assert.strictEqual(word.focus, '');
@@ -309,7 +309,7 @@ describe('RSVPStateMachine', () => {
     it('returns 50% at midpoint', () => {
       const sm = new RSVPStateMachine();
       sm.init('One two three four.');
-      sm.currentIndex = 2;
+      sm.chunkIndex = 2;
       const p = sm.progress();
       assert.strictEqual(p.percent, 50);
       assert.strictEqual(p.current, 2);
@@ -319,7 +319,7 @@ describe('RSVPStateMachine', () => {
     it('returns 100% at end', () => {
       const sm = new RSVPStateMachine();
       sm.init('One two three four.');
-      sm.currentIndex = 4;
+      sm.chunkIndex = sm.chunks.length;
       const p = sm.progress();
       assert.strictEqual(p.percent, 100);
     });
@@ -388,7 +388,7 @@ describe('RSVPStateMachine', () => {
     it('ignores NaN index without corrupting state', () => {
       const sm = new RSVPStateMachine();
       sm.init('One two three.');
-      sm.currentIndex = 1;
+      sm.chunkIndex = 1;
       sm.seekTo(NaN);
       assert.strictEqual(sm.currentIndex, 1); // unchanged
     });
@@ -396,7 +396,7 @@ describe('RSVPStateMachine', () => {
     it('ignores non-integer index', () => {
       const sm = new RSVPStateMachine();
       sm.init('One two three.');
-      sm.currentIndex = 1;
+      sm.chunkIndex = 1;
       sm.seekTo(1.5);
       assert.strictEqual(sm.currentIndex, 1); // unchanged
     });
@@ -421,7 +421,7 @@ describe('RSVPStateMachine', () => {
     it('returns correct times at midpoint', () => {
       const sm = new RSVPStateMachine();
       sm.init('One two three four five six.', { wpm: 300 }); // 6 words at 300wpm
-      sm.currentIndex = 3; // halfway
+      sm.chunkIndex = 3; // halfway
       // elapsed: ceil(3 / 300 * 60) = ceil(0.6) = 1
       assert.strictEqual(sm.timeElapsed(), 1);
       // remaining: ceil(3 / 300 * 60) = ceil(0.6) = 1
@@ -431,7 +431,7 @@ describe('RSVPStateMachine', () => {
     it('returns full elapsed and 0 remaining at end', () => {
       const sm = new RSVPStateMachine();
       sm.init('One two three four.', { wpm: 240 });
-      sm.currentIndex = 4; // past last word
+      sm.chunkIndex = sm.chunks.length; // past last word
       assert.strictEqual(sm.timeRemaining(), 0);
       assert.strictEqual(sm.timeElapsed(), 1);
     });
@@ -449,7 +449,7 @@ describe('RSVPStateMachine', () => {
     it('timeRemaining reaches 0 at end and timeElapsed equals total duration', () => {
       const sm = new RSVPStateMachine();
       sm.init('One two three four.', { wpm: 240 }); // 4 words at 240wpm = 1 sec
-      sm.currentIndex = sm.words.length;
+      sm.chunkIndex = sm.chunks.length;
       assert.strictEqual(sm.timeRemaining(), 0);
       assert.strictEqual(sm.timeElapsed(), Math.ceil((sm.words.length / sm.wpm) * 60));
     });
@@ -466,7 +466,7 @@ describe('RSVPStateMachine', () => {
     it('returns words in current sentence with highlight index', () => {
       const sm = new RSVPStateMachine();
       sm.init('First sentence. Second sentence.');
-      sm.currentIndex = 3; // "sentence." in 2nd sentence
+      sm.chunkIndex = 3; // "sentence." in 2nd sentence
       const ctx = sm.contextSentence();
       assert.deepStrictEqual(ctx.words, ['Second', 'sentence.']);
       assert.strictEqual(ctx.highlightIndex, 1);
@@ -475,7 +475,7 @@ describe('RSVPStateMachine', () => {
     it('returns first sentence when at start', () => {
       const sm = new RSVPStateMachine();
       sm.init('First sentence. Second sentence.');
-      sm.currentIndex = 0;
+      sm.chunkIndex = 0;
       const ctx = sm.contextSentence();
       assert.deepStrictEqual(ctx.words, ['First', 'sentence.']);
       assert.strictEqual(ctx.highlightIndex, 0);
@@ -484,11 +484,204 @@ describe('RSVPStateMachine', () => {
     it('returns empty for index past end', () => {
       const sm = new RSVPStateMachine();
       sm.init('Hello world.');
-      sm.currentIndex = sm.words.length;
+      sm.chunkIndex = sm.chunks.length;
       const ctx = sm.contextSentence();
       assert.deepStrictEqual(ctx.words, []);
       assert.strictEqual(ctx.highlightIndex, -1);
     });
   });
 
+});
+
+describe('chunk mode (chunkSize > 1)', () => {
+
+  describe('init with chunkSize', () => {
+    it('builds chunks from words', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('The quick brown fox.', { chunkSize: 2 });
+      assert.strictEqual(sm.chunks.length, 2); // "The quick" + "brown fox."
+      assert.strictEqual(sm.chunkIndex, 0);
+    });
+
+    it('defaults to chunkSize 1', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('Hello world.');
+      assert.strictEqual(sm.chunkSize, 1);
+      assert.strictEqual(sm.chunks.length, 2); // one chunk per word
+    });
+  });
+
+  describe('tick with chunks', () => {
+    it('advances chunkIndex by 1', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('The quick brown fox.', { wpm: 250, chunkSize: 2 });
+      sm.play();
+      const result = sm.tick();
+      assert.strictEqual(sm.chunkIndex, 1);
+      assert.strictEqual(result.done, undefined);
+    });
+
+    it('returns delay proportional to words in chunk', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('The quick brown fox.', { wpm: 250, chunkSize: 2 });
+      sm.play();
+      const result = sm.tick();
+      // 2-word chunk: baseDelay (240) * 2 = 480
+      assert.strictEqual(result.delay, 480);
+    });
+
+    it('applies punctuation pause to last word in chunk only', () => {
+      const sm = new RSVPStateMachine();
+      // "Hello world." is one 2-word chunk, last word has period
+      sm.init('Hello world.', { wpm: 250, chunkSize: 2, punctuationPause: true });
+      sm.play();
+      const result = sm.tick();
+      // baseDelay=240, 2 words=480, period on last word=480*1.5=720
+      assert.strictEqual(result.delay, Math.round(480 * 1.5));
+    });
+
+    it('returns done at last chunk', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('Hello world.', { chunkSize: 2 });
+      sm.play();
+      // Only one chunk: "Hello world."
+      const result = sm.tick();
+      assert.strictEqual(result.done, true);
+      assert.strictEqual(sm.isPlaying, false);
+    });
+  });
+
+  describe('currentDisplay', () => {
+    it('returns isChunk false with ORP split for chunkSize 1', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('Reading.', { chunkSize: 1 });
+      const d = sm.currentDisplay();
+      assert.strictEqual(d.isChunk, false);
+      assert.strictEqual(typeof d.before, 'string');
+      assert.strictEqual(typeof d.focus, 'string');
+      assert.strictEqual(typeof d.after, 'string');
+    });
+
+    it('returns isChunk true with plain text for chunkSize 2', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('Hello world.', { chunkSize: 2 });
+      const d = sm.currentDisplay();
+      assert.strictEqual(d.isChunk, true);
+      assert.strictEqual(d.text, 'Hello world.');
+    });
+
+    it('returns empty display past end', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('Hi.', { chunkSize: 2 });
+      sm.chunkIndex = sm.chunks.length;
+      const d = sm.currentDisplay();
+      assert.strictEqual(d.isChunk, false);
+      assert.strictEqual(d.before, '');
+      assert.strictEqual(d.focus, '');
+      assert.strictEqual(d.after, '');
+    });
+  });
+
+  describe('sentence navigation with chunks', () => {
+    it('prevSentence jumps to chunk containing previous sentence start', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('First sentence. Second sentence.', { chunkSize: 2 });
+      sm.play();
+      // chunks: ["First sentence."], ["Second sentence."]
+      sm.chunkIndex = 1;
+      sm.prevSentence();
+      assert.strictEqual(sm.chunkIndex, 0);
+    });
+
+    it('nextSentence jumps to chunk containing next sentence start', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('First sentence. Second sentence.', { chunkSize: 2 });
+      sm.play();
+      sm.chunkIndex = 0;
+      sm.nextSentence();
+      assert.strictEqual(sm.chunkIndex, 1);
+    });
+  });
+
+  describe('seekTo with chunks', () => {
+    it('maps word index to correct chunk', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { chunkSize: 2 });
+      // chunks: ["One two"], ["three four."]
+      sm.seekTo(2); // word "three" is in chunk 1
+      assert.strictEqual(sm.chunkIndex, 1);
+    });
+
+    it('maps word index 0 to chunk 0', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { chunkSize: 2 });
+      sm.seekTo(0);
+      assert.strictEqual(sm.chunkIndex, 0);
+    });
+  });
+
+  describe('progress with chunks', () => {
+    it('reports word-level progress not chunk-level', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { chunkSize: 2 });
+      sm.chunkIndex = 1; // chunk 1 starts at word index 2
+      const p = sm.progress();
+      assert.strictEqual(p.current, 2); // word index, not chunk index
+      assert.strictEqual(p.total, 4);
+      assert.strictEqual(p.percent, 50);
+    });
+  });
+
+  describe('timeElapsed and timeRemaining with chunks', () => {
+    it('computes from word position not chunk position', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { wpm: 240, chunkSize: 2 });
+      sm.chunkIndex = 1; // word index 2
+      // elapsed: ceil(2/240*60) = ceil(0.5) = 1
+      assert.strictEqual(sm.timeElapsed(), 1);
+      // remaining: ceil(2/240*60) = ceil(0.5) = 1
+      assert.strictEqual(sm.timeRemaining(), 1);
+    });
+  });
+
+  describe('contextSentence with chunks', () => {
+    it('returns highlightRange for multi-word chunk', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('The quick brown fox.', { chunkSize: 2 });
+      // chunk 0: "The quick" (words 0-1), chunk 1: "brown fox." (words 2-3)
+      sm.chunkIndex = 0;
+      const ctx = sm.contextSentence();
+      assert.deepStrictEqual(ctx.highlightRange, { start: 0, end: 1 });
+    });
+
+    it('returns single highlightIndex for chunkSize 1', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('Hello world.', { chunkSize: 1 });
+      sm.chunkIndex = 0;
+      const ctx = sm.contextSentence();
+      assert.strictEqual(ctx.highlightIndex, 0);
+      assert.strictEqual(ctx.highlightRange, undefined);
+    });
+  });
+
+  describe('backward compatibility (chunkSize 1)', () => {
+    it('tick advances same as before', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('Hello world again.', { wpm: 250, chunkSize: 1 });
+      sm.play();
+      const result = sm.tick();
+      assert.strictEqual(sm.chunkIndex, 1);
+      assert.strictEqual(result.delay, 240); // single word, baseDelay * 1
+    });
+
+    it('currentDisplay returns ORP split', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('Reading.', { chunkSize: 1 });
+      const d = sm.currentDisplay();
+      assert.strictEqual(d.isChunk, false);
+      assert.strictEqual(d.before, 'Re');
+      assert.strictEqual(d.focus, 'a');
+      assert.strictEqual(d.after, 'ding.');
+    });
+  });
 });
