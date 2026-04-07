@@ -55,6 +55,9 @@ describe('normalizeUrl', () => {
   it('removes ? when all params are tracking params', () => {
     assert.strictEqual(normalizeUrl('https://example.com/article?utm_source=twitter'), 'https://example.com/article');
   });
+  it('returns raw string for invalid URLs', () => {
+    assert.strictEqual(normalizeUrl('not-a-url'), 'not-a-url');
+  });
 });
 
 describe('hashText', () => {
@@ -106,6 +109,18 @@ describe('hashText', () => {
     const hash = hashText('');
     assert.strictEqual(typeof hash, 'string');
   });
+
+  it('uses full text at exactly 200 chars', () => {
+    const text200 = 'A'.repeat(100) + 'X' + 'B'.repeat(99);
+    const text200alt = 'A'.repeat(100) + 'Y' + 'B'.repeat(99);
+    assert.notStrictEqual(hashText(text200), hashText(text200alt));
+  });
+
+  it('samples only first/last 100 chars at 201 chars', () => {
+    const text201a = 'A'.repeat(100) + 'X' + 'B'.repeat(100);
+    const text201b = 'A'.repeat(100) + 'Y' + 'B'.repeat(100);
+    assert.strictEqual(hashText(text201a), hashText(text201b));
+  });
 });
 
 describe('save', () => {
@@ -153,6 +168,25 @@ describe('save', () => {
     assert.strictEqual(stored['https://example.com/page0'], undefined);
     assert.ok(stored['https://example.com/new-page']);
   });
+
+  it('evicts oldest by timestamp, not insertion order', async () => {
+    mockStorage = {};
+    const positions = {};
+    for (let i = 0; i < 100; i++) {
+      positions['https://example.com/page' + i] = {
+        index: 10, total: 100, textHash: 'abc', timestamp: 2000 + i,
+      };
+    }
+    // Make page50 the oldest entry
+    positions['https://example.com/page50'].timestamp = 100;
+    mockStorage = { readingPositions: positions };
+    await save('https://example.com/new-page', 'New article text', 5, 50);
+    const stored = mockStorage.readingPositions;
+    assert.strictEqual(Object.keys(stored).length, 100);
+    assert.strictEqual(stored['https://example.com/page50'], undefined);
+    assert.ok(stored['https://example.com/page0']);
+    assert.ok(stored['https://example.com/new-page']);
+  });
 });
 
 describe('restore', () => {
@@ -190,6 +224,36 @@ describe('restore', () => {
     };
     const index = await restore(url, text);
     assert.strictEqual(index, null);
+  });
+
+  it('returns null when index equals total (out of bounds)', async () => {
+    mockStorage = {};
+    const url = 'https://example.com/article';
+    const text = 'Some text';
+    mockStorage = {
+      readingPositions: {
+        [normalizeUrl(url)]: {
+          index: 200, total: 200, textHash: hashText(text), timestamp: Date.now(),
+        },
+      },
+    };
+    const index = await restore(url, text);
+    assert.strictEqual(index, null);
+  });
+
+  it('returns index when index equals total minus one (last valid word)', async () => {
+    mockStorage = {};
+    const url = 'https://example.com/article';
+    const text = 'Some text';
+    mockStorage = {
+      readingPositions: {
+        [normalizeUrl(url)]: {
+          index: 199, total: 200, textHash: hashText(text), timestamp: Date.now(),
+        },
+      },
+    };
+    const index = await restore(url, text);
+    assert.strictEqual(index, 199);
   });
 
   it('normalizes URL before lookup', async () => {

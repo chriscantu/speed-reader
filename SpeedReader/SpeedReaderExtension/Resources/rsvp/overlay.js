@@ -19,6 +19,9 @@ export class RSVPOverlay {
     this._boundKeyHandler = null;
     this._scrubFromIndex = undefined;
     this._autoSaveTimerId = null;
+    this._url = '';
+    this._text = '';
+    this._savePending = Promise.resolve();
   }
 
   async open(text, title, settings = {}, url = '') {
@@ -49,6 +52,7 @@ export class RSVPOverlay {
         }
       } catch (e) {
         console.warn('[SpeedReader] Failed to restore reading position:', e.message || e);
+        this._showPageToast('Could not restore your reading position. Starting from the beginning.');
       }
     }
 
@@ -128,7 +132,6 @@ export class RSVPOverlay {
   }
 
   close() {
-    this._savePosition();
     this._stopAutoSave();
     this.pause();
     if (this.host && this.host.parentNode) {
@@ -235,9 +238,11 @@ export class RSVPOverlay {
 
   _savePosition() {
     if (!this._url || this.state.currentIndex === 0) return;
-    save(this._url, this._text, this.state.currentIndex, this.state.words.length)
-      .catch(function(err) {
+    this._savePending = this._savePending
+      .then(() => save(this._url, this._text, this.state.currentIndex, this.state.words.length))
+      .catch((err) => {
         console.warn('[SpeedReader] Failed to save reading position:', err.message || err);
+        this._showPageToast('Could not save your reading position.');
       });
   }
 
@@ -261,10 +266,13 @@ export class RSVPOverlay {
 
     const result = this.state.tick();
     if (result.done) {
+      const url = this._url;
+      this._url = '';  // prevent pause() from saving a position we're about to clear
       this.pause();
-      if (this._url) {
-        clear(this._url).catch(function(err) {
+      if (url) {
+        clear(url).catch((err) => {
           console.warn('[SpeedReader] Failed to clear reading position:', err.message || err);
+          this._showPageToast('Could not clear saved reading position.');
         });
       }
       return;

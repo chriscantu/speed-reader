@@ -10,7 +10,12 @@ const TRACKING_PARAMS = [
 ];
 
 export function normalizeUrl(rawUrl) {
-  const url = new URL(rawUrl);
+  let url;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    return rawUrl;
+  }
   url.hash = '';
   for (const param of TRACKING_PARAMS) {
     url.searchParams.delete(param);
