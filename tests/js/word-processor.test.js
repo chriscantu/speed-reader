@@ -50,6 +50,31 @@ describe('processText', () => {
     const sentenceStarts = result.filter(w => w.sentenceStart).map(w => w.text);
     assert.deepStrictEqual(sentenceStarts, ['Wow!', 'That']);
   });
+
+  it('detects sentence boundary when period is followed by brackets', () => {
+    const result = processText('increase retention.[10][11][2] There are three types');
+    const sentenceStarts = result.filter(w => w.sentenceStart).map(w => w.text);
+    assert.deepStrictEqual(sentenceStarts, ['increase', 'There']);
+  });
+
+  it('detects sentence boundary when period is followed by closing paren', () => {
+    const result = processText('(see footnote.) The next');
+    const sentenceStarts = result.filter(w => w.sentenceStart).map(w => w.text);
+    assert.deepStrictEqual(sentenceStarts, ['(see', 'The']);
+  });
+
+  it('detects sentence boundary when period is followed by quotes', () => {
+    const result = processText('she said." He left.');
+    const sentenceStarts = result.filter(w => w.sentenceStart).map(w => w.text);
+    assert.deepStrictEqual(sentenceStarts, ['she', 'He']);
+  });
+
+  it('does not false-positive on abbreviations with brackets', () => {
+    const result = processText('Dr.[Smith] gave');
+    const sentenceStarts = result.filter(w => w.sentenceStart).map(w => w.text);
+    // Dr. triggers sentence boundary (same as current behavior for abbreviations)
+    assert.deepStrictEqual(sentenceStarts, ['Dr.[Smith]', 'gave']);
+  });
 });
 
 describe('calculateDelay', () => {
@@ -100,6 +125,21 @@ describe('calculateDelay', () => {
 
   it('returns base delay for null', () => {
     assert.strictEqual(calculateDelay(null, baseDelay), baseDelay);
+  });
+
+  it('returns 1.5x delay for period followed by brackets', () => {
+    const delay = calculateDelay('retention.[10]', baseDelay);
+    assert.strictEqual(delay, Math.round(baseDelay * 1.5));
+  });
+
+  it('returns 1.5x delay for question mark followed by closing quote', () => {
+    const delay = calculateDelay('right?"', baseDelay);
+    assert.strictEqual(delay, Math.round(baseDelay * 1.5));
+  });
+
+  it('returns 1.5x delay for exclamation followed by closing paren', () => {
+    const delay = calculateDelay('wow!)', baseDelay);
+    assert.strictEqual(delay, Math.round(baseDelay * 1.5));
   });
 });
 

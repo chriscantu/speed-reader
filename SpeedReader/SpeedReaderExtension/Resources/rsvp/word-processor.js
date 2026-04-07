@@ -1,3 +1,7 @@
+// Matches sentence-ending punctuation (.!?) optionally followed by
+// closing brackets, parens, or quotes — e.g. "retention.[10]" or 'said."'
+const SENTENCE_END_RE = /[.!?](\[[^\]]*\]|\([^)]*\)|["'»)}\]])*$/;
+
 /**
  * Splits raw text into an array of word objects with metadata.
  * Each word object: { text, index, sentenceStart }
@@ -18,8 +22,7 @@ export function processText(text) {
       sentenceStart: nextIsSentenceStart,
     };
 
-    // Check if this word ends a sentence
-    nextIsSentenceStart = /[.!?]$/.test(word);
+    nextIsSentenceStart = SENTENCE_END_RE.test(word);
 
     return entry;
   });
@@ -35,11 +38,12 @@ export function processText(text) {
  */
 export function calculateDelay(word, baseDelay) {
   if (!word) return baseDelay;
-  const lastChar = word[word.length - 1];
 
-  if ('.!?'.includes(lastChar)) {
+  if (SENTENCE_END_RE.test(word)) {
     return Math.round(baseDelay * 1.5);
   }
+
+  const lastChar = word[word.length - 1];
   if (',:;'.includes(lastChar)) {
     return Math.round(baseDelay * 1.2);
   }

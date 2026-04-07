@@ -9,7 +9,7 @@ describe('buildChunks', () => {
     let nextIsSentenceStart = true;
     return texts.map((text, index) => {
       const entry = { text, index, sentenceStart: nextIsSentenceStart };
-      nextIsSentenceStart = /[.!?]$/.test(text);
+      nextIsSentenceStart = /[.!?](\[[^\]]*\]|\([^)]*\)|["'»)}\]])*$/.test(text);
       return entry;
     });
   }
