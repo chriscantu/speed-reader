@@ -540,6 +540,16 @@ describe('chunk mode (chunkSize > 1)', () => {
       assert.strictEqual(result.delay, Math.round(480 * 1.5));
     });
 
+    it('applies comma pause (1.2x) to last word in chunk', () => {
+      const sm = new RSVPStateMachine();
+      // "Hello world," is one 2-word chunk, last word has comma
+      sm.init('Hello world, goodbye.', { wpm: 250, chunkSize: 2, punctuationPause: true });
+      sm.play();
+      const result = sm.tick();
+      // baseDelay=240, 2 words=480, comma on last word=480*1.2=576
+      assert.strictEqual(result.delay, Math.round(480 * 1.2));
+    });
+
     it('returns done at last chunk', () => {
       const sm = new RSVPStateMachine();
       sm.init('Hello world.', { chunkSize: 2 });
@@ -661,6 +671,51 @@ describe('chunk mode (chunkSize > 1)', () => {
       const ctx = sm.contextSentence();
       assert.strictEqual(ctx.highlightIndex, 0);
       assert.strictEqual(ctx.highlightRange, undefined);
+    });
+  });
+
+  describe('rebuildChunks', () => {
+    it('preserves position when switching from size 1 to 2', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { chunkSize: 1 });
+      sm.chunkIndex = 2; // word "three" at index 2
+      sm.rebuildChunks(2);
+      // chunks: ["One two"], ["three four."] — word 2 is in chunk 1
+      assert.strictEqual(sm.chunkSize, 2);
+      assert.strictEqual(sm.chunkIndex, 1);
+    });
+
+    it('preserves position when switching from size 2 to 1', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { chunkSize: 2 });
+      sm.chunkIndex = 1; // chunk 1 = "three four." starts at word 2
+      sm.rebuildChunks(1);
+      // chunks: 4 single-word chunks — word 2 is chunk 2
+      assert.strictEqual(sm.chunkSize, 1);
+      assert.strictEqual(sm.chunkIndex, 2);
+    });
+
+    it('stays at 0 when at start', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { chunkSize: 1 });
+      sm.chunkIndex = 0;
+      sm.rebuildChunks(3);
+      assert.strictEqual(sm.chunkIndex, 0);
+    });
+
+    it('stays near end when at last chunk', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three four.', { chunkSize: 2 });
+      sm.chunkIndex = 1; // last chunk, word index 2
+      sm.rebuildChunks(1);
+      assert.strictEqual(sm.chunkIndex, 2); // word 2 in single-word mode
+    });
+
+    it('clamps invalid chunk size', () => {
+      const sm = new RSVPStateMachine();
+      sm.init('One two three.', { chunkSize: 1 });
+      sm.rebuildChunks(99);
+      assert.strictEqual(sm.chunkSize, 3);
     });
   });
 

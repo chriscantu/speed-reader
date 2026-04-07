@@ -43,5 +43,5 @@ export function validateAlignment(value) {
 
 export function clampChunkSize(value) {
   if (typeof value !== 'number' || isNaN(value)) return CHUNK_SIZE_DEFAULT;
-  return Math.max(CHUNK_SIZE_MIN, Math.min(CHUNK_SIZE_MAX, value));
+  return Math.max(CHUNK_SIZE_MIN, Math.min(CHUNK_SIZE_MAX, Math.round(value)));
 }

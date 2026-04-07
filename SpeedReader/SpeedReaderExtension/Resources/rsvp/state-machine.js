@@ -1,4 +1,4 @@
-import { processText, wpmToDelay } from './word-processor.js';
+import { processText, calculateDelay, wpmToDelay } from './word-processor.js';
 import { splitWordAtFocus } from './focus-point.js';
 import { WPM_DEFAULT, CHUNK_SIZE_DEFAULT, clampWpm, clampChunkSize } from './settings-defaults.js';
 import { buildChunks } from './chunk-builder.js';
@@ -57,12 +57,7 @@ export class RSVPStateMachine {
 
     if (this.punctuationPause) {
       const lastWord = chunk.words[chunk.words.length - 1].text;
-      const lastChar = lastWord[lastWord.length - 1];
-      if ('.!?'.includes(lastChar)) {
-        delay = Math.round(delay * 1.5);
-      } else if (',:;'.includes(lastChar)) {
-        delay = Math.round(delay * 1.2);
-      }
+      delay = calculateDelay(lastWord, delay);
     }
 
     this.chunkIndex++;
@@ -112,6 +107,7 @@ export class RSVPStateMachine {
         return;
       }
     }
+    console.warn('[SpeedReader] seekTo: word index', wordIndex, 'did not match any chunk range; falling back to last chunk');
     this.chunkIndex = this.chunks.length - 1;
   }
 

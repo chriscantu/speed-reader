@@ -110,4 +110,10 @@ describe('clampChunkSize', () => {
     assert.strictEqual(clampChunkSize(CHUNK_SIZE_MIN), CHUNK_SIZE_MIN);
     assert.strictEqual(clampChunkSize(CHUNK_SIZE_MAX), CHUNK_SIZE_MAX);
   });
+
+  it('rounds floats to nearest integer', () => {
+    assert.strictEqual(clampChunkSize(1.5), 2);
+    assert.strictEqual(clampChunkSize(2.7), 3);
+    assert.strictEqual(clampChunkSize(0.6), 1);
+  });
 });

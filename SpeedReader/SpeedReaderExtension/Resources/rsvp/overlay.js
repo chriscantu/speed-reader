@@ -413,8 +413,8 @@ export class RSVPOverlay {
       if (this.elements.tipBanner) {
         this.elements.tipBanner.setAttribute('data-visible', 'true');
       }
-    } catch (_e) {
-      // Silently skip tip if storage fails
+    } catch (e) {
+      console.warn('[SpeedReader] Tip check failed:', e.message || e);
     }
   }
 
@@ -422,7 +422,9 @@ export class RSVPOverlay {
     if (this.elements.tipBanner) {
       this.elements.tipBanner.setAttribute('data-visible', 'false');
     }
-    browser.storage.sync.set({ sr_chunkSizeTipSeen: true }).catch(() => {});
+    browser.storage.sync.set({ sr_chunkSizeTipSeen: true }).catch((e) => {
+      console.warn('[SpeedReader] Failed to persist tip dismissal:', e.message || e);
+    });
   }
 
   _showPageToast(message) {
