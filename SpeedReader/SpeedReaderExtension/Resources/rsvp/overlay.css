@@ -160,7 +160,14 @@
 }
 
 .sr-chunk-text {
-  color: var(--sr-word-color, #e2e8f0);
+  color: var(--sr-text);
+}
+
+/* In chunk mode (centered alignment), reset the word container to inline
+   so _scaleWordToFit can measure true text width without grid interference. */
+:host([data-alignment="center"]) .sr-word {
+  display: inline-block;
+  min-width: auto;
 }
 
 /* ORP-aligned: focus letter locked at horizontal center via CSS grid. */
