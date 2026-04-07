@@ -159,6 +159,10 @@
   font-weight: 600;
 }
 
+.sr-chunk-text {
+  color: var(--sr-word-color, #e2e8f0);
+}
+
 /* ORP-aligned: focus letter locked at horizontal center via CSS grid. */
 :host([data-alignment="orp"]) .sr-word {
   display: grid;

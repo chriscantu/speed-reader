@@ -36,6 +36,7 @@ export class RSVPOverlay {
     this.state.init(text, {
       wpm: settings.wpm,
       punctuationPause: settings.punctuationPause ?? true,
+      chunkSize: settings.chunkSize,
     });
 
     if (this.state.words.length === 0) {
@@ -99,6 +100,12 @@ export class RSVPOverlay {
     }
     if (settings.punctuationPause !== undefined) {
       this.state.punctuationPause = settings.punctuationPause;
+    }
+    if (typeof settings.chunkSize === 'number') {
+      this.state.rebuildChunks(settings.chunkSize);
+      this.pause();
+      this._renderWord();
+      this._updateProgress();
     }
   }
 
@@ -284,16 +291,32 @@ export class RSVPOverlay {
   }
 
   _renderWord() {
-    const parts = this.state.currentWord();
-    if (this.elements.wordBefore) {
-      this.elements.wordBefore.textContent = parts.before;
+    const display = this.state.currentDisplay();
+
+    if (display.isChunk) {
+      // Chunk mode: hide ORP spans, show plain text
+      if (this.elements.wordBefore) this.elements.wordBefore.textContent = '';
+      if (this.elements.wordFocus) this.elements.wordFocus.textContent = '';
+      if (this.elements.wordAfter) this.elements.wordAfter.textContent = '';
+      if (this.elements.chunkText) {
+        this.elements.chunkText.textContent = display.text;
+        this.elements.chunkText.style.display = '';
+      }
+    } else {
+      // ORP mode: hide chunk span, show split word
+      if (this.elements.chunkText) this.elements.chunkText.style.display = 'none';
+      if (this.elements.wordBefore) this.elements.wordBefore.textContent = display.before;
+      if (this.elements.wordFocus) this.elements.wordFocus.textContent = display.focus;
+      if (this.elements.wordAfter) this.elements.wordAfter.textContent = display.after;
     }
-    if (this.elements.wordFocus) {
-      this.elements.wordFocus.textContent = parts.focus;
+
+    // Chunk mode forces centered alignment — ORP anchor has no meaning with plain text
+    if (display.isChunk) {
+      this.host.setAttribute('data-alignment', 'center');
+    } else {
+      this.host.setAttribute('data-alignment', validateAlignment(this.settings.alignment));
     }
-    if (this.elements.wordAfter) {
-      this.elements.wordAfter.textContent = parts.after;
-    }
+
     this._scaleWordToFit();
   }
 
@@ -359,7 +382,12 @@ export class RSVPOverlay {
       if (i > 0) {
         contentEl.appendChild(document.createTextNode(' '));
       }
-      if (i === ctx.highlightIndex) {
+
+      const isHighlighted = ctx.highlightRange
+        ? (i >= ctx.highlightRange.start && i <= ctx.highlightRange.end)
+        : (i === ctx.highlightIndex);
+
+      if (isHighlighted) {
         const highlight = document.createElement('span');
         highlight.className = 'sr-context-highlight';
         highlight.textContent = ctx.words[i];
@@ -473,9 +501,15 @@ export class RSVPOverlay {
     wordAfter.className = 'sr-word-after';
     this.elements.wordAfter = wordAfter;
 
+    const chunkText = document.createElement('span');
+    chunkText.className = 'sr-chunk-text';
+    chunkText.style.display = 'none';
+    this.elements.chunkText = chunkText;
+
     wordContainer.appendChild(wordBefore);
     wordContainer.appendChild(wordFocus);
     wordContainer.appendChild(wordAfter);
+    wordContainer.appendChild(chunkText);
     this.elements.wordContainer = wordContainer;
 
     wordArea.appendChild(wordContainer);
