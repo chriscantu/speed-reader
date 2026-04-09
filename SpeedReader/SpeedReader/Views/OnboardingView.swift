@@ -31,10 +31,11 @@ struct OnboardingView: View {
                 instructionRow(number: 3, text: "Enable SpeedReader")
                 instructionRow(number: 4, text: "Allow on all websites")
                 #else
-                instructionRow(number: 1, text: "Open Settings app")
-                instructionRow(number: 2, text: "Go to Apps → Safari → Extensions")
-                instructionRow(number: 3, text: "Enable SpeedReader")
-                instructionRow(number: 4, text: "Set to \"Allow\" on all websites")
+                instructionRow(number: 1, text: "Tap \"Open Settings\" below")
+                instructionRow(number: 2, text: "Tap ← Back to return to Settings")
+                instructionRow(number: 3, text: "Tap Apps → Safari → Extensions")
+                instructionRow(number: 4, text: "Turn on SpeedReader")
+                instructionRow(number: 5, text: "Set to \"Allow\" on all websites")
                 #endif
             }
             .padding(24)
@@ -63,9 +64,10 @@ struct OnboardingView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
 
-            Text("Then navigate to Apps → Safari → Extensions")
+            Text("This opens SpeedReader settings — tap ← Back\nto reach Safari extensions.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
             #endif
 
             Button("I've enabled it") {
