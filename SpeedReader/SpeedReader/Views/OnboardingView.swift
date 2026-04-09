@@ -25,10 +25,17 @@ struct OnboardingView: View {
                 .padding(.horizontal, 32)
 
             VStack(alignment: .leading, spacing: 16) {
+                #if os(macOS)
                 instructionRow(number: 1, text: "Open Safari Settings")
                 instructionRow(number: 2, text: "Tap Extensions")
                 instructionRow(number: 3, text: "Enable SpeedReader")
                 instructionRow(number: 4, text: "Allow on all websites")
+                #else
+                instructionRow(number: 1, text: "Open Settings app")
+                instructionRow(number: 2, text: "Go to Apps → Safari → Extensions")
+                instructionRow(number: 3, text: "Enable SpeedReader")
+                instructionRow(number: 4, text: "Set to \"Allow\" on all websites")
+                #endif
             }
             .padding(24)
             .background(.quaternary)
@@ -48,13 +55,17 @@ struct OnboardingView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             #else
-            Button("Open Settings") {
+            Button("Open Settings App") {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
                 }
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
+
+            Text("Then navigate to Apps → Safari → Extensions")
+                .font(.caption)
+                .foregroundStyle(.secondary)
             #endif
 
             Button("I've enabled it") {
