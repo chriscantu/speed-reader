@@ -1,4 +1,5 @@
 import CoreText
+import MetricKit
 import OSLog
 import SwiftUI
 
@@ -8,6 +9,7 @@ struct SpeedReaderApp: App {
 
     init() {
         Self.registerCustomFonts()
+        CrashDiagnosticsSubscriber.shared.register()
     }
 
     private static func registerCustomFonts() {

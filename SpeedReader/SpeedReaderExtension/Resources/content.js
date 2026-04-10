@@ -8,6 +8,14 @@ let _syncWarningShown = false;
 // Mark content script presence for test verification
 document.documentElement.setAttribute('data-speedreader-loaded', 'true');
 
+// Error reporting — capture uncaught errors and unhandled rejections.
+// Uses dynamic import since content.js runs as a classic script in Safari.
+import(browser.runtime.getURL('error-reporter.js')).then((mod) => {
+  mod.installWindowHandlers('content', window.location.href);
+}).catch((e) => {
+  console.error('[SpeedReader] Failed to load error reporter:', e);
+});
+
 // Live-reload settings into an open overlay when they change in storage.
 browser.storage.onChanged.addListener(function(changes, area) {
   if (area !== 'sync' || !overlay || !overlay.host) return;

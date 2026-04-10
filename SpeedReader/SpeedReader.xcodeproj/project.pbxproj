@@ -18,6 +18,8 @@
 		ABC84A71AB9B9F43D28F006A /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
 		DAB8DCFD212EBA275AADDF48 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7C9932756921056EBA7A59 /* SafariServices.framework */; };
 		CC0000000000000000000001 /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000010 /* OnboardingUITests.swift */; };
+
+
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +99,8 @@
 		CAFFEE1258C20D75FFDA8F4F /* toolbar-icon-72.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-72.png"; sourceTree = "<group>"; };
 		CDA736A75407BDAE1865E723 /* icon-128.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "icon-128.png"; sourceTree = "<group>"; };
 		EE7C9932756921056EBA7A59 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
+		DD0000000000000000000010 /* error-reporter.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; path = "error-reporter.js"; sourceTree = "<group>"; };
+		DD0000000000000000000020 /* CrashDiagnosticsSubscriber.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CrashDiagnosticsSubscriber.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -192,6 +196,7 @@
 		02E2FE092F7F6F9E007CB358 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				DD0000000000000000000020 /* CrashDiagnosticsSubscriber.swift */,
 				02E2FE082F7F6F9E007CB358 /* Settings.swift */,
 			);
 			name = Models;
@@ -230,6 +235,7 @@
 			children = (
 				336BA88D6062B640644E045E /* background.js */,
 				155C7D23A470E05538BC8787 /* content.js */,
+				DD0000000000000000000010 /* error-reporter.js */,
 				0CC95A975897B0B6DB3C00F1 /* fonts */,
 				6EC5A3CCAD698A36D7BBECAB /* images */,
 				6BC5DE1D105E75B697976892 /* lib */,
