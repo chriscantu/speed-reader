@@ -41,6 +41,17 @@
                ReferencedContainer = "container:SpeedReader.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "CC0000000000000000000040"
+               BuildableName = "SpeedReaderUITests.xctest"
+               BlueprintName = "SpeedReaderUITests"
+               ReferencedContainer = "container:SpeedReader.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

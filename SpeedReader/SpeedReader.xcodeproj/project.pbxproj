@@ -17,6 +17,7 @@
 		AA0000000000000000000002 /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
 		ABC84A71AB9B9F43D28F006A /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
 		DAB8DCFD212EBA275AADDF48 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7C9932756921056EBA7A59 /* SafariServices.framework */; };
+		CC0000000000000000000001 /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000010 /* OnboardingUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,6 +29,13 @@
 			remoteInfo = SpeedReaderExtension;
 		};
 		A55BD1969DEEB98A966E509F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 02E2FDE82F7F6E15007CB358 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 02E2FDEF2F7F6E15007CB358;
+			remoteInfo = SpeedReader;
+		};
+		CC0000000000000000000020 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 02E2FDE82F7F6E15007CB358 /* Project object */;
 			proxyType = 1;
@@ -77,6 +85,8 @@
 		57270C891B5A8607F4D7800E /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		60576CF8DFF855A5FBC03458 /* SettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
 		BB0000000000000000000010 /* OnboardingContentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingContentTests.swift; sourceTree = "<group>"; };
+		CC0000000000000000000010 /* OnboardingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingUITests.swift; sourceTree = "<group>"; };
+		CC0000000000000000000099 /* SpeedReaderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpeedReaderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		64C4F798A63CCC4C2CF9EFAE /* toolbar-icon-19.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-19.png"; sourceTree = "<group>"; };
 		72D243DCA7839B0A1128F247 /* focus-point.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; path = "focus-point.js"; sourceTree = "<group>"; };
 		78F0C821786D5C099708EEF6 /* icon-48.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "icon-48.png"; sourceTree = "<group>"; };
@@ -141,6 +151,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC0000000000000000000042 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -157,6 +174,7 @@
 				93B65BF1B9E6706F62E90922 /* SpeedReaderExtension */,
 				A37BCB2C7E68BF9FC84D9E3E /* Frameworks */,
 				186F1FDC7316F16A3BC64AD0 /* SpeedReaderTests */,
+				CC0000000000000000000030 /* SpeedReaderUITests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -166,6 +184,7 @@
 				02E2FDF02F7F6E15007CB358 /* SpeedReader.app */,
 				02E2FE192F7F7065007CB358 /* SpeedReaderExtension.appex */,
 				95C08B51DBDF2C79E03A0E65 /* SpeedReaderTests.xctest */,
+				CC0000000000000000000099 /* SpeedReaderUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -302,6 +321,14 @@
 			name = "OS X";
 			sourceTree = "<group>";
 		};
+		CC0000000000000000000030 /* SpeedReaderUITests */ = {
+			isa = PBXGroup;
+			children = (
+				CC0000000000000000000010 /* OnboardingUITests.swift */,
+			);
+			path = SpeedReaderUITests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -365,6 +392,24 @@
 			productReference = 95C08B51DBDF2C79E03A0E65 /* SpeedReaderTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		CC0000000000000000000040 /* SpeedReaderUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC0000000000000000000060 /* Build configuration list for PBXNativeTarget "SpeedReaderUITests" */;
+			buildPhases = (
+				CC0000000000000000000041 /* Sources */,
+				CC0000000000000000000042 /* Frameworks */,
+				CC0000000000000000000043 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC0000000000000000000051 /* PBXTargetDependency */,
+			);
+			name = SpeedReaderUITests;
+			productName = SpeedReaderUITests;
+			productReference = CC0000000000000000000099 /* SpeedReaderUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -380,6 +425,10 @@
 					};
 					02E2FE182F7F7065007CB358 = {
 						CreatedOnToolsVersion = 26.4;
+					};
+					CC0000000000000000000040 = {
+						CreatedOnToolsVersion = 26.4;
+						TestTargetID = 02E2FDEF2F7F6E15007CB358;
 					};
 				};
 			};
@@ -400,6 +449,7 @@
 				02E2FDEF2F7F6E15007CB358 /* SpeedReader */,
 				02E2FE182F7F7065007CB358 /* SpeedReaderExtension */,
 				C6309D8D6C327E36BF2B673F /* SpeedReaderTests */,
+					CC0000000000000000000040 /* SpeedReaderUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -420,6 +470,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3927423A1E99A0BB5DF309E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC0000000000000000000043 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -457,6 +514,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC0000000000000000000041 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC0000000000000000000001 /* OnboardingUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -470,6 +535,11 @@
 			name = SpeedReader;
 			target = 02E2FDEF2F7F6E15007CB358 /* SpeedReader */;
 			targetProxy = A55BD1969DEEB98A966E509F /* PBXContainerItemProxy */;
+		};
+		CC0000000000000000000051 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 02E2FDEF2F7F6E15007CB358 /* SpeedReader */;
+			targetProxy = CC0000000000000000000020 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -801,6 +871,48 @@
 			};
 			name = Release;
 		};
+		CC0000000000000000000061 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4AKSB2RDBU;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chriscantu.SpeedReader.SpeedReaderUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = SpeedReader;
+			};
+			name = Debug;
+		};
+		CC0000000000000000000062 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4AKSB2RDBU;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chriscantu.SpeedReader.SpeedReaderUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = SpeedReader;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -836,6 +948,15 @@
 			buildConfigurations = (
 				E16705D186796CF7BED25E3E /* Release */,
 				3B865454FB317964B213BC92 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC0000000000000000000060 /* Build configuration list for PBXNativeTarget "SpeedReaderUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC0000000000000000000061 /* Debug */,
+				CC0000000000000000000062 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
