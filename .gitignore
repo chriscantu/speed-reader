@@ -6,3 +6,5 @@ DerivedData/
 build/
 .claude/settings.json
 node_modules/
+Gemfile.lock
+.ruby-version
