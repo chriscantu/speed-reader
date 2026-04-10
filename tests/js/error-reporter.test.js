@@ -6,6 +6,8 @@ import {
   ERROR_LOG_CAP,
   storeError,
   reportError,
+  installWindowHandlers,
+  installServiceWorkerHandlers,
 } from '../../SpeedReader/SpeedReaderExtension/Resources/error-reporter.js';
 
 describe('extractHostname', () => {
@@ -167,5 +169,90 @@ describe('reportError — public API', () => {
     // Should not throw — reportError is defensive
     const payload = await reportError(new Error('test'), 'content', '', { storage: brokenStorage });
     assert.strictEqual(payload, null);
+  });
+});
+
+// Mock event target — simulates window or self for handler registration
+function createMockTarget() {
+  const listeners = {};
+  return {
+    addEventListener(type, handler) {
+      if (!listeners[type]) listeners[type] = [];
+      listeners[type].push(handler);
+    },
+    dispatch(type, event) {
+      (listeners[type] || []).forEach((h) => h(event));
+    },
+    getListeners(type) {
+      return listeners[type] || [];
+    },
+  };
+}
+
+describe('installWindowHandlers', () => {
+  it('registers error and unhandledrejection listeners', () => {
+    const target = createMockTarget();
+    const storage = createMockStorage({});
+    installWindowHandlers('content', '', { target, storage });
+    assert.strictEqual(target.getListeners('error').length, 1);
+    assert.strictEqual(target.getListeners('unhandledrejection').length, 1);
+  });
+
+  it('error listener stores a formatted payload', async () => {
+    const target = createMockTarget();
+    const storage = createMockStorage({});
+    installWindowHandlers('content', 'https://example.com', { target, storage });
+
+    target.dispatch('error', {
+      error: new TypeError('null ref'),
+      message: 'Uncaught TypeError: null ref',
+    });
+
+    // Give the async handler time to complete
+    await new Promise((r) => setTimeout(r, 50));
+    const data = storage._getData();
+    assert.strictEqual(data.errorLog.length, 1);
+    assert.strictEqual(data.errorLog[0].source, 'content');
+    assert.strictEqual(data.errorLog[0].url, 'example.com');
+  });
+
+  it('unhandledrejection listener stores a formatted payload', async () => {
+    const target = createMockTarget();
+    const storage = createMockStorage({});
+    installWindowHandlers('overlay', '', { target, storage });
+
+    target.dispatch('unhandledrejection', {
+      reason: new Error('promise failed'),
+    });
+
+    await new Promise((r) => setTimeout(r, 50));
+    const data = storage._getData();
+    assert.strictEqual(data.errorLog.length, 1);
+    assert.ok(data.errorLog[0].message.includes('promise failed'));
+  });
+});
+
+describe('installServiceWorkerHandlers', () => {
+  it('registers error and unhandledrejection on self-like target', () => {
+    const target = createMockTarget();
+    const storage = createMockStorage({});
+    installServiceWorkerHandlers({ target, storage });
+    assert.strictEqual(target.getListeners('error').length, 1);
+    assert.strictEqual(target.getListeners('unhandledrejection').length, 1);
+  });
+
+  it('error listener uses source "background"', async () => {
+    const target = createMockTarget();
+    const storage = createMockStorage({});
+    installServiceWorkerHandlers({ target, storage });
+
+    target.dispatch('error', {
+      error: new Error('sw error'),
+      message: 'Uncaught Error: sw error',
+    });
+
+    await new Promise((r) => setTimeout(r, 50));
+    const data = storage._getData();
+    assert.strictEqual(data.errorLog[0].source, 'background');
   });
 });

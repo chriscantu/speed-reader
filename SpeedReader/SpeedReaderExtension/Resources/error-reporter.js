@@ -114,3 +114,47 @@ export async function reportError(error, source, pageUrl, options) {
     return null;
   }
 }
+
+/**
+ * Install global error and unhandledrejection handlers on a window-like target.
+ * Used by content.js and overlay.js (runs in page context with `window`).
+ *
+ * @param {string} source - Script identifier: 'content' or 'overlay'
+ * @param {string} pageUrl - Current page URL (will be stripped to hostname)
+ * @param {object} [options={}] - Options. Pass { target, storage } for testing.
+ */
+export function installWindowHandlers(source, pageUrl, options) {
+  const opts = options || {};
+  const target = opts.target || window;
+
+  target.addEventListener('error', (event) => {
+    const error = event.error || event.message || 'Unknown error';
+    reportError(error, source, pageUrl, { storage: opts.storage });
+  });
+
+  target.addEventListener('unhandledrejection', (event) => {
+    const error = event.reason || 'Unhandled promise rejection';
+    reportError(error, source, pageUrl, { storage: opts.storage });
+  });
+}
+
+/**
+ * Install global error and unhandledrejection handlers on a service worker target.
+ * Used by background.js (runs in service worker context — no `window`).
+ *
+ * @param {object} [options={}] - Options. Pass { target, storage } for testing.
+ */
+export function installServiceWorkerHandlers(options) {
+  const opts = options || {};
+  const target = opts.target || self;
+
+  target.addEventListener('error', (event) => {
+    const error = event.error || event.message || 'Unknown error';
+    reportError(error, 'background', '', { storage: opts.storage });
+  });
+
+  target.addEventListener('unhandledrejection', (event) => {
+    const error = event.reason || 'Unhandled promise rejection';
+    reportError(error, 'background', '', { storage: opts.storage });
+  });
+}
