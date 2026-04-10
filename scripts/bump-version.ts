@@ -1,8 +1,14 @@
 #!/usr/bin/env bun
 
 import { argv, exit } from "process";
+import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { execSync } from "node:child_process";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 const PBXPROJ_PATH = "SpeedReader/SpeedReader.xcodeproj/project.pbxproj";
+const EXPECTED_MARKETING_COUNT = 4;
+const EXPECTED_BUILD_COUNT = 8;
 
 type BumpType = "major" | "minor" | "patch";
 
@@ -102,14 +108,65 @@ export function replaceVersions(content: string, newMarketing: string, newBuild:
   return { content: updated, marketingCount, buildCount };
 }
 
-// Only execute CLI logic when this file is the entry point, not when imported
+function validateWithPlutil(content: string): void {
+  const tempDir = mkdtempSync(join(tmpdir(), "bump-version-"));
+  const tempFile = join(tempDir, "project.pbxproj");
+  writeFileSync(tempFile, content);
+
+  try {
+    execSync(`plutil -lint "${tempFile}"`, { stdio: "pipe" });
+  } catch {
+    throw new Error(
+      "plutil validation failed — the modified project.pbxproj is not valid. Original file was NOT modified."
+    );
+  }
+}
+
+function bumpPbxproj(bumpType: BumpType, dryRun: boolean): { newVersion: string; newBuild: number } {
+  const content = readFileSync(PBXPROJ_PATH, "utf-8");
+
+  const { marketingVersion, buildNumber } = extractVersions(content);
+  const current = parseVersion(marketingVersion);
+  const newVersion = bumpVersion(current, bumpType);
+  const newBuild = buildNumber + 1;
+
+  console.log(`Marketing version: ${marketingVersion} → ${newVersion}`);
+  console.log(`Build number: ${buildNumber} → ${newBuild}`);
+
+  const { content: updated, marketingCount, buildCount } = replaceVersions(content, newVersion, newBuild);
+
+  if (marketingCount !== EXPECTED_MARKETING_COUNT) {
+    throw new Error(
+      `Expected ${EXPECTED_MARKETING_COUNT} MARKETING_VERSION replacements, got ${marketingCount}. Aborting.`
+    );
+  }
+  if (buildCount !== EXPECTED_BUILD_COUNT) {
+    throw new Error(
+      `Expected ${EXPECTED_BUILD_COUNT} CURRENT_PROJECT_VERSION replacements, got ${buildCount}. Aborting.`
+    );
+  }
+
+  console.log(`Replaced ${marketingCount} MARKETING_VERSION and ${buildCount} CURRENT_PROJECT_VERSION entries.`);
+
+  if (dryRun) {
+    console.log("\n[dry-run] No files modified.");
+    return { newVersion, newBuild };
+  }
+
+  validateWithPlutil(updated);
+  writeFileSync(PBXPROJ_PATH, updated);
+  console.log(`\nWrote ${PBXPROJ_PATH}`);
+
+  return { newVersion, newBuild };
+}
+
+// --- Main ---
 if (import.meta.main) {
-  // Script args start at index 2 (bun run scripts/bump-version.ts <args>)
   const { bumpType, dryRun } = parseArgs(argv.slice(2));
 
   if (dryRun) {
     console.log("[dry-run] No files will be modified.\n");
   }
 
-  console.log(`Bump type: ${bumpType}`);
+  const { newVersion, newBuild } = bumpPbxproj(bumpType, dryRun);
 }
