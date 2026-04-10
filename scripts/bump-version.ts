@@ -160,6 +160,55 @@ function bumpPbxproj(bumpType: BumpType, dryRun: boolean): { newVersion: string;
   return { newVersion, newBuild };
 }
 
+function generateChangelog(): string {
+  let log: string;
+  try {
+    const lastTag = execSync("git describe --tags --abbrev=0", { stdio: "pipe", encoding: "utf-8" }).trim();
+    log = execSync(`git log --oneline ${lastTag}..HEAD`, { stdio: "pipe", encoding: "utf-8" }).trim();
+  } catch {
+    // No tags exist yet — use recent history (count-based to avoid shallow-clone issues)
+    log = execSync("git log --oneline -50", { stdio: "pipe", encoding: "utf-8" }).trim();
+  }
+
+  if (!log) {
+    return "- No changes since last tag";
+  }
+
+  return log
+    .split("\n")
+    .map((line) => `- ${line.replace(/^[a-f0-9]+ /, "")}`)
+    .join("\n");
+}
+
+function writeChangelog(version: string, entries: string): void {
+  const date = new Date().toISOString().split("T")[0];
+  const section = `## v${version} (${date})\n\n${entries}\n`;
+
+  let existing = "";
+  try {
+    existing = readFileSync("CHANGELOG.md", "utf-8");
+  } catch {
+    // File doesn't exist yet — that's fine
+  }
+
+  const header = "# Changelog\n\n";
+  if (existing.startsWith("# Changelog")) {
+    // Insert new section after the header
+    const content = existing.replace(header, `${header}${section}\n`);
+    writeFileSync("CHANGELOG.md", content);
+  } else {
+    writeFileSync("CHANGELOG.md", `${header}${section}\n${existing}`);
+  }
+}
+
+function gitCommitAndTag(version: string, buildNumber: number): void {
+  execSync(`git add "${PBXPROJ_PATH}" CHANGELOG.md`, { stdio: "inherit" });
+  execSync(`git commit -m "Bump version to ${version} (build ${buildNumber})"`, { stdio: "inherit" });
+  execSync(`git tag -a "v${version}" -m "v${version}"`, { stdio: "inherit" });
+  console.log(`\nCreated tag v${version}`);
+  console.log("Run 'git push && git push --tags' to publish.");
+}
+
 // --- Main ---
 if (import.meta.main) {
   const { bumpType, dryRun } = parseArgs(argv.slice(2));
@@ -169,4 +218,12 @@ if (import.meta.main) {
   }
 
   const { newVersion, newBuild } = bumpPbxproj(bumpType, dryRun);
+
+  const changelogEntries = generateChangelog();
+  console.log(`\nChangelog:\n${changelogEntries}\n`);
+
+  if (!dryRun) {
+    writeChangelog(newVersion, changelogEntries);
+    gitCommitAndTag(newVersion, newBuild);
+  }
 }
