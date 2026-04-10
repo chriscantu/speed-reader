@@ -4,11 +4,10 @@
   "type": "module",
   "description": "Test runner for SpeedReader extension JavaScript (dev only, not bundled)",
   "scripts": {
-    "test": "node --test tests/js/*.test.js",
-    "test:regression": "node --test --test-concurrency=1 tests/regression/*.test.js",
-    "test:word-processor": "node --test tests/js/word-processor.test.js",
-    "test:focus-point": "node --test tests/js/focus-point.test.js",
-    "test:bump": "bun test tests/bun/bump-version.test.js",
+    "test": "bun test tests/js/*.test.js",
+    "test:regression": "bun test tests/regression/*.test.js",
+    "test:word-processor": "bun test tests/js/word-processor.test.js",
+    "test:focus-point": "bun test tests/js/focus-point.test.js",
     "version:bump": "bun run scripts/bump-version.ts"
   },
   "devDependencies": {
