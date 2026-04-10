@@ -3,8 +3,44 @@ import SwiftUI
 import SafariServices
 #endif
 
+/// Platform-specific onboarding content, extracted for testability.
+struct OnboardingContent {
+    let instructions: [String]
+    let buttonTitle: String
+    let helperText: String?
+
+    static let current: OnboardingContent = {
+        #if os(macOS)
+        return OnboardingContent(
+            instructions: [
+                "Open Safari Settings",
+                "Tap Extensions",
+                "Enable SpeedReader",
+                "Allow on all websites",
+            ],
+            buttonTitle: "Open Safari Settings",
+            helperText: nil
+        )
+        #else
+        return OnboardingContent(
+            instructions: [
+                "Tap \"Open Settings\" below",
+                "Tap ← Back to return to Settings",
+                "Tap Apps → Safari → Extensions",
+                "Turn on SpeedReader",
+                "Set to \"Allow\" on all websites",
+            ],
+            buttonTitle: "Open Settings App",
+            helperText: "This opens SpeedReader settings — tap ← Back\nto reach Safari extensions."
+        )
+        #endif
+    }()
+}
+
 struct OnboardingView: View {
     var onComplete: () -> Void
+
+    private let content = OnboardingContent.current
 
     var body: some View {
         VStack(spacing: 32) {
@@ -25,26 +61,17 @@ struct OnboardingView: View {
                 .padding(.horizontal, 32)
 
             VStack(alignment: .leading, spacing: 16) {
-                #if os(macOS)
-                instructionRow(number: 1, text: "Open Safari Settings")
-                instructionRow(number: 2, text: "Tap Extensions")
-                instructionRow(number: 3, text: "Enable SpeedReader")
-                instructionRow(number: 4, text: "Allow on all websites")
-                #else
-                instructionRow(number: 1, text: "Tap \"Open Settings\" below")
-                instructionRow(number: 2, text: "Tap ← Back to return to Settings")
-                instructionRow(number: 3, text: "Tap Apps → Safari → Extensions")
-                instructionRow(number: 4, text: "Turn on SpeedReader")
-                instructionRow(number: 5, text: "Set to \"Allow\" on all websites")
-                #endif
+                ForEach(Array(content.instructions.enumerated()), id: \.offset) { index, text in
+                    instructionRow(number: index + 1, text: text)
+                }
             }
             .padding(24)
             .background(.quaternary)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal, 24)
 
-            #if os(macOS)
-            Button("Open Safari Settings") {
+            Button(content.buttonTitle) {
+                #if os(macOS)
                 SFSafariApplication.showPreferencesForExtension(
                     withIdentifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
                 ) { error in
@@ -52,23 +79,21 @@ struct OnboardingView: View {
                         print("[SpeedReader] Could not open settings: \(error)")
                     }
                 }
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            #else
-            Button("Open Settings App") {
+                #else
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
                 }
+                #endif
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
 
-            Text("This opens SpeedReader settings — tap ← Back\nto reach Safari extensions.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            #endif
+            if let helperText = content.helperText {
+                Text(helperText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
 
             Button("I've enabled it") {
                 onComplete()

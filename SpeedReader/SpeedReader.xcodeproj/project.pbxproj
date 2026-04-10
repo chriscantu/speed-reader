@@ -9,7 +9,9 @@
 /* Begin PBXBuildFile section */
 		02E2FE312F7F7065007CB358 /* SpeedReaderExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 02E2FE192F7F7065007CB358 /* SpeedReaderExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60576CF8DFF855A5FBC03458 /* SettingsTests.swift */; };
-		8583EC8C5846A9425A341FF0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C47E9825806A930B7A8484 /* Cocoa.framework */; };
+		BB0000000000000000000001 /* OnboardingContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000010 /* OnboardingContentTests.swift */; };
+		BB0000000000000000000002 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE0B2F7F6F9E007CB358 /* OnboardingView.swift */; };
+		8583EC8C5846A9425A341FF0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C47E9825806A930B7A8484 /* Cocoa.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8C9DEF341921D79BD47B1A7C /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
 		AA0000000000000000000001 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE082F7F6F9E007CB358 /* Settings.swift */; };
 		AA0000000000000000000002 /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
@@ -74,6 +76,7 @@
 		4DFBFC19ACD7105EA7C06AF3 /* word-processor.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; path = "word-processor.js"; sourceTree = "<group>"; };
 		57270C891B5A8607F4D7800E /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		60576CF8DFF855A5FBC03458 /* SettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
+		BB0000000000000000000010 /* OnboardingContentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingContentTests.swift; sourceTree = "<group>"; };
 		64C4F798A63CCC4C2CF9EFAE /* toolbar-icon-19.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-19.png"; sourceTree = "<group>"; };
 		72D243DCA7839B0A1128F247 /* focus-point.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; path = "focus-point.js"; sourceTree = "<group>"; };
 		78F0C821786D5C099708EEF6 /* icon-48.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "icon-48.png"; sourceTree = "<group>"; };
@@ -135,7 +138,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8583EC8C5846A9425A341FF0 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +224,7 @@
 			isa = PBXGroup;
 			children = (
 				60576CF8DFF855A5FBC03458 /* SettingsTests.swift */,
+				BB0000000000000000000010 /* OnboardingContentTests.swift */,
 			);
 			path = SpeedReaderTests;
 			sourceTree = "<group>";
@@ -447,6 +450,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */,
+				BB0000000000000000000001 /* OnboardingContentTests.swift in Sources */,
+				BB0000000000000000000002 /* OnboardingView.swift in Sources */,
 				AA0000000000000000000001 /* Settings.swift in Sources */,
 				AA0000000000000000000002 /* SettingsKeys.swift in Sources */,
 			);
