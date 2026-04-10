@@ -5,6 +5,7 @@ import {
   extractHostname,
   ERROR_LOG_CAP,
   storeError,
+  reportError,
 } from '../../SpeedReader/SpeedReaderExtension/Resources/error-reporter.js';
 
 describe('extractHostname', () => {
@@ -139,5 +140,32 @@ describe('storeError — FIFO storage', () => {
     assert.strictEqual(data.errorLog.length, 50);
     assert.strictEqual(data.errorLog[45].message, 'overflow-0');
     assert.strictEqual(data.errorLog[49].message, 'overflow-4');
+  });
+});
+
+describe('reportError — public API', () => {
+  it('formats, stores, and returns the payload', async () => {
+    const storage = createMockStorage({});
+    const payload = await reportError(
+      new Error('explicit catch'),
+      'overlay',
+      'https://example.com/page',
+      { storage }
+    );
+    assert.strictEqual(payload.message, 'explicit catch');
+    assert.strictEqual(payload.source, 'overlay');
+    assert.strictEqual(payload.url, 'example.com');
+    const data = storage._getData();
+    assert.strictEqual(data.errorLog.length, 1);
+  });
+
+  it('does not throw when storage fails', async () => {
+    const brokenStorage = {
+      get() { return Promise.reject(new Error('storage broken')); },
+      set() { return Promise.reject(new Error('storage broken')); },
+    };
+    // Should not throw — reportError is defensive
+    const payload = await reportError(new Error('test'), 'content', '', { storage: brokenStorage });
+    assert.strictEqual(payload, null);
   });
 });

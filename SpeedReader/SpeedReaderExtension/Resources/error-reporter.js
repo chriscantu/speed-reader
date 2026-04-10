@@ -75,3 +75,42 @@ export async function storeError(payload, storage) {
   }
   await store.set({ errorLog });
 }
+
+/**
+ * Fire-and-forget: send error payload to native SafariWebExtensionHandler
+ * via sendNativeMessage. Swallows errors — if native side is unavailable,
+ * the error remains in browser.storage.local as fallback.
+ */
+function sendToNative(payload) {
+  if (typeof browser === 'undefined' || !browser.runtime || !browser.runtime.sendNativeMessage) {
+    return;
+  }
+  browser.runtime.sendNativeMessage(
+    'com.chriscantu.SpeedReader',
+    { action: 'jsError', error: payload }
+  ).catch(() => {
+    // Fire-and-forget — native handler unavailable is not fatal
+  });
+}
+
+/**
+ * Public API for explicit error reporting from try-catch blocks.
+ * Formats the error, stores it, and bridges it to native logging.
+ *
+ * @param {Error|string} error - The caught error
+ * @param {string} source - Which script: 'content', 'background', 'overlay'
+ * @param {string} [pageUrl=''] - Current page URL (stripped to hostname)
+ * @param {object} [options={}] - Options. Pass { storage } for testing.
+ * @returns {Promise<object|null>} The stored payload, or null if storage failed
+ */
+export async function reportError(error, source, pageUrl, options) {
+  const opts = options || {};
+  const payload = formatErrorPayload(error, source, pageUrl || '');
+  try {
+    await storeError(payload, opts.storage);
+    sendToNative(payload);
+    return payload;
+  } catch {
+    return null;
+  }
+}
