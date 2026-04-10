@@ -18,8 +18,8 @@
 		ABC84A71AB9B9F43D28F006A /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
 		DAB8DCFD212EBA275AADDF48 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7C9932756921056EBA7A59 /* SafariServices.framework */; };
 		CC0000000000000000000001 /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000010 /* OnboardingUITests.swift */; };
-		DD0000000000000000000001 /* error-reporter.js in Resources */ = {isa = PBXBuildFile; fileRef = DD0000000000000000000010 /* error-reporter.js */; };
-		DD0000000000000000000002 /* CrashDiagnosticsSubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0000000000000000000020 /* CrashDiagnosticsSubscriber.swift */; };
+
+
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -472,7 +472,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DD0000000000000000000001 /* error-reporter.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,7 +496,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DD0000000000000000000002 /* CrashDiagnosticsSubscriber.swift in Sources */,
 				8C9DEF341921D79BD47B1A7C /* SettingsKeys.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
