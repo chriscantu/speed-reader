@@ -57,6 +57,51 @@ export function bumpVersion(current: SemVer, type: BumpType): string {
   }
 }
 
+interface ExtractedVersions {
+  marketingVersion: string;
+  buildNumber: number;
+}
+
+interface ReplaceResult {
+  content: string;
+  marketingCount: number;
+  buildCount: number;
+}
+
+export function extractVersions(content: string): ExtractedVersions {
+  const marketingMatch = content.match(/MARKETING_VERSION = ([^;]+);/);
+  if (!marketingMatch) {
+    throw new Error("Could not find MARKETING_VERSION in project.pbxproj");
+  }
+
+  const buildMatch = content.match(/CURRENT_PROJECT_VERSION = (\d+);/);
+  if (!buildMatch) {
+    throw new Error("Could not find CURRENT_PROJECT_VERSION in project.pbxproj");
+  }
+
+  return {
+    marketingVersion: marketingMatch[1].trim(),
+    buildNumber: parseInt(buildMatch[1], 10),
+  };
+}
+
+export function replaceVersions(content: string, newMarketing: string, newBuild: number): ReplaceResult {
+  let marketingCount = 0;
+  let buildCount = 0;
+
+  const updated = content
+    .replace(/MARKETING_VERSION = [^;]+;/g, () => {
+      marketingCount++;
+      return `MARKETING_VERSION = ${newMarketing};`;
+    })
+    .replace(/CURRENT_PROJECT_VERSION = \d+;/g, () => {
+      buildCount++;
+      return `CURRENT_PROJECT_VERSION = ${newBuild};`;
+    });
+
+  return { content: updated, marketingCount, buildCount };
+}
+
 // Only execute CLI logic when this file is the entry point, not when imported
 if (import.meta.main) {
   // Script args start at index 2 (bun run scripts/bump-version.ts <args>)
