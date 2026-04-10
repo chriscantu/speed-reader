@@ -28,11 +28,43 @@ function parseArgs(args: string[]): { bumpType: BumpType; dryRun: boolean } {
   return { bumpType, dryRun };
 }
 
-// Script args start at index 2 (bun run scripts/bump-version.ts <args>)
-const { bumpType, dryRun } = parseArgs(argv.slice(2));
-
-if (dryRun) {
-  console.log("[dry-run] No files will be modified.\n");
+interface SemVer {
+  major: number;
+  minor: number;
+  patch: number;
 }
 
-console.log(`Bump type: ${bumpType}`);
+export function parseVersion(versionStr: string): SemVer {
+  const parts = versionStr.split(".").map(Number);
+  if (parts.length < 2 || parts.length > 3 || parts.some(isNaN)) {
+    throw new Error(`Invalid version: "${versionStr}"`);
+  }
+  return {
+    major: parts[0],
+    minor: parts[1],
+    patch: parts[2] ?? 0,
+  };
+}
+
+export function bumpVersion(current: SemVer, type: BumpType): string {
+  switch (type) {
+    case "major":
+      return `${current.major + 1}.0.0`;
+    case "minor":
+      return `${current.major}.${current.minor + 1}.0`;
+    case "patch":
+      return `${current.major}.${current.minor}.${current.patch + 1}`;
+  }
+}
+
+// Only execute CLI logic when this file is the entry point, not when imported
+if (import.meta.main) {
+  // Script args start at index 2 (bun run scripts/bump-version.ts <args>)
+  const { bumpType, dryRun } = parseArgs(argv.slice(2));
+
+  if (dryRun) {
+    console.log("[dry-run] No files will be modified.\n");
+  }
+
+  console.log(`Bump type: ${bumpType}`);
+}
