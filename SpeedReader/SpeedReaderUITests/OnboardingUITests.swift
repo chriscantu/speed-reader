@@ -1,11 +1,10 @@
 import XCTest
 
 final class OnboardingUITests: XCTestCase {
-    private var app: XCUIApplication!
+    private var app = XCUIApplication()
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        app = XCUIApplication()
         // Reset onboarding state so the sheet appears
         app.launchArguments += ["-hasCompletedOnboarding", "NO"]
         app.launch()
