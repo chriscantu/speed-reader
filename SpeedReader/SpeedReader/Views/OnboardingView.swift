@@ -3,8 +3,68 @@ import SwiftUI
 import SafariServices
 #endif
 
+/// Describes the action performed by the settings button.
+enum SettingsAction: Equatable {
+    #if os(macOS)
+    /// Open Safari extension preferences.
+    case openSafariExtensionPreferences
+    #else
+    /// Navigate to the system Settings app.
+    case openSystemSettings
+    #endif
+}
+
+/// Platform-specific onboarding content, extracted for testability.
+struct OnboardingContent {
+    let instructions: [String]
+    let buttonTitle: String
+    let helperText: String?
+    let settingsAction: SettingsAction
+
+    init(instructions: [String], buttonTitle: String, helperText: String?, settingsAction: SettingsAction) {
+        precondition(!instructions.isEmpty, "Onboarding must have at least one instruction")
+        precondition(!buttonTitle.isEmpty, "Button title must not be empty")
+        self.instructions = instructions
+        self.buttonTitle = buttonTitle
+        self.helperText = helperText
+        self.settingsAction = settingsAction
+    }
+
+    static let current: OnboardingContent = {
+        #if os(macOS)
+        return OnboardingContent(
+            instructions: [
+                "Click Safari → Settings",
+                "Click Extensions",
+                "Enable SpeedReader",
+                "Allow on all websites"
+            ],
+            buttonTitle: "Open Safari Settings",
+            helperText: nil,
+            settingsAction: .openSafariExtensionPreferences
+        )
+        #else
+        return OnboardingContent(
+            instructions: [
+                "Tap \"Open Settings\" below",
+                "Tap ← Back to return to Settings",
+                "Tap Apps → Safari → Extensions",
+                "Turn on SpeedReader",
+                "Set to \"Allow\" on all websites"
+            ],
+            buttonTitle: "Open Settings App",
+            helperText: "This opens SpeedReader settings — tap ← Back\nto reach Safari extensions.",
+            settingsAction: .openSystemSettings
+        )
+        #endif
+    }()
+}
+
 struct OnboardingView: View {
     var onComplete: () -> Void
+
+    private let content = OnboardingContent.current
+    @State private var settingsErrorMessage: String?
 
     var body: some View {
         VStack(spacing: 32) {
@@ -25,37 +85,27 @@ struct OnboardingView: View {
                 .padding(.horizontal, 32)
 
             VStack(alignment: .leading, spacing: 16) {
-                instructionRow(number: 1, text: "Open Safari Settings")
-                instructionRow(number: 2, text: "Tap Extensions")
-                instructionRow(number: 3, text: "Enable SpeedReader")
-                instructionRow(number: 4, text: "Allow on all websites")
+                ForEach(Array(content.instructions.enumerated()), id: \.offset) { index, text in
+                    instructionRow(number: index + 1, text: text)
+                }
             }
             .padding(24)
             .background(.quaternary)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal, 24)
 
-            #if os(macOS)
-            Button("Open Safari Settings") {
-                SFSafariApplication.showPreferencesForExtension(
-                    withIdentifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
-                ) { error in
-                    if let error {
-                        print("[SpeedReader] Could not open settings: \(error)")
-                    }
-                }
+            Button(content.buttonTitle) {
+                performSettingsAction(content.settingsAction)
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
-            #else
-            Button("Open Settings") {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
+
+            if let helperText = content.helperText {
+                Text(helperText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            #endif
 
             Button("I've enabled it") {
                 onComplete()
@@ -63,6 +113,48 @@ struct OnboardingView: View {
             .foregroundStyle(.secondary)
 
             Spacer()
+        }
+        .alert("Unable to Open Settings", isPresented: Binding(
+            get: { settingsErrorMessage != nil },
+            set: { if !$0 { settingsErrorMessage = nil } }
+        )) {
+            Button("OK") { settingsErrorMessage = nil }
+        } message: {
+            if let msg = settingsErrorMessage {
+                Text(msg)
+            }
+        }
+    }
+
+    private func performSettingsAction(_ action: SettingsAction) {
+        switch action {
+        #if os(macOS)
+        case .openSafariExtensionPreferences:
+            SFSafariApplication.showPreferencesForExtension(
+                withIdentifier: SettingsKeys.extensionBundleIdentifier
+            ) { error in
+                if let error {
+                    DispatchQueue.main.async {
+                        settingsErrorMessage = "Could not open Safari settings: \(error.localizedDescription)"
+                    }
+                }
+            }
+        #else
+        case .openSystemSettings:
+            guard let url = URL(string: UIApplication.openSettingsURLString) else {
+                settingsErrorMessage = "Could not build Settings URL. "
+                    + "Please open Settings manually: Apps → Safari → Extensions."
+                return
+            }
+            UIApplication.shared.open(url) { success in
+                if !success {
+                    DispatchQueue.main.async {
+                        settingsErrorMessage = "Could not open Settings. "
+                            + "Please navigate manually: Settings → Apps → Safari → Extensions."
+                    }
+                }
+            }
+        #endif
         }
     }
 
