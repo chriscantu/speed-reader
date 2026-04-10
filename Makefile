@@ -1,7 +1,10 @@
-.PHONY: test-js test-swift test-all lint-js lint-swift lint-all ci test-regression
+.PHONY: test-js test-bun test-swift test-all lint-js lint-swift lint-all ci test-regression
 
 test-js:
 	node --test tests/js/*.test.js
+
+test-bun:
+	bun test tests/bun/*.test.js
 
 test-swift:
 	xcodebuild test \
@@ -10,7 +13,7 @@ test-swift:
 		-destination 'platform=macOS' \
 		-quiet
 
-test-all: test-js test-swift
+test-all: test-js test-bun test-swift
 
 lint-js:
 	npx eslint .

@@ -44,6 +44,7 @@ ios-speed-reader/
 │
 ├── tests/
 │   ├── js/                             # Unit tests (JS, Node.js test runner)
+│   ├── bun/                            # Unit tests requiring Bun (TypeScript imports)
 │   └── regression/                     # Regression tests (Node.js test runner)
 │
 ├── docs/
@@ -86,7 +87,9 @@ ios-speed-reader/
 | Implementation plans | `docs/plans/` |
 | App assets | `SpeedReader/SpeedReader/Assets.xcassets` |
 | Unit tests (JS) | `tests/js/` |
+| Unit tests (Bun/TS) | `tests/bun/` |
 | Regression tests | `tests/regression/` |
+| Build scripts | `scripts/` |
 | Safari driver (test infra) | `scripts/lib/` |
 
 ## Build & Run

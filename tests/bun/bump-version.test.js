@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { execSync } from "node:child_process";
-import { parseVersion, bumpVersion, extractVersions, replaceVersions } from "../../scripts/bump-version.ts";
+import { parseVersion, bumpVersion, extractVersions, replaceVersions, validateReplacementCounts } from "../../scripts/bump-version.ts";
 
 describe("parseVersion", () => {
   it("parses three-segment version", () => {
@@ -16,6 +16,14 @@ describe("parseVersion", () => {
 
   it("throws on invalid version", () => {
     assert.throws(() => parseVersion("abc"), /Invalid version/);
+  });
+
+  it("throws on negative version components", () => {
+    assert.throws(() => parseVersion("-1.0.0"), /Invalid version/);
+  });
+
+  it("throws on non-integer version components", () => {
+    assert.throws(() => parseVersion("1.2.5.3"), /Invalid version/);
   });
 });
 
@@ -73,6 +81,20 @@ describe("replaceVersions", () => {
   it("does not modify unrelated content", () => {
     const result = replaceVersions(SAMPLE_PBXPROJ, "1.0.1", 2);
     assert.ok(result.content.includes("name = Debug;"));
+  });
+});
+
+describe("validateReplacementCounts", () => {
+  it("passes with expected counts", () => {
+    assert.doesNotThrow(() => validateReplacementCounts(4, 8));
+  });
+
+  it("throws on wrong marketing count", () => {
+    assert.throws(() => validateReplacementCounts(3, 8), /Expected 4 MARKETING_VERSION/);
+  });
+
+  it("throws on wrong build count", () => {
+    assert.throws(() => validateReplacementCounts(4, 7), /Expected 8 CURRENT_PROJECT_VERSION/);
   });
 });
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
 import { argv, exit } from "process";
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { execFileSync, execSync } from "node:child_process";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -42,7 +42,7 @@ interface SemVer {
 
 export function parseVersion(versionStr: string): SemVer {
   const parts = versionStr.split(".").map(Number);
-  if (parts.length < 2 || parts.length > 3 || parts.some(isNaN)) {
+  if (parts.length < 2 || parts.length > 3 || parts.some((n) => isNaN(n) || n < 0 || !Number.isInteger(n))) {
     throw new Error(`Invalid version: "${versionStr}"`);
   }
   return {
@@ -108,6 +108,19 @@ export function replaceVersions(content: string, newMarketing: string, newBuild:
   return { content: updated, marketingCount, buildCount };
 }
 
+export function validateReplacementCounts(marketingCount: number, buildCount: number): void {
+  if (marketingCount !== EXPECTED_MARKETING_COUNT) {
+    throw new Error(
+      `Expected ${EXPECTED_MARKETING_COUNT} MARKETING_VERSION replacements, got ${marketingCount}. Aborting.`
+    );
+  }
+  if (buildCount !== EXPECTED_BUILD_COUNT) {
+    throw new Error(
+      `Expected ${EXPECTED_BUILD_COUNT} CURRENT_PROJECT_VERSION replacements, got ${buildCount}. Aborting.`
+    );
+  }
+}
+
 function validateWithPlutil(content: string): void {
   const tempDir = mkdtempSync(join(tmpdir(), "bump-version-"));
   const tempFile = join(tempDir, "project.pbxproj");
@@ -115,9 +128,12 @@ function validateWithPlutil(content: string): void {
 
   try {
     execSync(`plutil -lint "${tempFile}"`, { stdio: "pipe" });
-  } catch {
+  } catch (err: unknown) {
+    const stderr = err instanceof Error && "stderr" in err ? String((err as any).stderr) : String(err);
     throw new Error(
-      "plutil validation failed — the modified project.pbxproj is not valid. Original file was NOT modified."
+      `plutil validation failed — the modified project.pbxproj is not valid.\n` +
+        `plutil output: ${stderr}\n` +
+        `Original file was NOT modified.`
     );
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
@@ -125,6 +141,10 @@ function validateWithPlutil(content: string): void {
 }
 
 function bumpPbxproj(bumpType: BumpType, dryRun: boolean): { newVersion: string; newBuild: number } {
+  if (!existsSync(PBXPROJ_PATH)) {
+    throw new Error(`Could not find ${PBXPROJ_PATH} — are you running this from the project root?`);
+  }
+
   const content = readFileSync(PBXPROJ_PATH, "utf-8");
 
   const { marketingVersion, buildNumber } = extractVersions(content);
@@ -137,16 +157,7 @@ function bumpPbxproj(bumpType: BumpType, dryRun: boolean): { newVersion: string;
 
   const { content: updated, marketingCount, buildCount } = replaceVersions(content, newVersion, newBuild);
 
-  if (marketingCount !== EXPECTED_MARKETING_COUNT) {
-    throw new Error(
-      `Expected ${EXPECTED_MARKETING_COUNT} MARKETING_VERSION replacements, got ${marketingCount}. Aborting.`
-    );
-  }
-  if (buildCount !== EXPECTED_BUILD_COUNT) {
-    throw new Error(
-      `Expected ${EXPECTED_BUILD_COUNT} CURRENT_PROJECT_VERSION replacements, got ${buildCount}. Aborting.`
-    );
-  }
+  validateReplacementCounts(marketingCount, buildCount);
 
   console.log(`Replaced ${marketingCount} MARKETING_VERSION and ${buildCount} CURRENT_PROJECT_VERSION entries.`);
 
@@ -167,9 +178,13 @@ function generateChangelog(): string {
   try {
     const lastTag = execSync("git describe --tags --abbrev=0", { stdio: "pipe", encoding: "utf-8" }).trim();
     range = `${lastTag}..HEAD`;
-  } catch {
-    // No tags exist yet
-    range = "";
+  } catch (err: unknown) {
+    const stderr = err instanceof Error && "stderr" in err ? String((err as any).stderr) : "";
+    if (stderr.includes("No names found") || stderr.includes("No tags can describe") || stderr.includes("fatal")) {
+      range = "";
+    } else {
+      throw new Error(`Failed to query git tags: ${stderr}`);
+    }
   }
 
   const logCmd = range ? `git log --oneline ${range}` : "git log --oneline -50";
@@ -192,13 +207,14 @@ function writeChangelog(version: string, entries: string): void {
   let existing = "";
   try {
     existing = readFileSync("CHANGELOG.md", "utf-8");
-  } catch {
-    // File doesn't exist yet — that's fine
+  } catch (err: unknown) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw new Error(`Failed to read existing CHANGELOG.md: ${(err as Error).message}`);
+    }
   }
 
   const header = "# Changelog\n\n";
   if (existing.startsWith("# Changelog")) {
-    // Insert new section after the header
     const content = existing.replace(header, `${header}${section}\n`);
     writeFileSync("CHANGELOG.md", content);
   } else {
@@ -207,28 +223,49 @@ function writeChangelog(version: string, entries: string): void {
 }
 
 function gitCommitAndTag(version: string, buildNumber: number): void {
-  execSync(`git add "${PBXPROJ_PATH}" CHANGELOG.md`, { stdio: "inherit" });
-  execSync(`git commit -m "Bump version to ${version} (build ${buildNumber})"`, { stdio: "inherit" });
-  execSync(`git tag -a "v${version}" -m "v${version}"`, { stdio: "inherit" });
+  execFileSync("git", ["add", PBXPROJ_PATH, "CHANGELOG.md"], { stdio: "inherit" });
+
+  try {
+    execFileSync("git", ["commit", "-m", `Bump version to ${version} (build ${buildNumber})`], { stdio: "inherit" });
+  } catch {
+    throw new Error(
+      `git commit failed. The pbxproj and CHANGELOG.md have been modified on disk but not committed.`
+    );
+  }
+
+  try {
+    execFileSync("git", ["tag", "-a", `v${version}`, "-m", `v${version}`], { stdio: "inherit" });
+  } catch {
+    throw new Error(
+      `git tag v${version} failed (does the tag already exist?). ` +
+        `The commit was already created. To retry: git tag -a "v${version}" -m "v${version}"`
+    );
+  }
+
   console.log(`\nCreated tag v${version}`);
   console.log("Run 'git push && git push --tags' to publish.");
 }
 
 // --- Main ---
 if (import.meta.main) {
-  const { bumpType, dryRun } = parseArgs(argv.slice(2));
+  try {
+    const { bumpType, dryRun } = parseArgs(argv.slice(2));
 
-  if (dryRun) {
-    console.log("[dry-run] No files will be modified.\n");
-  }
+    if (dryRun) {
+      console.log("[dry-run] No files will be modified.\n");
+    }
 
-  const { newVersion, newBuild } = bumpPbxproj(bumpType, dryRun);
+    const { newVersion, newBuild } = bumpPbxproj(bumpType, dryRun);
 
-  const changelogEntries = generateChangelog();
-  console.log(`\nChangelog:\n${changelogEntries}\n`);
+    const changelogEntries = generateChangelog();
+    console.log(`\nChangelog:\n${changelogEntries}\n`);
 
-  if (!dryRun) {
-    writeChangelog(newVersion, changelogEntries);
-    gitCommitAndTag(newVersion, newBuild);
+    if (!dryRun) {
+      writeChangelog(newVersion, changelogEntries);
+      gitCommitAndTag(newVersion, newBuild);
+    }
+  } catch (err: unknown) {
+    console.error(`\nError: ${err instanceof Error ? err.message : String(err)}`);
+    exit(1);
   }
 }
