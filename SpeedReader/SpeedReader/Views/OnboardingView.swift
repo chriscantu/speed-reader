@@ -3,13 +3,13 @@ import SwiftUI
 import SafariServices
 #endif
 
-/// Describes what the "Open Settings" button should do when tapped.
+/// Describes the action performed by the settings button.
 enum SettingsAction: Equatable {
     #if os(macOS)
-    /// Open Safari extension preferences for the given identifier.
-    case openSafariExtensionPreferences(identifier: String)
+    /// Open Safari extension preferences.
+    case openSafariExtensionPreferences
     #else
-    /// Open the system Settings app via `UIApplication.openSettingsURLString`.
+    /// Navigate to the system Settings app.
     case openSystemSettings
     #endif
 }
@@ -21,20 +21,27 @@ struct OnboardingContent {
     let helperText: String?
     let settingsAction: SettingsAction
 
+    init(instructions: [String], buttonTitle: String, helperText: String?, settingsAction: SettingsAction) {
+        precondition(!instructions.isEmpty, "Onboarding must have at least one instruction")
+        precondition(!buttonTitle.isEmpty, "Button title must not be empty")
+        self.instructions = instructions
+        self.buttonTitle = buttonTitle
+        self.helperText = helperText
+        self.settingsAction = settingsAction
+    }
+
     static let current: OnboardingContent = {
         #if os(macOS)
         return OnboardingContent(
             instructions: [
-                "Open Safari Settings",
-                "Tap Extensions",
+                "Click Safari → Settings",
+                "Click Extensions",
                 "Enable SpeedReader",
-                "Allow on all websites",
+                "Allow on all websites"
             ],
             buttonTitle: "Open Safari Settings",
             helperText: nil,
-            settingsAction: .openSafariExtensionPreferences(
-                identifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
-            )
+            settingsAction: .openSafariExtensionPreferences
         )
         #else
         return OnboardingContent(
@@ -43,7 +50,7 @@ struct OnboardingContent {
                 "Tap ← Back to return to Settings",
                 "Tap Apps → Safari → Extensions",
                 "Turn on SpeedReader",
-                "Set to \"Allow\" on all websites",
+                "Set to \"Allow\" on all websites"
             ],
             buttonTitle: "Open Settings App",
             helperText: "This opens SpeedReader settings — tap ← Back\nto reach Safari extensions.",
@@ -57,6 +64,7 @@ struct OnboardingView: View {
     var onComplete: () -> Void
 
     private let content = OnboardingContent.current
+    @State private var settingsErrorMessage: String?
 
     var body: some View {
         VStack(spacing: 32) {
@@ -106,23 +114,45 @@ struct OnboardingView: View {
 
             Spacer()
         }
+        .alert("Unable to Open Settings", isPresented: Binding(
+            get: { settingsErrorMessage != nil },
+            set: { if !$0 { settingsErrorMessage = nil } }
+        )) {
+            Button("OK") { settingsErrorMessage = nil }
+        } message: {
+            if let msg = settingsErrorMessage {
+                Text(msg)
+            }
+        }
     }
 
     private func performSettingsAction(_ action: SettingsAction) {
         switch action {
         #if os(macOS)
-        case .openSafariExtensionPreferences(let identifier):
+        case .openSafariExtensionPreferences:
             SFSafariApplication.showPreferencesForExtension(
-                withIdentifier: identifier
+                withIdentifier: SettingsKeys.extensionBundleIdentifier
             ) { error in
                 if let error {
-                    print("[SpeedReader] Could not open settings: \(error)")
+                    DispatchQueue.main.async {
+                        settingsErrorMessage = "Could not open Safari settings: \(error.localizedDescription)"
+                    }
                 }
             }
         #else
         case .openSystemSettings:
-            if let url = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(url)
+            guard let url = URL(string: UIApplication.openSettingsURLString) else {
+                settingsErrorMessage = "Could not build Settings URL. "
+                    + "Please open Settings manually: Apps → Safari → Extensions."
+                return
+            }
+            UIApplication.shared.open(url) { success in
+                if !success {
+                    DispatchQueue.main.async {
+                        settingsErrorMessage = "Could not open Settings. "
+                            + "Please navigate manually: Settings → Apps → Safari → Extensions."
+                    }
+                }
             }
         #endif
         }

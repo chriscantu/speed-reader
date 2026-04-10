@@ -5,7 +5,7 @@ final class OnboardingUITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        // Reset onboarding state so the sheet appears
+        // Must match @AppStorage key in ContentView
         app.launchArguments += ["-hasCompletedOnboarding", "NO"]
         app.launch()
     }
@@ -13,7 +13,6 @@ final class OnboardingUITests: XCTestCase {
     // MARK: - Onboarding content
 
     func testOnboardingSheetAppears() {
-        // The sheet should show "SpeedReader" title
         let title = app.staticTexts["SpeedReader"]
         XCTAssertTrue(title.waitForExistence(timeout: 5), "Onboarding sheet should appear")
     }
@@ -25,12 +24,13 @@ final class OnboardingUITests: XCTestCase {
         XCTAssertTrue(button.waitForExistence(timeout: 5))
     }
 
-    func testMacOSInstructionsMentionSafari() {
-        XCTAssertTrue(app.staticTexts["Open Safari Settings"].exists)
-    }
-
-    func testMacOSInstructionsMentionExtensions() {
-        XCTAssertTrue(app.staticTexts["Tap Extensions"].exists)
+    func testMacOSShowsInstructionRows() {
+        // Instruction rows are numbered — verify at least the first number appears
+        let firstStep = app.staticTexts["1"]
+        XCTAssertTrue(
+            firstStep.waitForExistence(timeout: 5),
+            "macOS should show numbered instruction rows"
+        )
     }
 
     #else
@@ -62,8 +62,7 @@ final class OnboardingUITests: XCTestCase {
         XCTAssertTrue(button.waitForExistence(timeout: 5))
         button.tap()
 
-        // After tapping, the Settings app should launch (SpeedReader goes to background).
-        // We can verify by checking that a Settings app element appears.
+        // Verify Settings app launched after tap
         let settingsApp = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
         let settingsNavBar = settingsApp.navigationBars.firstMatch
         XCTAssertTrue(
@@ -74,8 +73,40 @@ final class OnboardingUITests: XCTestCase {
 
     #endif
 
-    func testIveEnabledItButtonExists() {
+    // MARK: - Onboarding flow
+
+    func testIveEnabledItButtonDismissesOnboarding() {
         let button = app.buttons["I've enabled it"]
         XCTAssertTrue(button.waitForExistence(timeout: 5))
+        button.tap()
+
+        // After tapping, the onboarding sheet should dismiss — settings view becomes visible
+        let settingsTitle = app.staticTexts["Reading Speed"]
+        XCTAssertTrue(
+            settingsTitle.waitForExistence(timeout: 5),
+            "Settings view should appear after dismissing onboarding"
+        )
+    }
+
+    func testOnboardingDoesNotAppearWhenAlreadyCompleted() {
+        // Terminate and relaunch with onboarding already completed
+        app.terminate()
+
+        let completedApp = XCUIApplication()
+        completedApp.launchArguments += ["-hasCompletedOnboarding", "YES"]
+        completedApp.launch()
+
+        // Settings view should be visible immediately, no onboarding sheet
+        let settingsTitle = completedApp.staticTexts["Reading Speed"]
+        XCTAssertTrue(
+            settingsTitle.waitForExistence(timeout: 5),
+            "Settings view should appear directly when onboarding is already completed"
+        )
+
+        // Onboarding-specific elements should NOT be present
+        let openSettingsButton = completedApp.buttons["Open Settings App"]
+        let openSafariButton = completedApp.buttons["Open Safari Settings"]
+        XCTAssertFalse(openSettingsButton.exists, "Open Settings button should not appear")
+        XCTAssertFalse(openSafariButton.exists, "Open Safari Settings button should not appear")
     }
 }

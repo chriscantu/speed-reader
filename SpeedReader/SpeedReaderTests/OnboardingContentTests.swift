@@ -33,23 +33,17 @@ final class OnboardingContentTests: XCTestCase {
         )
     }
 
-    // MARK: - macOS button action
-
-    func testMacOSSettingsActionOpensSafariExtensionPreferences() {
-        XCTAssertEqual(
-            content.settingsAction,
-            .openSafariExtensionPreferences(
-                identifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
-            )
+    func testMacOSUsesClickNotTap() {
+        XCTAssertFalse(
+            content.instructions.contains { $0.contains("Tap") },
+            "macOS instructions should use 'Click', not 'Tap'"
         )
     }
 
-    func testMacOSSettingsActionUsesCorrectExtensionIdentifier() {
-        guard case .openSafariExtensionPreferences(let identifier) = content.settingsAction else {
-            XCTFail("Expected openSafariExtensionPreferences action on macOS")
-            return
-        }
-        XCTAssertEqual(identifier, "com.chriscantu.SpeedReader.SpeedReaderExtension")
+    // MARK: - macOS button action
+
+    func testMacOSSettingsActionOpensSafariExtensionPreferences() {
+        XCTAssertEqual(content.settingsAction, .openSafariExtensionPreferences)
     }
 
     #else

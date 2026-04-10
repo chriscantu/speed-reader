@@ -59,6 +59,9 @@ enum SettingsKeys {
     /// App Group identifier — must match the entitlements file.
     static let appGroupID = "group.com.speedreader.shared"
 
+    /// Safari Web Extension bundle identifier.
+    static let extensionBundleIdentifier = "com.chriscantu.SpeedReader.SpeedReaderExtension"
+
     static let wpm = "sr_wpm"
     static let font = "sr_font"
     static let theme = "sr_theme"
