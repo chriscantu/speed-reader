@@ -1,3 +1,11 @@
+// Error reporting — capture uncaught errors and unhandled rejections
+// in the service worker context.
+import(browser.runtime.getURL('error-reporter.js')).then((mod) => {
+  mod.installServiceWorkerHandlers();
+}).catch((e) => {
+  console.error('[SpeedReader] Failed to load error reporter:', e);
+});
+
 // Send toggle message to active tab when toolbar icon is clicked
 browser.action.onClicked.addListener(async (tab) => {
   try {
