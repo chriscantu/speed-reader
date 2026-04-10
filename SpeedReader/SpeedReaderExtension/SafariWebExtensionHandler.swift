@@ -1,7 +1,13 @@
 import os.log
+import OSLog
 import SafariServices
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
+
+    private static let jsErrorLog = Logger(
+        subsystem: "com.chriscantu.SpeedReader",
+        category: "JSError"
+    )
 
     func beginRequest(with context: NSExtensionContext) {
         guard let item = context.inputItems.first as? NSExtensionItem else {
@@ -37,6 +43,22 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
         case "ping":
             response.userInfo = [SFExtensionMessageKey: ["status": "ok", "version": "1.0.0"]]
+
+        case "jsError":
+            if let errorData = messageDict["error"] as? [String: Any] {
+                let message = errorData["message"] as? String ?? "Unknown error"
+                let source = errorData["source"] as? String ?? "unknown"
+                let stack = errorData["stack"] as? String ?? ""
+                let host = errorData["url"] as? String ?? ""
+
+                let stackLine = stack.isEmpty ? "" : "\nStack: \(stack.components(separatedBy: "\n").prefix(3).joined(separator: " → "))"
+                let hostLine = host.isEmpty ? "" : "\nHost: \(host)"
+
+                Self.jsErrorLog.error("[SpeedReader:JSError] \(source, privacy: .public) — \(message, privacy: .public)\(stackLine, privacy: .public)\(hostLine, privacy: .public)")
+            } else {
+                Self.jsErrorLog.error("[SpeedReader:JSError] Received jsError with missing/invalid error payload")
+            }
+            response.userInfo = [SFExtensionMessageKey: ["status": "ok"]]
 
         default:
             os_log(.default, "[SpeedReader] Unknown action: %{public}@", action)
