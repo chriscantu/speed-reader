@@ -43,8 +43,8 @@ ios-speed-reader/
 │   └── SpeedReader.xcodeproj           # Xcode project file
 │
 ├── tests/
-│   ├── js/                             # Unit tests (JS, Node.js test runner)
-│   └── regression/                     # Regression tests (Node.js test runner)
+│   ├── js/                             # Unit tests (JS/TS, Bun test runner)
+│   └── regression/                     # Regression tests (Bun test runner)
 │
 ├── docs/
 │   ├── superpowers/
@@ -85,8 +85,9 @@ ios-speed-reader/
 | Design specs | `docs/superpowers/specs/` |
 | Implementation plans | `docs/plans/` |
 | App assets | `SpeedReader/SpeedReader/Assets.xcassets` |
-| Unit tests (JS) | `tests/js/` |
+| Unit tests (JS/TS) | `tests/js/` |
 | Regression tests | `tests/regression/` |
+| Build scripts | `scripts/` |
 | Safari driver (test infra) | `scripts/lib/` |
 
 ## Build & Run
@@ -108,7 +109,7 @@ make ci           # Run everything (lint + test)
 ```
 
 - **Swift tests**: `make test-swift` (or Xcode ⌘U)
-- **JS tests**: `make test-js` (Node.js test runner)
+- **JS tests**: `make test-js` (Bun test runner)
 - **SwiftLint**: `make lint-swift` (enforces style + safety rules)
 - **ESLint**: `make lint-js` (enforces JS quality rules)
 - Test on all three platforms: iPhone simulator, iPad simulator, Mac (native)
