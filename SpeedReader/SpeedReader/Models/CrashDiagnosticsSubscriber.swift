@@ -35,9 +35,10 @@ final class CrashDiagnosticsSubscriber: NSObject, MXMetricManagerSubscriber {
         for payload in payloads {
             if let crashDiagnostics = payload.crashDiagnostics {
                 for crash in crashDiagnostics {
-                    Self.log.error(
-                        "[SpeedReader:CrashDiagnostics] Crash: \(crash.applicationVersion, privacy: .public) signal \(crash.signal?.description ?? "unknown", privacy: .public)"
-                    )
+                    let version = crash.applicationVersion
+                    let sig = crash.signal?.description ?? "unknown"
+                    let info = "Crash: \(version) signal \(sig)"
+                    Self.log.error("[SpeedReader:CrashDiagnostics] \(info, privacy: .public)")
                 }
             }
 

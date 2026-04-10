@@ -51,10 +51,14 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 let stack = errorData["stack"] as? String ?? ""
                 let host = errorData["url"] as? String ?? ""
 
-                let stackLine = stack.isEmpty ? "" : "\nStack: \(stack.components(separatedBy: "\n").prefix(3).joined(separator: " → "))"
+                let frames = stack.components(separatedBy: "\n")
+                    .prefix(3).joined(separator: " → ")
+                let stackLine = stack.isEmpty ? "" : "\nStack: \(frames)"
                 let hostLine = host.isEmpty ? "" : "\nHost: \(host)"
+                let detail = "\(stackLine)\(hostLine)"
 
-                Self.jsErrorLog.error("[SpeedReader:JSError] \(source, privacy: .public) — \(message, privacy: .public)\(stackLine, privacy: .public)\(hostLine, privacy: .public)")
+                let logLine = "\(source) — \(message)\(detail)"
+                Self.jsErrorLog.error("[SpeedReader:JSError] \(logLine, privacy: .public)")
             } else {
                 Self.jsErrorLog.error("[SpeedReader:JSError] Received jsError with missing/invalid error payload")
             }
