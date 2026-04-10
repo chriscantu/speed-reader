@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { argv, exit } from "process";
-import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -119,6 +119,8 @@ function validateWithPlutil(content: string): void {
     throw new Error(
       "plutil validation failed — the modified project.pbxproj is not valid. Original file was NOT modified."
     );
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
   }
 }
 
@@ -161,14 +163,17 @@ function bumpPbxproj(bumpType: BumpType, dryRun: boolean): { newVersion: string;
 }
 
 function generateChangelog(): string {
-  let log: string;
+  let range: string;
   try {
     const lastTag = execSync("git describe --tags --abbrev=0", { stdio: "pipe", encoding: "utf-8" }).trim();
-    log = execSync(`git log --oneline ${lastTag}..HEAD`, { stdio: "pipe", encoding: "utf-8" }).trim();
+    range = `${lastTag}..HEAD`;
   } catch {
-    // No tags exist yet — use recent history (count-based to avoid shallow-clone issues)
-    log = execSync("git log --oneline -50", { stdio: "pipe", encoding: "utf-8" }).trim();
+    // No tags exist yet
+    range = "";
   }
+
+  const logCmd = range ? `git log --oneline ${range}` : "git log --oneline -50";
+  const log = execSync(logCmd, { stdio: "pipe", encoding: "utf-8" }).trim();
 
   if (!log) {
     return "- No changes since last tag";

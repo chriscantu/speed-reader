@@ -8,6 +8,7 @@
     "test:regression": "node --test --test-concurrency=1 tests/regression/*.test.js",
     "test:word-processor": "node --test tests/js/word-processor.test.js",
     "test:focus-point": "node --test tests/js/focus-point.test.js",
+    "test:bump": "bun test tests/bun/bump-version.test.js",
     "version:bump": "bun run scripts/bump-version.ts"
   },
   "devDependencies": {
