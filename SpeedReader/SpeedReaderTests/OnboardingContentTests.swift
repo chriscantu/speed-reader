@@ -33,6 +33,25 @@ final class OnboardingContentTests: XCTestCase {
         )
     }
 
+    // MARK: - macOS button action
+
+    func testMacOSSettingsActionOpensSafariExtensionPreferences() {
+        XCTAssertEqual(
+            content.settingsAction,
+            .openSafariExtensionPreferences(
+                identifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
+            )
+        )
+    }
+
+    func testMacOSSettingsActionUsesCorrectExtensionIdentifier() {
+        guard case .openSafariExtensionPreferences(let identifier) = content.settingsAction else {
+            XCTFail("Expected openSafariExtensionPreferences action on macOS")
+            return
+        }
+        XCTAssertEqual(identifier, "com.chriscantu.SpeedReader.SpeedReaderExtension")
+    }
+
     #else
 
     func testIOSInstructionCount() {
@@ -73,6 +92,12 @@ final class OnboardingContentTests: XCTestCase {
             content.instructions.contains { $0 == "Open Safari Settings" },
             "iOS instructions should not say 'Open Safari Settings' — that's the macOS flow"
         )
+    }
+
+    // MARK: - iOS button action
+
+    func testIOSSettingsActionOpensSystemSettings() {
+        XCTAssertEqual(content.settingsAction, .openSystemSettings)
     }
 
     #endif

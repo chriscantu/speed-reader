@@ -3,11 +3,23 @@ import SwiftUI
 import SafariServices
 #endif
 
+/// Describes what the "Open Settings" button should do when tapped.
+enum SettingsAction: Equatable {
+    #if os(macOS)
+    /// Open Safari extension preferences for the given identifier.
+    case openSafariExtensionPreferences(identifier: String)
+    #else
+    /// Open the system Settings app via `UIApplication.openSettingsURLString`.
+    case openSystemSettings
+    #endif
+}
+
 /// Platform-specific onboarding content, extracted for testability.
 struct OnboardingContent {
     let instructions: [String]
     let buttonTitle: String
     let helperText: String?
+    let settingsAction: SettingsAction
 
     static let current: OnboardingContent = {
         #if os(macOS)
@@ -19,7 +31,10 @@ struct OnboardingContent {
                 "Allow on all websites",
             ],
             buttonTitle: "Open Safari Settings",
-            helperText: nil
+            helperText: nil,
+            settingsAction: .openSafariExtensionPreferences(
+                identifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
+            )
         )
         #else
         return OnboardingContent(
@@ -31,7 +46,8 @@ struct OnboardingContent {
                 "Set to \"Allow\" on all websites",
             ],
             buttonTitle: "Open Settings App",
-            helperText: "This opens SpeedReader settings — tap ← Back\nto reach Safari extensions."
+            helperText: "This opens SpeedReader settings — tap ← Back\nto reach Safari extensions.",
+            settingsAction: .openSystemSettings
         )
         #endif
     }()
@@ -71,19 +87,7 @@ struct OnboardingView: View {
             .padding(.horizontal, 24)
 
             Button(content.buttonTitle) {
-                #if os(macOS)
-                SFSafariApplication.showPreferencesForExtension(
-                    withIdentifier: "com.chriscantu.SpeedReader.SpeedReaderExtension"
-                ) { error in
-                    if let error {
-                        print("[SpeedReader] Could not open settings: \(error)")
-                    }
-                }
-                #else
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
-                #endif
+                performSettingsAction(content.settingsAction)
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
@@ -101,6 +105,26 @@ struct OnboardingView: View {
             .foregroundStyle(.secondary)
 
             Spacer()
+        }
+    }
+
+    private func performSettingsAction(_ action: SettingsAction) {
+        switch action {
+        #if os(macOS)
+        case .openSafariExtensionPreferences(let identifier):
+            SFSafariApplication.showPreferencesForExtension(
+                withIdentifier: identifier
+            ) { error in
+                if let error {
+                    print("[SpeedReader] Could not open settings: \(error)")
+                }
+            }
+        #else
+        case .openSystemSettings:
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        #endif
         }
     }
 
