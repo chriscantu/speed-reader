@@ -1,5 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { execSync } from "node:child_process";
 import { parseVersion, bumpVersion, extractVersions, replaceVersions } from "../../scripts/bump-version.ts";
 
 describe("parseVersion", () => {
@@ -72,5 +73,30 @@ describe("replaceVersions", () => {
   it("does not modify unrelated content", () => {
     const result = replaceVersions(SAMPLE_PBXPROJ, "1.0.1", 2);
     assert.ok(result.content.includes("name = Debug;"));
+  });
+});
+
+describe("bump-version CLI (integration)", () => {
+  it("dry-run prints version bump without modifying files", () => {
+    const output = execSync("bun run scripts/bump-version.ts patch --dry-run", {
+      encoding: "utf-8",
+      cwd: process.cwd(),
+    });
+    assert.ok(output.includes("Marketing version:"));
+    assert.ok(output.includes("\u2192"));
+    assert.ok(output.includes("[dry-run]"));
+    assert.ok(output.includes("Changelog:"));
+  });
+
+  it("rejects invalid bump type", () => {
+    assert.throws(
+      () => execSync("bun run scripts/bump-version.ts invalid", { encoding: "utf-8", stdio: "pipe" }),
+    );
+  });
+
+  it("rejects missing bump type", () => {
+    assert.throws(
+      () => execSync("bun run scripts/bump-version.ts", { encoding: "utf-8", stdio: "pipe" }),
+    );
   });
 });
