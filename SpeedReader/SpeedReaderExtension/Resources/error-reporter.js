@@ -58,3 +58,20 @@ export function formatErrorPayload(error, source, pageUrl) {
     userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
   };
 }
+
+/**
+ * Persist an error payload to browser.storage.local under 'errorLog'.
+ * FIFO: drops oldest entries when the log exceeds ERROR_LOG_CAP.
+ *
+ * @param {object} payload - Formatted error payload from formatErrorPayload()
+ * @param {object} [storage] - Storage backend (defaults to browser.storage.local). Accepts any object with get()/set() returning promises — used for testing.
+ */
+export async function storeError(payload, storage) {
+  const store = storage || browser.storage.local;
+  const { errorLog } = await store.get({ errorLog: [] });
+  errorLog.push(payload);
+  if (errorLog.length > ERROR_LOG_CAP) {
+    errorLog.splice(0, errorLog.length - ERROR_LOG_CAP);
+  }
+  await store.set({ errorLog });
+}

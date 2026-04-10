@@ -4,6 +4,7 @@ import {
   formatErrorPayload,
   extractHostname,
   ERROR_LOG_CAP,
+  storeError,
 } from '../../SpeedReader/SpeedReaderExtension/Resources/error-reporter.js';
 
 describe('extractHostname', () => {
@@ -76,5 +77,67 @@ describe('formatErrorPayload', () => {
 describe('ERROR_LOG_CAP', () => {
   it('is 50', () => {
     assert.strictEqual(ERROR_LOG_CAP, 50);
+  });
+});
+
+// Minimal mock of browser.storage.local for testing storeError().
+// storeError() accepts an optional storage parameter for testability.
+function createMockStorage(initialData = {}) {
+  const data = { ...initialData };
+  return {
+    get(keys) {
+      const result = {};
+      for (const key of Object.keys(keys)) {
+        result[key] = data[key] !== undefined ? data[key] : keys[key];
+      }
+      return Promise.resolve(result);
+    },
+    set(items) {
+      Object.assign(data, items);
+      return Promise.resolve();
+    },
+    _getData() { return data; },
+  };
+}
+
+describe('storeError — FIFO storage', () => {
+  it('stores an error payload in errorLog array', async () => {
+    const storage = createMockStorage({});
+    const payload = { message: 'test', timestamp: '2026-01-01T00:00:00Z', source: 'content', stack: '', url: '', userAgent: '' };
+    await storeError(payload, storage);
+    const data = storage._getData();
+    assert.strictEqual(data.errorLog.length, 1);
+    assert.strictEqual(data.errorLog[0].message, 'test');
+  });
+
+  it('appends to existing errorLog', async () => {
+    const existing = [{ message: 'first' }];
+    const storage = createMockStorage({ errorLog: existing });
+    await storeError({ message: 'second' }, storage);
+    const data = storage._getData();
+    assert.strictEqual(data.errorLog.length, 2);
+    assert.strictEqual(data.errorLog[1].message, 'second');
+  });
+
+  it('caps at 50 entries, dropping oldest', async () => {
+    const existing = Array.from({ length: 50 }, (_, i) => ({ message: `error-${i}` }));
+    const storage = createMockStorage({ errorLog: existing });
+    await storeError({ message: 'new-error' }, storage);
+    const data = storage._getData();
+    assert.strictEqual(data.errorLog.length, 50);
+    assert.strictEqual(data.errorLog[0].message, 'error-1');
+    assert.strictEqual(data.errorLog[49].message, 'new-error');
+  });
+
+  it('caps correctly when writing 5 over the limit', async () => {
+    const existing = Array.from({ length: 50 }, (_, i) => ({ message: `error-${i}` }));
+    const storage = createMockStorage({ errorLog: existing });
+    for (let i = 0; i < 5; i++) {
+      await storeError({ message: `overflow-${i}` }, storage);
+    }
+    const data = storage._getData();
+    assert.strictEqual(data.errorLog.length, 50);
+    assert.strictEqual(data.errorLog[45].message, 'overflow-0');
+    assert.strictEqual(data.errorLog[49].message, 'overflow-4');
   });
 });
