@@ -222,7 +222,7 @@ function writeChangelog(version: string, entries: string): void {
   }
 }
 
-function gitCommitAndTag(version: string, buildNumber: number): void {
+function gitCommitAndTag(version: string, buildNumber: number, changelogEntries: string): void {
   execFileSync("git", ["add", PBXPROJ_PATH, "CHANGELOG.md"], { stdio: "inherit" });
 
   try {
@@ -233,8 +233,9 @@ function gitCommitAndTag(version: string, buildNumber: number): void {
     );
   }
 
+  const tagMessage = `v${version}\n\n${changelogEntries}`;
   try {
-    execFileSync("git", ["tag", "-a", `v${version}`, "-m", `v${version}`], { stdio: "inherit" });
+    execFileSync("git", ["tag", "-a", `v${version}`, "-m", tagMessage], { stdio: "inherit" });
   } catch {
     throw new Error(
       `git tag v${version} failed (does the tag already exist?). ` +
@@ -262,7 +263,7 @@ if (import.meta.main) {
 
     if (!dryRun) {
       writeChangelog(newVersion, changelogEntries);
-      gitCommitAndTag(newVersion, newBuild);
+      gitCommitAndTag(newVersion, newBuild, changelogEntries);
     }
   } catch (err: unknown) {
     console.error(`\nError: ${err instanceof Error ? err.message : String(err)}`);
