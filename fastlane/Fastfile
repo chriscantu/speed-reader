@@ -16,7 +16,8 @@ platform :ios do
 
     build_app(
       xcargs: auth_xcargs,
-      destination: "generic/platform=iOS"
+      destination: "generic/platform=iOS",
+      output_directory: "./build/ios"
     )
     upload_to_testflight(
       skip_waiting_for_build_processing: true
@@ -24,10 +25,14 @@ platform :ios do
 
     build_app(
       xcargs: auth_xcargs,
-      destination: "generic/platform=macOS"
+      destination: "generic/platform=macOS",
+      output_directory: "./build/macos",
+      export_method: "app-store",
+      skip_package_pkg: false
     )
     upload_to_testflight(
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: true,
+      pkg: lane_context[SharedValues::PKG_OUTPUT_PATH]
     )
   end
 
@@ -37,7 +42,8 @@ platform :ios do
 
     build_app(
       xcargs: auth_xcargs,
-      destination: "generic/platform=iOS"
+      destination: "generic/platform=iOS",
+      output_directory: "./build/ios"
     )
     upload_to_app_store(
       submit_for_review: false,
@@ -49,14 +55,18 @@ platform :ios do
 
     build_app(
       xcargs: auth_xcargs,
-      destination: "generic/platform=macOS"
+      destination: "generic/platform=macOS",
+      output_directory: "./build/macos",
+      export_method: "app-store",
+      skip_package_pkg: false
     )
     upload_to_app_store(
       submit_for_review: false,
       automatic_release: false,
       skip_screenshots: true,
       skip_metadata: true,
-      precheck_include_in_app_purchases: false
+      precheck_include_in_app_purchases: false,
+      pkg: lane_context[SharedValues::PKG_OUTPUT_PATH]
     )
   end
 end
