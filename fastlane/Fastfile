@@ -3,6 +3,10 @@ default_platform(:ios)
 APP_BUNDLE_ID = "com.chriscantu.SpeedReader"
 EXTENSION_BUNDLE_ID = "com.chriscantu.SpeedReader.SpeedReaderExtension"
 XCODE_PROJECT = "SpeedReader/SpeedReader.xcodeproj"
+TARGET_NAMES = {
+  APP_BUNDLE_ID => "SpeedReader",
+  EXTENSION_BUNDLE_ID => "SpeedReaderExtension"
+}.freeze
 
 platform :ios do
   before_all do
@@ -30,49 +34,28 @@ platform :ios do
     profiles
   end
 
-  # Set platform-conditional signing in the Xcode project (CI checkout only).
-  # The project supports both iOS and macOS (SUPPORTED_PLATFORMS), so each
-  # target needs per-SDK profile specifiers to avoid cross-platform validation
-  # errors during archive.
-  private_lane :configure_signing do |options|
-    ios_profiles = options[:ios_profiles]
-    macos_profiles = options[:macos_profiles]
-
-    require "xcodeproj"
-    project = Xcodeproj::Project.open("../#{XCODE_PROJECT}")
-
-    target_bundle_ids = {
-      "SpeedReader" => APP_BUNDLE_ID,
-      "SpeedReaderExtension" => EXTENSION_BUNDLE_ID
-    }
-
-    project.targets.each do |target|
-      bundle_id = target_bundle_ids[target.name]
-      next unless bundle_id
-
-      target.build_configurations.each do |config|
-        s = config.build_settings
-        s["CODE_SIGN_STYLE"] = "Manual"
-        s["CODE_SIGN_IDENTITY"] = "Apple Distribution"
-        s["CODE_SIGN_IDENTITY[sdk=macosx*]"] = "Apple Distribution"
-        # Base value applies to iphoneos/iphonesimulator
-        s["PROVISIONING_PROFILE_SPECIFIER"] = ios_profiles[bundle_id]
-        # macOS override
-        s["PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]"] = macos_profiles[bundle_id]
-      end
+  # Switch Xcode project to manual signing with the given profiles.
+  # Called once per platform build on the disposable CI checkout.
+  private_lane :apply_signing do |options|
+    profiles = options[:profiles]
+    profiles.each do |bundle_id, profile_name|
+      update_code_signing_settings(
+        path: XCODE_PROJECT,
+        use_automatic_signing: false,
+        code_sign_identity: "Apple Distribution",
+        profile_name: profile_name,
+        targets: [TARGET_NAMES[bundle_id]]
+      )
     end
-
-    project.save
   end
 
   desc "Build and upload to TestFlight (iOS + macOS)"
   lane :beta do
     setup_ci
 
+    # --- iOS ---
     ios_profiles = fetch_profiles(platform: "ios")
-    macos_profiles = fetch_profiles(platform: "macos")
-    configure_signing(ios_profiles: ios_profiles, macos_profiles: macos_profiles)
-
+    apply_signing(profiles: ios_profiles)
     build_app(
       destination: "generic/platform=iOS",
       output_directory: "./build/ios",
@@ -83,7 +66,11 @@ platform :ios do
     )
     upload_to_testflight(skip_waiting_for_build_processing: true)
 
+    # --- macOS ---
+    macos_profiles = fetch_profiles(platform: "macos")
+    apply_signing(profiles: macos_profiles)
     build_mac_app(
+      destination: "generic/platform=macOS",
       scheme: "SpeedReader",
       project: XCODE_PROJECT,
       output_directory: "./build/macos",
@@ -104,10 +91,9 @@ platform :ios do
   lane :release do
     setup_ci
 
+    # --- iOS ---
     ios_profiles = fetch_profiles(platform: "ios")
-    macos_profiles = fetch_profiles(platform: "macos")
-    configure_signing(ios_profiles: ios_profiles, macos_profiles: macos_profiles)
-
+    apply_signing(profiles: ios_profiles)
     build_app(
       destination: "generic/platform=iOS",
       output_directory: "./build/ios",
@@ -124,7 +110,11 @@ platform :ios do
       precheck_include_in_app_purchases: false
     )
 
+    # --- macOS ---
+    macos_profiles = fetch_profiles(platform: "macos")
+    apply_signing(profiles: macos_profiles)
     build_mac_app(
+      destination: "generic/platform=macOS",
       scheme: "SpeedReader",
       project: XCODE_PROJECT,
       output_directory: "./build/macos",
