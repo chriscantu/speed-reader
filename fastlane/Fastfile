@@ -13,15 +13,16 @@ platform :ios do
     )
   end
 
-  # Download existing provisioning profiles without creating new certs or profiles.
-  # Uses the API key from lane_context (set in before_all).
+  # Fetch (or create) provisioning profiles via sigh.
+  # sigh manages profiles only — it never creates certificates.
+  # Certificate creation was the root cause of #55 and is prevented
+  # by removing -allowProvisioningUpdates from xcodebuild args.
   private_lane :fetch_profiles do |options|
     profiles = {}
     [APP_BUNDLE_ID, EXTENSION_BUNDLE_ID].each do |bundle_id|
       get_provisioning_profile(
         app_identifier: bundle_id,
-        platform: options[:platform],
-        readonly: true
+        platform: options[:platform]
       )
       profiles[bundle_id] = lane_context[SharedValues::SIGH_NAME]
     end
