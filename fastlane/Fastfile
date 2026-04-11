@@ -27,7 +27,8 @@ platform :ios do
       submit_for_review: false,
       automatic_release: false,
       skip_screenshots: true,
-      skip_metadata: true
+      skip_metadata: true,
+      precheck_include_in_app_purchases: false
     )
   end
 end
