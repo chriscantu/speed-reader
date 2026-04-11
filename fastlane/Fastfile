@@ -39,7 +39,7 @@ platform :ios do
     macos_profiles = options[:macos_profiles]
 
     require "xcodeproj"
-    project = Xcodeproj::Project.open(XCODE_PROJECT)
+    project = Xcodeproj::Project.open("../#{XCODE_PROJECT}")
 
     target_bundle_ids = {
       "SpeedReader" => APP_BUNDLE_ID,
