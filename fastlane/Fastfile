@@ -10,19 +10,47 @@ platform :ios do
     )
   end
 
-  desc "Build and upload to TestFlight"
+  desc "Build and upload to TestFlight (iOS + macOS)"
   lane :beta do
     setup_ci
-    build_app(xcargs: auth_xcargs)
+
+    build_app(
+      xcargs: auth_xcargs,
+      destination: "generic/platform=iOS"
+    )
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+
+    build_app(
+      xcargs: auth_xcargs,
+      destination: "generic/platform=macOS"
+    )
     upload_to_testflight(
       skip_waiting_for_build_processing: true
     )
   end
 
-  desc "Build and upload to App Store"
+  desc "Build and upload to App Store (iOS + macOS)"
   lane :release do
     setup_ci
-    build_app(xcargs: auth_xcargs)
+
+    build_app(
+      xcargs: auth_xcargs,
+      destination: "generic/platform=iOS"
+    )
+    upload_to_app_store(
+      submit_for_review: false,
+      automatic_release: false,
+      skip_screenshots: true,
+      skip_metadata: true,
+      precheck_include_in_app_purchases: false
+    )
+
+    build_app(
+      xcargs: auth_xcargs,
+      destination: "generic/platform=macOS"
+    )
     upload_to_app_store(
       submit_for_review: false,
       automatic_release: false,
