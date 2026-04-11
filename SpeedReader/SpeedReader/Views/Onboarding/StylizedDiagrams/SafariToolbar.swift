@@ -7,7 +7,6 @@ struct SafariToolbar: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Traffic lights
             HStack(spacing: 6) {
                 Circle().fill(.red.opacity(0.8)).frame(width: 12, height: 12)
                 Circle().fill(.yellow.opacity(0.8)).frame(width: 12, height: 12)
@@ -18,9 +17,7 @@ struct SafariToolbar: View {
             .padding(.top, 8)
             .padding(.bottom, 4)
 
-            // Toolbar row
             HStack(spacing: 8) {
-                // Nav buttons
                 HStack(spacing: 4) {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(.tertiary)
@@ -29,7 +26,6 @@ struct SafariToolbar: View {
                 }
                 .font(.caption)
 
-                // Address bar
                 HStack(spacing: 6) {
                     Image(systemName: "lock.fill")
                         .font(.caption2)
@@ -44,14 +40,12 @@ struct SafariToolbar: View {
                 .background(.quaternary)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
 
-                // Extension icons area
                 HStack(spacing: 6) {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(.quaternary)
                         .frame(width: 20, height: 20)
                         .opacity(0.4)
 
-                    // SpeedReader icon highlighted
                     Image("AppIcon-Small")
                         .resizable()
                         .frame(width: 20, height: 20)

@@ -1,13 +1,12 @@
 import SwiftUI
 
-/// Stylized iOS Safari address bar with a pulsing puzzle piece extension icon.
+/// Stylized Safari address bar with a pulsing puzzle piece extension icon.
 /// Used in the Phase 2 walkthrough to show where to find extensions.
 struct SafariAddressBar: View {
     @State private var isPulsing = false
 
     var body: some View {
         HStack(spacing: 8) {
-            // Address bar
             HStack(spacing: 6) {
                 Image(systemName: "lock.fill")
                     .font(.caption2)
@@ -22,7 +21,6 @@ struct SafariAddressBar: View {
             .background(.quaternary)
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Puzzle piece icon
             Image(systemName: "puzzlepiece.extension")
                 .font(.title3)
                 .foregroundStyle(.white)

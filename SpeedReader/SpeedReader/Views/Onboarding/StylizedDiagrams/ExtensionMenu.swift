@@ -5,7 +5,6 @@ import SwiftUI
 struct ExtensionMenu: View {
     var body: some View {
         VStack(spacing: 0) {
-            // Header
             Text("Extensions")
                 .font(.caption)
                 .fontWeight(.semibold)
@@ -16,7 +15,6 @@ struct ExtensionMenu: View {
 
             Divider()
 
-            // Other extension (dimmed)
             extensionRow(
                 icon: AnyView(
                     RoundedRectangle(cornerRadius: 6)
@@ -28,7 +26,6 @@ struct ExtensionMenu: View {
             )
             .opacity(0.35)
 
-            // SpeedReader (highlighted)
             extensionRow(
                 icon: AnyView(
                     Image("AppIcon-Small")
@@ -40,7 +37,6 @@ struct ExtensionMenu: View {
                 highlighted: true
             )
 
-            // Another extension (dimmed)
             extensionRow(
                 icon: AnyView(
                     RoundedRectangle(cornerRadius: 6)

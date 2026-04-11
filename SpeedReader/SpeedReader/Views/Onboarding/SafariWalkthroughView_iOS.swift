@@ -13,7 +13,6 @@ struct SafariWalkthroughView_iOS: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header: progress + skip
             HStack {
                 HStack(spacing: 6) {
                     ForEach(0..<totalSteps, id: \.self) { step in
@@ -30,7 +29,6 @@ struct SafariWalkthroughView_iOS: View {
             .padding(.horizontal, 24)
             .padding(.top, 16)
 
-            // Paged content
             TabView(selection: $currentStep) {
                 step1.tag(0)
                 step2.tag(1)
@@ -44,7 +42,6 @@ struct SafariWalkthroughView_iOS: View {
                 }
             }
 
-            // Bottom button
             Button(currentStep < totalSteps - 1 ? "Next" : "Got it") {
                 if currentStep < totalSteps - 1 {
                     withAnimation { currentStep += 1 }

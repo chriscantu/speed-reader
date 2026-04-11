@@ -8,6 +8,18 @@ enum OnboardingPhase: String {
     case safariWalkthrough
     case completed
 
+    /// Platform discriminator for funnel tracking keys.
+    enum Platform {
+        case ios, macos
+
+        var walkthroughStepKey: String {
+            switch self {
+            case .ios: return SettingsKeys.walkthroughLastStepIOS
+            case .macos: return SettingsKeys.walkthroughLastStepMacOS
+            }
+        }
+    }
+
     /// Read the current phase from UserDefaults. Defaults to `.enableExtension`.
     static func current(from defaults: UserDefaults) -> OnboardingPhase {
         guard let raw = defaults.string(forKey: SettingsKeys.onboardingPhase),
@@ -23,7 +35,9 @@ enum OnboardingPhase: String {
     }
 
     /// Migrate from the legacy `hasCompletedOnboarding` boolean.
-    /// Returns the resolved phase and writes the new key if migrating.
+    /// If the new key already exists, returns its value.
+    /// If the legacy key is true, writes `.completed` to the new key and returns it.
+    /// Otherwise returns `.enableExtension` without writing (the default for fresh installs).
     @discardableResult
     static func migrateIfNeeded(defaults: UserDefaults) -> OnboardingPhase {
         // If the new key already exists, use it
@@ -31,7 +45,7 @@ enum OnboardingPhase: String {
             return current(from: defaults)
         }
         // Legacy migration: if old boolean is true, mark as completed
-        if defaults.bool(forKey: "hasCompletedOnboarding") {
+        if defaults.bool(forKey: SettingsKeys.legacyHasCompletedOnboarding) {
             OnboardingPhase.completed.save(to: defaults)
             return .completed
         }
@@ -41,14 +55,11 @@ enum OnboardingPhase: String {
     // MARK: - Funnel tracking
 
     /// Record the last walkthrough step reached for the given platform.
-    static func recordWalkthroughStep(_ step: Int, platform: String, defaults: UserDefaults) {
-        let key = platform == "macos"
-            ? SettingsKeys.walkthroughLastStepMacOS
-            : SettingsKeys.walkthroughLastStepIOS
-        defaults.set(step, forKey: key)
+    static func recordWalkthroughStep(_ step: Int, platform: Platform, defaults: UserDefaults) {
+        defaults.set(step, forKey: platform.walkthroughStepKey)
     }
 
-    /// Mark the walkthrough as completed with a timestamp and transition to `.completed`.
+    /// Record the walkthrough completed timestamp and persist the `.completed` phase to UserDefaults.
     static func markWalkthroughCompleted(defaults: UserDefaults) {
         defaults.set(Date().timeIntervalSince1970, forKey: SettingsKeys.walkthroughCompletedAt)
         OnboardingPhase.completed.save(to: defaults)

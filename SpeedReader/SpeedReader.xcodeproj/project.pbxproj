@@ -13,6 +13,8 @@
 		EE0000000000000000000002 /* OnboardingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000010 /* OnboardingPhase.swift */; };
 		EE0000000000000000000003 /* OnboardingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000010 /* OnboardingPhase.swift */; };
 		EE0000000000000000000004 /* OnboardingPhaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000020 /* OnboardingPhaseTests.swift */; };
+		FF0000000000000000000001 /* OnboardingCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000010 /* OnboardingCoordinatorTests.swift */; };
+		FF0000000000000000000002 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000020 /* OnboardingCoordinator.swift */; };
 		8583EC8C5846A9425A341FF0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C47E9825806A930B7A8484 /* Cocoa.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8C9DEF341921D79BD47B1A7C /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
 		AA0000000000000000000001 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE082F7F6F9E007CB358 /* Settings.swift */; };
@@ -103,6 +105,8 @@
 		DD0000000000000000000020 /* CrashDiagnosticsSubscriber.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CrashDiagnosticsSubscriber.swift; sourceTree = "<group>"; };
 		EE0000000000000000000010 /* OnboardingPhase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingPhase.swift; sourceTree = "<group>"; };
 		EE0000000000000000000020 /* OnboardingPhaseTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingPhaseTests.swift; sourceTree = "<group>"; };
+		FF0000000000000000000010 /* OnboardingCoordinatorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinatorTests.swift; sourceTree = "<group>"; };
+		FF0000000000000000000020 /* OnboardingCoordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingCoordinator.swift; path = SpeedReader/Views/Onboarding/OnboardingCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -252,6 +256,7 @@
 			children = (
 				60576CF8DFF855A5FBC03458 /* SettingsTests.swift */,
 				EE0000000000000000000020 /* OnboardingPhaseTests.swift */,
+				FF0000000000000000000010 /* OnboardingCoordinatorTests.swift */,
 			);
 			path = SpeedReaderTests;
 			sourceTree = "<group>";
@@ -521,6 +526,8 @@
 				AA0000000000000000000002 /* SettingsKeys.swift in Sources */,
 				EE0000000000000000000003 /* OnboardingPhase.swift in Sources */,
 				EE0000000000000000000004 /* OnboardingPhaseTests.swift in Sources */,
+				FF0000000000000000000001 /* OnboardingCoordinatorTests.swift in Sources */,
+				FF0000000000000000000002 /* OnboardingCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

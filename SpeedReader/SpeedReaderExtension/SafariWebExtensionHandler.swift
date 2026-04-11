@@ -71,8 +71,11 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                     defaults.set(Date().timeIntervalSince1970, forKey: SettingsKeys.firstExtensionActivation)
                     os_log(.default, "[SpeedReader] First extension activation recorded")
                 }
+                response.userInfo = [SFExtensionMessageKey: ["status": "ok"]]
+            } else {
+                os_log(.error, "[SpeedReader] App Group not available for firstActivation")
+                response.userInfo = [SFExtensionMessageKey: ["error": "App Group unavailable"]]
             }
-            response.userInfo = [SFExtensionMessageKey: ["status": "ok"]]
 
         default:
             os_log(.default, "[SpeedReader] Unknown action: %{public}@", action)

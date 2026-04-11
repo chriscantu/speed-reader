@@ -15,7 +15,10 @@ struct ContentView: View {
                     onboardingSheet
                         .interactiveDismissDisabled()
                 }
-                .sheet(isPresented: $coordinator.showingSafariWalkthrough) {
+                .sheet(isPresented: Binding(
+                    get: { coordinator.showingSafariWalkthrough },
+                    set: { if !$0 { coordinator.dismissReplay() } }
+                )) {
                     walkthroughSheet(isReplay: true)
                 }
         }
@@ -52,7 +55,7 @@ struct ContentView: View {
         SafariWalkthroughView_macOS(
             onComplete: {
                 if isReplay {
-                    coordinator.showingSafariWalkthrough = false
+                    coordinator.dismissReplay()
                 } else {
                     coordinator.completeWalkthrough()
                 }
@@ -64,7 +67,7 @@ struct ContentView: View {
         SafariWalkthroughView_iOS(
             onComplete: {
                 if isReplay {
-                    coordinator.showingSafariWalkthrough = false
+                    coordinator.dismissReplay()
                 } else {
                     coordinator.completeWalkthrough()
                 }

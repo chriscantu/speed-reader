@@ -13,7 +13,6 @@ struct SafariWalkthroughView_macOS: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header: progress + skip
             HStack {
                 HStack(spacing: 6) {
                     ForEach(0..<totalSteps, id: \.self) { step in
@@ -30,7 +29,6 @@ struct SafariWalkthroughView_macOS: View {
             .padding(.horizontal, 24)
             .padding(.top, 16)
 
-            // Step content
             Group {
                 switch currentStep {
                 case 0: step1
@@ -47,7 +45,6 @@ struct SafariWalkthroughView_macOS: View {
                 }
             }
 
-            // Navigation buttons
             HStack {
                 if currentStep > 0 {
                     Button("Back") {

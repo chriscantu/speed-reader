@@ -71,6 +71,8 @@ enum SettingsKeys {
     static let chunkSize = "sr_chunkSize"
 
     // Onboarding & funnel tracking keys
+    /// Legacy onboarding boolean key (pre-v1.1). Used only for migration.
+    static let legacyHasCompletedOnboarding = "hasCompletedOnboarding"
     static let onboardingPhase = "sr_onboardingPhase"
     static let walkthroughLastStepIOS = "sr_walkthrough_lastStep_ios"
     static let walkthroughLastStepMacOS = "sr_walkthrough_lastStep_macos"

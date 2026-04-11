@@ -30,7 +30,7 @@ final class OnboardingPhaseTests: XCTestCase {
 
     func testMigrationFromLegacyOnboarding() {
         let defaults = makeDefaults()
-        defaults.set(true, forKey: "hasCompletedOnboarding")
+        defaults.set(true, forKey: SettingsKeys.legacyHasCompletedOnboarding)
         let phase = OnboardingPhase.migrateIfNeeded(defaults: defaults)
         XCTAssertEqual(phase, .completed)
         XCTAssertEqual(OnboardingPhase.current(from: defaults), .completed)
@@ -38,7 +38,7 @@ final class OnboardingPhaseTests: XCTestCase {
 
     func testNoMigrationWhenNewKeyExists() {
         let defaults = makeDefaults()
-        defaults.set(true, forKey: "hasCompletedOnboarding")
+        defaults.set(true, forKey: SettingsKeys.legacyHasCompletedOnboarding)
         OnboardingPhase.safariWalkthrough.save(to: defaults)
         let phase = OnboardingPhase.migrateIfNeeded(defaults: defaults)
         XCTAssertEqual(phase, .safariWalkthrough)
@@ -46,7 +46,7 @@ final class OnboardingPhaseTests: XCTestCase {
 
     func testNoMigrationWhenLegacyKeyIsFalse() {
         let defaults = makeDefaults()
-        defaults.set(false, forKey: "hasCompletedOnboarding")
+        defaults.set(false, forKey: SettingsKeys.legacyHasCompletedOnboarding)
         let phase = OnboardingPhase.migrateIfNeeded(defaults: defaults)
         XCTAssertEqual(phase, .enableExtension)
     }
@@ -55,14 +55,14 @@ final class OnboardingPhaseTests: XCTestCase {
 
     func testRecordWalkthroughStep() {
         let defaults = makeDefaults()
-        OnboardingPhase.recordWalkthroughStep(2, platform: "ios", defaults: defaults)
+        OnboardingPhase.recordWalkthroughStep(2, platform: .ios, defaults: defaults)
         let step = defaults.integer(forKey: SettingsKeys.walkthroughLastStepIOS)
         XCTAssertEqual(step, 2)
     }
 
     func testRecordWalkthroughStepMacOS() {
         let defaults = makeDefaults()
-        OnboardingPhase.recordWalkthroughStep(3, platform: "macos", defaults: defaults)
+        OnboardingPhase.recordWalkthroughStep(3, platform: .macos, defaults: defaults)
         let step = defaults.integer(forKey: SettingsKeys.walkthroughLastStepMacOS)
         XCTAssertEqual(step, 3)
     }

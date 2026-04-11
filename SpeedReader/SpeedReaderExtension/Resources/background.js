@@ -11,16 +11,20 @@ browser.action.onClicked.addListener(async (tab) => {
   try {
     await browser.tabs.sendMessage(tab.id, { action: 'toggle-reader' });
 
-    // Signal first activation for onboarding funnel tracking
+    // Signal first activation for onboarding funnel tracking.
+    // Fire-and-forget: don't block the toggle action on funnel tracking.
     browser.storage.local.get({ hasReportedFirstActivation: false })
-      .then(function(result) {
+      .then(async function(result) {
         if (!result.hasReportedFirstActivation) {
-          browser.runtime.sendNativeMessage(
+          await browser.runtime.sendNativeMessage(
             'com.chriscantu.SpeedReader',
             { action: 'firstActivation' }
           );
-          browser.storage.local.set({ hasReportedFirstActivation: true });
+          await browser.storage.local.set({ hasReportedFirstActivation: true });
         }
+      })
+      .catch(function(err) {
+        console.warn('[SpeedReader] First activation signal failed:', err.message || err);
       });
   } catch (error) {
     console.error('[SpeedReader] Could not reach content script:', error);

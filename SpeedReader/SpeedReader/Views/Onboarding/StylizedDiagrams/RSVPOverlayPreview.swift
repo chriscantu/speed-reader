@@ -1,22 +1,20 @@
 import SwiftUI
 
-/// Simplified RSVP overlay preview for the walkthrough's "Start Reading" step.
+/// Simplified RSVP overlay preview for the final step of the walkthrough.
 /// Shows a sample word with ORP highlighting and basic controls.
 struct RSVPOverlayPreview: View {
     /// Whether to show keyboard shortcut hints (macOS) or tap hints (iOS).
     var showKeyboardHints: Bool = false
 
-    /// Matches `--sr-accent: #0891b2` in overlay.css.
+    /// Matches `--sr-accent: #0891b2` in overlay.css. Update both if the accent color changes.
     private let accentColor = Color(red: 8 / 255, green: 145 / 255, blue: 178 / 255)
 
     var body: some View {
         VStack(spacing: 16) {
-            // Context line
             Text("The quick brown fox jumps over the lazy dog")
                 .font(.caption2)
                 .foregroundStyle(.white.opacity(0.3))
 
-            // Word with ORP
             HStack(spacing: 0) {
                 Text("qu")
                     .foregroundStyle(.white.opacity(0.7))
@@ -27,14 +25,12 @@ struct RSVPOverlayPreview: View {
             }
             .font(.system(size: 32, weight: .light))
 
-            // Controls
             HStack(spacing: 20) {
                 controlButton(systemName: "chevron.left")
                 controlButton(systemName: "play.fill", accent: true)
                 controlButton(systemName: "chevron.right")
             }
 
-            // Hint text
             if showKeyboardHints {
                 Text("Space to pause \u{00B7} \u{2190} \u{2192} to navigate")
                     .font(.caption2)
