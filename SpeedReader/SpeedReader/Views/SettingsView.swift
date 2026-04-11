@@ -103,6 +103,7 @@ private struct RSVPPreview: View {
 
 struct SettingsView: View {
     @Environment(ReaderSettings.self) private var settings
+    @Environment(OnboardingCoordinator.self) private var coordinator: OnboardingCoordinator?
 
     var body: some View {
         Form {
@@ -224,13 +225,35 @@ struct SettingsView: View {
             }
 
             Section {
-                DisclosureGroup("How to Use") {
-                    Label("Navigate to any article in Safari", systemImage: "safari")
-                    Label("Tap the SpeedReader icon in the toolbar", systemImage: "hand.tap")
-                    Label("Tap anywhere to pause, Space on Mac", systemImage: "pause.circle")
-                    Label("Use ← → to skip between sentences", systemImage: "arrow.left.arrow.right")
+                Button("How to Use in Safari") {
+                    coordinator?.replayWalkthrough()
                 }
             }
+
+            #if DEBUG
+            Section("Debug: Onboarding Funnel") {
+                if let defaults = UserDefaults(suiteName: SettingsKeys.appGroupID) {
+                    LabeledContent("Phase",
+                        value: defaults.string(forKey: SettingsKeys.onboardingPhase) ?? "nil")
+                    LabeledContent("Last Step (iOS)",
+                        value: "\(defaults.integer(forKey: SettingsKeys.walkthroughLastStepIOS))")
+                    LabeledContent("Last Step (macOS)",
+                        value: "\(defaults.integer(forKey: SettingsKeys.walkthroughLastStepMacOS))")
+                    let completedAt = defaults.double(forKey: SettingsKeys.walkthroughCompletedAt)
+                    LabeledContent("Completed",
+                        value: completedAt > 0
+                            ? Date(timeIntervalSince1970: completedAt).formatted()
+                            : "\u{2014}")
+                    let activatedAt = defaults.double(forKey: SettingsKeys.firstExtensionActivation)
+                    LabeledContent("First Activation",
+                        value: activatedAt > 0
+                            ? Date(timeIntervalSince1970: activatedAt).formatted()
+                            : "\u{2014}")
+                    LabeledContent("Replays",
+                        value: "\(defaults.integer(forKey: SettingsKeys.walkthroughReplays))")
+                }
+            }
+            #endif
         }
         .navigationTitle("SpeedReader")
         #if os(macOS)

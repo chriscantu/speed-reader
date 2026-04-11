@@ -70,6 +70,16 @@ enum SettingsKeys {
     static let alignment = "sr_alignment"
     static let chunkSize = "sr_chunkSize"
 
+    // Onboarding & funnel tracking keys
+    /// Legacy onboarding boolean key (pre-v1.1). Used only for migration.
+    static let legacyHasCompletedOnboarding = "hasCompletedOnboarding"
+    static let onboardingPhase = "sr_onboardingPhase"
+    static let walkthroughLastStepIOS = "sr_walkthrough_lastStep_ios"
+    static let walkthroughLastStepMacOS = "sr_walkthrough_lastStep_macos"
+    static let walkthroughCompletedAt = "sr_walkthrough_completedAt"
+    static let firstExtensionActivation = "sr_firstExtensionActivation"
+    static let walkthroughReplays = "sr_walkthrough_replays"
+
     /// Default values — typed enum cases prevent drift from raw values.
     enum Defaults {
         static let wpm = 250

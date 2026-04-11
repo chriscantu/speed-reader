@@ -64,12 +64,28 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             }
             response.userInfo = [SFExtensionMessageKey: ["status": "ok"]]
 
+        case "firstActivation":
+            response.userInfo = [SFExtensionMessageKey: handleFirstActivation()]
+
         default:
             os_log(.default, "[SpeedReader] Unknown action: %{public}@", action)
             response.userInfo = [SFExtensionMessageKey: ["error": "Unknown action"]]
         }
 
         context.completeRequest(returningItems: [response], completionHandler: nil)
+    }
+
+    private func handleFirstActivation() -> [String: Any] {
+        guard let defaults = UserDefaults(suiteName: SettingsKeys.appGroupID) else {
+            os_log(.error, "[SpeedReader] App Group not available for firstActivation")
+            return ["error": "App Group unavailable"]
+        }
+        let existing = defaults.double(forKey: SettingsKeys.firstExtensionActivation)
+        if existing == 0 {
+            defaults.set(Date().timeIntervalSince1970, forKey: SettingsKeys.firstExtensionActivation)
+            os_log(.default, "[SpeedReader] First extension activation recorded")
+        }
+        return ["status": "ok"]
     }
 
     private func loadSettingsFromAppGroup() -> [String: Any] {
