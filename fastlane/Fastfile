@@ -2,10 +2,11 @@ default_platform(:ios)
 
 APP_BUNDLE_ID = "com.chriscantu.SpeedReader"
 EXTENSION_BUNDLE_ID = "com.chriscantu.SpeedReader.SpeedReaderExtension"
-TARGETS = {
-  APP_BUNDLE_ID => "SpeedReader",
-  EXTENSION_BUNDLE_ID => "SpeedReaderExtension"
-}.freeze
+
+# Override automatic signing at build time without modifying the project file.
+# Each xcodebuild invocation gets its own signing config — no cross-platform
+# contamination between iOS and macOS builds.
+SIGNING_XCARGS = "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution'"
 
 platform :ios do
   before_all do
@@ -33,30 +34,13 @@ platform :ios do
     profiles
   end
 
-  # Switch Xcode project to manual signing with distribution identity.
-  # Required because the project uses automatic signing locally, but on CI
-  # we can't pass -allowProvisioningUpdates (it creates certificates).
-  # This modifies the pbxproj on the disposable CI checkout only.
-  private_lane :apply_signing do |options|
-    profiles = options[:profiles]
-    profiles.each do |bundle_id, profile_name|
-      update_code_signing_settings(
-        path: "SpeedReader/SpeedReader.xcodeproj",
-        use_automatic_signing: false,
-        code_sign_identity: "Apple Distribution",
-        profile_name: profile_name,
-        targets: [TARGETS[bundle_id]]
-      )
-    end
-  end
-
   desc "Build and upload to TestFlight (iOS + macOS)"
   lane :beta do
     setup_ci
 
     ios_profiles = fetch_profiles(platform: "ios")
-    apply_signing(profiles: ios_profiles)
     build_app(
+      xcargs: SIGNING_XCARGS,
       destination: "generic/platform=iOS",
       output_directory: "./build/ios",
       export_options: {
@@ -67,8 +51,8 @@ platform :ios do
     upload_to_testflight(skip_waiting_for_build_processing: true)
 
     macos_profiles = fetch_profiles(platform: "macos")
-    apply_signing(profiles: macos_profiles)
     build_mac_app(
+      xcargs: SIGNING_XCARGS,
       scheme: "SpeedReader",
       project: "SpeedReader/SpeedReader.xcodeproj",
       output_directory: "./build/macos",
@@ -90,8 +74,8 @@ platform :ios do
     setup_ci
 
     ios_profiles = fetch_profiles(platform: "ios")
-    apply_signing(profiles: ios_profiles)
     build_app(
+      xcargs: SIGNING_XCARGS,
       destination: "generic/platform=iOS",
       output_directory: "./build/ios",
       export_options: {
@@ -108,8 +92,8 @@ platform :ios do
     )
 
     macos_profiles = fetch_profiles(platform: "macos")
-    apply_signing(profiles: macos_profiles)
     build_mac_app(
+      xcargs: SIGNING_XCARGS,
       scheme: "SpeedReader",
       project: "SpeedReader/SpeedReader.xcodeproj",
       output_directory: "./build/macos",
