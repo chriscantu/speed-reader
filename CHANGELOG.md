@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.3 (2026-04-11)
+
+- Build and upload both iOS and macOS platforms in fastlane lanes
+
 ## v1.0.2 (2026-04-11)
 
 - Disable IAP precheck in upload_to_app_store (not supported with API key)
