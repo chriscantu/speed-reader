@@ -64,6 +64,16 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             }
             response.userInfo = [SFExtensionMessageKey: ["status": "ok"]]
 
+        case "firstActivation":
+            if let defaults = UserDefaults(suiteName: SettingsKeys.appGroupID) {
+                let existing = defaults.double(forKey: SettingsKeys.firstExtensionActivation)
+                if existing == 0 {
+                    defaults.set(Date().timeIntervalSince1970, forKey: SettingsKeys.firstExtensionActivation)
+                    os_log(.default, "[SpeedReader] First extension activation recorded")
+                }
+            }
+            response.userInfo = [SFExtensionMessageKey: ["status": "ok"]]
+
         default:
             os_log(.default, "[SpeedReader] Unknown action: %{public}@", action)
             response.userInfo = [SFExtensionMessageKey: ["error": "Unknown action"]]
