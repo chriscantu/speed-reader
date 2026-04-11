@@ -76,6 +76,7 @@ platform :ios do
       output_directory: "./build/macos",
       export_method: "app-store",
       clean: true,
+      installer_cert_name: "3rd Party Mac Developer Installer",
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: macos_profiles
@@ -120,18 +121,23 @@ platform :ios do
       output_directory: "./build/macos",
       export_method: "app-store",
       clean: true,
+      installer_cert_name: "3rd Party Mac Developer Installer",
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: macos_profiles
       }
     )
+
+    pkg_path = lane_context[SharedValues::PKG_OUTPUT_PATH]
+    UI.user_error!("macOS .pkg was not produced — check export logs") unless pkg_path && File.exist?(pkg_path)
+
     upload_to_app_store(
       submit_for_review: false,
       automatic_release: false,
       skip_screenshots: true,
       skip_metadata: true,
       precheck_include_in_app_purchases: false,
-      pkg: lane_context[SharedValues::PKG_OUTPUT_PATH]
+      pkg: pkg_path
     )
   end
 end
