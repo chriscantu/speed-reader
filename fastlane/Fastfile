@@ -13,11 +13,12 @@ platform :ios do
   desc "Build and upload to TestFlight"
   lane :beta do
     setup_ci
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      team_id: CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+    )
     build_app(
-      export_options: {
-        signingStyle: "automatic",
-        teamID: CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
-      }
+      xcargs: auth_xcargs
     )
     upload_to_testflight(
       skip_waiting_for_build_processing: true
@@ -27,11 +28,12 @@ platform :ios do
   desc "Build and upload to App Store"
   lane :release do
     setup_ci
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      team_id: CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+    )
     build_app(
-      export_options: {
-        signingStyle: "automatic",
-        teamID: CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
-      }
+      xcargs: auth_xcargs
     )
     upload_to_app_store(
       submit_for_review: false,
@@ -40,4 +42,17 @@ platform :ios do
       skip_metadata: true
     )
   end
+end
+
+# Build xcodebuild auth flags from the API key for automatic provisioning on CI
+def auth_xcargs
+  key_path = File.join(Dir.tmpdir, "AuthKey_#{ENV.fetch('APP_STORE_CONNECT_KEY_ID')}.p8")
+  unless File.exist?(key_path)
+    require "base64"
+    File.write(key_path, Base64.decode64(ENV.fetch("APP_STORE_CONNECT_KEY")))
+  end
+  "-authenticationKeyPath #{key_path} " \
+    "-authenticationKeyID #{ENV.fetch('APP_STORE_CONNECT_KEY_ID')} " \
+    "-authenticationKeyIssuerID #{ENV.fetch('APP_STORE_CONNECT_ISSUER_ID')} " \
+    "-allowProvisioningUpdates"
 end
