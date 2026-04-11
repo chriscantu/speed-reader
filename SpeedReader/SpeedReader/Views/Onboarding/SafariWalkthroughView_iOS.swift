@@ -2,7 +2,7 @@
 import SwiftUI
 
 /// Phase 2 walkthrough for iOS: 4-step wizard showing how to use SpeedReader in Safari.
-struct SafariWalkthroughView_iOS: View {
+struct SafariWalkthroughViewIOS: View {
     var onComplete: () -> Void
     var isReplay: Bool = false
 
@@ -59,11 +59,19 @@ struct SafariWalkthroughView_iOS: View {
     // MARK: - Steps
 
     private var step1: some View {
-        walkthroughStep(
-            icon: Image(systemName: "safari").font(.system(size: 56)),
-            title: "Open Safari",
-            subtitle: "Navigate to any article or web page you'd like to read"
-        )
+        VStack(spacing: 24) {
+            Spacer()
+            Image(systemName: "safari")
+                .font(.system(size: 56))
+                .foregroundStyle(Color.accentColor)
+            Text("Open Safari")
+                .font(.title2).fontWeight(.semibold)
+            Text("Navigate to any article or web page you'd like to read")
+                .font(.subheadline).foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+            Spacer()
+        }
     }
 
     private var step2: some View {
@@ -104,20 +112,6 @@ struct SafariWalkthroughView_iOS: View {
             Text("You're reading!")
                 .font(.title2).fontWeight(.semibold)
             Text("Tap anywhere to pause. Use \u{2039} \u{203A} to skip between sentences.")
-                .font(.subheadline).foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-            Spacer()
-        }
-    }
-
-    private func walkthroughStep(icon: Image, title: String, subtitle: String) -> some View {
-        VStack(spacing: 24) {
-            Spacer()
-            icon.foregroundStyle(Color.accentColor)
-            Text(title)
-                .font(.title2).fontWeight(.semibold)
-            Text(subtitle)
                 .font(.subheadline).foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)

@@ -19,7 +19,10 @@ final class OnboardingCoordinator {
         } else if let groupDefaults = UserDefaults(suiteName: SettingsKeys.appGroupID) {
             store = groupDefaults
         } else {
-            os_log(.error, "[SpeedReader] App Group defaults unavailable — onboarding state will not sync with extension")
+            os_log(
+                .error,
+                "[SpeedReader] App Group defaults unavailable — onboarding state will not sync with extension"
+            )
             store = .standard
         }
         self.defaults = store

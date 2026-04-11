@@ -2,7 +2,7 @@
 import SwiftUI
 
 /// Phase 1 onboarding for iOS: guide user to enable the Safari extension in Settings.
-struct EnableExtensionView_iOS: View {
+struct EnableExtensionViewIOS: View {
     var onComplete: () -> Void
 
     @State private var settingsErrorMessage: String?

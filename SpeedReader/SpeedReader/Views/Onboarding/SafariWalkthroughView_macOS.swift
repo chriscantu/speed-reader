@@ -2,7 +2,7 @@
 import SwiftUI
 
 /// Phase 2 walkthrough for macOS: 4-step wizard showing how to use SpeedReader in Safari.
-struct SafariWalkthroughView_macOS: View {
+struct SafariWalkthroughViewMacOS: View {
     var onComplete: () -> Void
     var isReplay: Bool = false
 

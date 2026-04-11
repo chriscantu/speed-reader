@@ -1,9 +1,9 @@
 #if os(macOS)
-import SwiftUI
 import SafariServices
+import SwiftUI
 
 /// Phase 1 onboarding for macOS: guide user to enable the Safari extension.
-struct EnableExtensionView_macOS: View {
+struct EnableExtensionViewMacOS: View {
     var onComplete: () -> Void
 
     @State private var settingsErrorMessage: String?

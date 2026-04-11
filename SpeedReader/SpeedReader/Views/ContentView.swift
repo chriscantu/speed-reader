@@ -39,11 +39,11 @@ struct ContentView: View {
     @ViewBuilder
     private var enableExtensionView: some View {
         #if os(macOS)
-        EnableExtensionView_macOS(onComplete: {
+        EnableExtensionViewMacOS(onComplete: {
             coordinator.completeEnableExtension()
         })
         #else
-        EnableExtensionView_iOS(onComplete: {
+        EnableExtensionViewIOS(onComplete: {
             coordinator.completeEnableExtension()
         })
         #endif
@@ -52,7 +52,7 @@ struct ContentView: View {
     @ViewBuilder
     private func walkthroughSheet(isReplay: Bool) -> some View {
         #if os(macOS)
-        SafariWalkthroughView_macOS(
+        SafariWalkthroughViewMacOS(
             onComplete: {
                 if isReplay {
                     coordinator.dismissReplay()
@@ -64,7 +64,7 @@ struct ContentView: View {
         )
         .environment(coordinator)
         #else
-        SafariWalkthroughView_iOS(
+        SafariWalkthroughViewIOS(
             onComplete: {
                 if isReplay {
                     coordinator.dismissReplay()
