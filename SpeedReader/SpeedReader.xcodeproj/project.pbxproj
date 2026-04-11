@@ -11,6 +11,10 @@
 		697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60576CF8DFF855A5FBC03458 /* SettingsTests.swift */; };
 		BB0000000000000000000001 /* OnboardingContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000010 /* OnboardingContentTests.swift */; };
 		BB0000000000000000000002 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE0B2F7F6F9E007CB358 /* OnboardingView.swift */; };
+		EE0000000000000000000001 /* OnboardingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000010 /* OnboardingPhase.swift */; };
+		EE0000000000000000000002 /* OnboardingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000010 /* OnboardingPhase.swift */; };
+		EE0000000000000000000003 /* OnboardingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000010 /* OnboardingPhase.swift */; };
+		EE0000000000000000000004 /* OnboardingPhaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000020 /* OnboardingPhaseTests.swift */; };
 		8583EC8C5846A9425A341FF0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C47E9825806A930B7A8484 /* Cocoa.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8C9DEF341921D79BD47B1A7C /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */; };
 		AA0000000000000000000001 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE082F7F6F9E007CB358 /* Settings.swift */; };
@@ -101,6 +105,8 @@
 		EE7C9932756921056EBA7A59 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
 		DD0000000000000000000010 /* error-reporter.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; path = "error-reporter.js"; sourceTree = "<group>"; };
 		DD0000000000000000000020 /* CrashDiagnosticsSubscriber.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CrashDiagnosticsSubscriber.swift; sourceTree = "<group>"; };
+		EE0000000000000000000010 /* OnboardingPhase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingPhase.swift; sourceTree = "<group>"; };
+		EE0000000000000000000020 /* OnboardingPhaseTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingPhaseTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -218,6 +224,7 @@
 			isa = PBXGroup;
 			children = (
 				02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */,
+				EE0000000000000000000010 /* OnboardingPhase.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -250,6 +257,7 @@
 			children = (
 				60576CF8DFF855A5FBC03458 /* SettingsTests.swift */,
 				BB0000000000000000000010 /* OnboardingContentTests.swift */,
+				EE0000000000000000000020 /* OnboardingPhaseTests.swift */,
 			);
 			path = SpeedReaderTests;
 			sourceTree = "<group>";
@@ -497,6 +505,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8C9DEF341921D79BD47B1A7C /* SettingsKeys.swift in Sources */,
+				EE0000000000000000000001 /* OnboardingPhase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -505,6 +514,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABC84A71AB9B9F43D28F006A /* SettingsKeys.swift in Sources */,
+				EE0000000000000000000002 /* OnboardingPhase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -517,6 +527,8 @@
 				BB0000000000000000000002 /* OnboardingView.swift in Sources */,
 				AA0000000000000000000001 /* Settings.swift in Sources */,
 				AA0000000000000000000002 /* SettingsKeys.swift in Sources */,
+				EE0000000000000000000003 /* OnboardingPhase.swift in Sources */,
+				EE0000000000000000000004 /* OnboardingPhaseTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
