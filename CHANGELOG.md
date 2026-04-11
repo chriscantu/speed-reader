@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.4 (2026-04-11)
+
+- Fix macOS build: separate output dirs, use pkg for macOS uploads
+
 ## v1.0.3 (2026-04-11)
 
 - Build and upload both iOS and macOS platforms in fastlane lanes
