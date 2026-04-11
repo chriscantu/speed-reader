@@ -54,6 +54,11 @@ ios-speed-reader/
 ├── scripts/
 │   └── lib/                            # Safari driver and shared test infra
 │
+├── fastlane/                              # Fastlane distribution config
+│   ├── Appfile                            # App metadata (bundle ID, team)
+│   ├── Fastfile                           # Lane definitions (beta, release)
+│   └── Gymfile                            # Shared build settings
+│
 ├── CLAUDE.md                           # Claude Code project instructions
 ├── PRINCIPLES.md                       # Design decisions, conventions, workflow
 ├── STRUCTURE.md                        # This file — project layout reference
@@ -89,6 +94,7 @@ ios-speed-reader/
 | Regression tests | `tests/regression/` |
 | Build scripts | `scripts/` |
 | Safari driver (test infra) | `scripts/lib/` |
+| Fastlane config | `fastlane/` |
 
 ## Build & Run
 

@@ -1,0 +1,45 @@
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+    @api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+      key_content: ENV.fetch("APP_STORE_CONNECT_KEY"),
+      is_key_content_base64: true
+    )
+  end
+
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    setup_ci
+    build_app(xcargs: auth_xcargs)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  desc "Build and upload to App Store"
+  lane :release do
+    setup_ci
+    build_app(xcargs: auth_xcargs)
+    upload_to_app_store(
+      submit_for_review: false,
+      automatic_release: false,
+      skip_screenshots: true,
+      skip_metadata: true
+    )
+  end
+end
+
+def auth_xcargs
+  key_path = File.join(Dir.tmpdir, "AuthKey_#{ENV.fetch('APP_STORE_CONNECT_KEY_ID')}.p8")
+  unless File.exist?(key_path)
+    require "base64"
+    File.write(key_path, Base64.decode64(ENV.fetch("APP_STORE_CONNECT_KEY")))
+  end
+  "-authenticationKeyPath '#{key_path}' " \
+    "-authenticationKeyID '#{ENV.fetch('APP_STORE_CONNECT_KEY_ID')}' " \
+    "-authenticationKeyIssuerID '#{ENV.fetch('APP_STORE_CONNECT_ISSUER_ID')}' " \
+    "-allowProvisioningUpdates"
+end

@@ -1,0 +1,5 @@
+scheme("SpeedReader")
+project("SpeedReader/SpeedReader.xcodeproj")
+output_directory("./build")
+export_method("app-store")
+clean(true)
