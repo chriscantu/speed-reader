@@ -63,6 +63,12 @@ jobs:
           # Add to keychain search list
           security list-keychains -d user -s $KEYCHAIN_PATH login.keychain-db
 
+          # Debug: list signing identities available in keychain
+          echo "=== Signing identities ==="
+          security find-identity -v -p codesigning $KEYCHAIN_PATH || true
+          echo "=== All identities ==="
+          security find-identity -v $KEYCHAIN_PATH || true
+
       - name: Build and upload to App Store
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}

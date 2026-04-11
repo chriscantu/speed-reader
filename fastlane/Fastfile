@@ -128,6 +128,12 @@ platform :ios do
       }
     )
 
+    # Debug: dump lane context paths for macOS build
+    UI.message("PKG_OUTPUT_PATH: #{lane_context[SharedValues::PKG_OUTPUT_PATH]}")
+    UI.message("IPA_OUTPUT_PATH: #{lane_context[SharedValues::IPA_OUTPUT_PATH]}")
+    UI.message("BUILD_OUTPUT_DIRECTORY: ./build/macos")
+    Dir.glob("./build/macos/*").each { |f| UI.message("  #{f}") }
+
     pkg_path = lane_context[SharedValues::PKG_OUTPUT_PATH]
     UI.user_error!("macOS .pkg was not produced — check export logs") unless pkg_path && File.exist?(pkg_path)
 
