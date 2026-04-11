@@ -54,7 +54,9 @@ We will use **step-level on-device funnel tracking** stored entirely in App Grou
 
 **First activation detection**: On the first `toggle-reader` action, the background script sends a `firstActivation` native message to `SafariWebExtensionHandler`, which writes `sr_firstExtensionActivation` to App Group UserDefaults. Subsequent activations check `browser.storage.local` and skip.
 
-**Developer visibility**: A debug-only section in SettingsView (behind a hidden gesture) displays the raw funnel state for diagnostics. No user-facing analytics UI.
+**Walkthrough visuals**: The walkthrough uses stylized SwiftUI views (not screenshots) so they automatically adapt to Dark Mode and Dynamic Type, are VoiceOver accessible, and don't require image asset updates when Apple redesigns Safari.
+
+**Developer visibility**: A debug-only section in SettingsView (DEBUG builds only) displays the raw funnel state for diagnostics. No user-facing analytics UI.
 
 **Success criteria** (evaluated manually, periodically):
 - Walkthrough completion rate (step 4 reached) trending upward
