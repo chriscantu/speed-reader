@@ -14,7 +14,17 @@ ios-speed-reader/
 │   │   ├── Views/
 │   │   │   ├── ContentView.swift       # Main app view (onboarding + settings)
 │   │   │   ├── SettingsView.swift      # WPM, font, theme controls
-│   │   │   └── OnboardingView.swift    # Enable extension instructions
+│   │   │   └── Onboarding/
+│   │   │       ├── OnboardingCoordinator.swift      # Phase state machine
+│   │   │       ├── EnableExtensionView_iOS.swift     # Phase 1: enable extension (iOS)
+│   │   │       ├── EnableExtensionView_macOS.swift   # Phase 1: enable extension (macOS)
+│   │   │       ├── SafariWalkthroughView_iOS.swift   # Phase 2: usage walkthrough (iOS)
+│   │   │       ├── SafariWalkthroughView_macOS.swift # Phase 2: usage walkthrough (macOS)
+│   │   │       └── StylizedDiagrams/                 # Visual aids for walkthrough
+│   │   │           ├── SafariAddressBar.swift         # iOS Safari address bar
+│   │   │           ├── SafariToolbar.swift             # macOS Safari toolbar
+│   │   │           ├── ExtensionMenu.swift             # Extension dropdown menu
+│   │   │           └── RSVPOverlayPreview.swift        # RSVP overlay sample
 │   │   ├── Models/
 │   │   │   └── Settings.swift          # Shared settings model
 │   │   └── Assets.xcassets             # App icons, colors
@@ -38,7 +48,8 @@ ios-speed-reader/
 │   │       └── images/                 # Extension icons (various sizes)
 │   │
 │   ├── Shared/                         # Code shared between app + extension
-│   │   └── SettingsKeys.swift          # App Group keys, defaults
+│   │   ├── SettingsKeys.swift          # App Group keys, defaults
+│   │   └── OnboardingPhase.swift       # Onboarding phase enum + funnel tracking
 │   │
 │   └── SpeedReader.xcodeproj           # Xcode project file
 │
@@ -80,6 +91,7 @@ ios-speed-reader/
 | What | Where |
 |------|-------|
 | Swift UI views | `SpeedReader/SpeedReader/Views/` |
+| Onboarding views | `SpeedReader/SpeedReader/Views/Onboarding/` |
 | Swift models | `SpeedReader/SpeedReader/Models/` |
 | Extension JS (core) | `SpeedReader/SpeedReaderExtension/Resources/` |
 | RSVP reader code | `SpeedReader/SpeedReaderExtension/Resources/rsvp/` |
