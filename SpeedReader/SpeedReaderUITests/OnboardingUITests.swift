@@ -5,8 +5,8 @@ final class OnboardingUITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        // Must match @AppStorage key in ContentView
-        app.launchArguments += ["-hasCompletedOnboarding", "NO"]
+        // Override the onboarding phase so tests start in Phase 1
+        app.launchArguments += ["-sr_onboardingPhase", "enableExtension"]
         app.launch()
     }
 
@@ -75,16 +75,26 @@ final class OnboardingUITests: XCTestCase {
 
     // MARK: - Onboarding flow
 
-    func testIveEnabledItButtonDismissesOnboarding() {
-        let button = app.buttons["I've enabled it"]
-        XCTAssertTrue(button.waitForExistence(timeout: 5))
-        button.tap()
+    func testPhase1DoneTransitionsToWalkthroughThenDismisses() {
+        let doneButton = app.buttons["Done \u{2014} show me how to use it"]
+        XCTAssertTrue(doneButton.waitForExistence(timeout: 5))
+        doneButton.tap()
 
-        // After tapping, the onboarding sheet should dismiss — settings view becomes visible
+        // After tapping, Phase 2 walkthrough should appear with a Skip button
+        let skipButton = app.buttons["Skip"]
+        XCTAssertTrue(
+            skipButton.waitForExistence(timeout: 5),
+            "Walkthrough should appear after completing Phase 1"
+        )
+
+        // Skip the walkthrough to dismiss
+        skipButton.tap()
+
+        // Settings view should now be visible
         let settingsTitle = app.staticTexts["Reading Speed"]
         XCTAssertTrue(
             settingsTitle.waitForExistence(timeout: 5),
-            "Settings view should appear after dismissing onboarding"
+            "Settings view should appear after completing walkthrough"
         )
     }
 
@@ -93,7 +103,7 @@ final class OnboardingUITests: XCTestCase {
         app.terminate()
 
         let completedApp = XCUIApplication()
-        completedApp.launchArguments += ["-hasCompletedOnboarding", "YES"]
+        completedApp.launchArguments += ["-sr_onboardingPhase", "completed"]
         completedApp.launch()
 
         // Settings view should be visible immediately, no onboarding sheet

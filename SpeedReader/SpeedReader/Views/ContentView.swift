@@ -2,23 +2,76 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(ReaderSettings.self) private var settings
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-    @State private var showingOnboarding = false
+    @State private var coordinator = OnboardingCoordinator()
 
     var body: some View {
         NavigationStack {
             SettingsView()
-                .sheet(isPresented: $showingOnboarding) {
-                    OnboardingView(onComplete: {
-                        hasCompletedOnboarding = true
-                        showingOnboarding = false
-                    })
+                .environment(coordinator)
+                .sheet(isPresented: Binding(
+                    get: { coordinator.shouldShowOnboarding },
+                    set: { _ in }
+                )) {
+                    onboardingSheet
+                        .interactiveDismissDisabled()
+                }
+                .sheet(isPresented: $coordinator.showingSafariWalkthrough) {
+                    walkthroughSheet(isReplay: true)
                 }
         }
-        .onAppear {
-            if !hasCompletedOnboarding {
-                showingOnboarding = true
-            }
+    }
+
+    @ViewBuilder
+    private var onboardingSheet: some View {
+        switch coordinator.phase {
+        case .enableExtension:
+            enableExtensionView
+        case .safariWalkthrough:
+            walkthroughSheet(isReplay: false)
+        case .completed:
+            EmptyView()
         }
+    }
+
+    @ViewBuilder
+    private var enableExtensionView: some View {
+        #if os(macOS)
+        EnableExtensionView_macOS(onComplete: {
+            coordinator.completeEnableExtension()
+        })
+        #else
+        EnableExtensionView_iOS(onComplete: {
+            coordinator.completeEnableExtension()
+        })
+        #endif
+    }
+
+    @ViewBuilder
+    private func walkthroughSheet(isReplay: Bool) -> some View {
+        #if os(macOS)
+        SafariWalkthroughView_macOS(
+            onComplete: {
+                if isReplay {
+                    coordinator.showingSafariWalkthrough = false
+                } else {
+                    coordinator.completeWalkthrough()
+                }
+            },
+            isReplay: isReplay
+        )
+        .environment(coordinator)
+        #else
+        SafariWalkthroughView_iOS(
+            onComplete: {
+                if isReplay {
+                    coordinator.showingSafariWalkthrough = false
+                } else {
+                    coordinator.completeWalkthrough()
+                }
+            },
+            isReplay: isReplay
+        )
+        .environment(coordinator)
+        #endif
     }
 }

@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		02E2FE312F7F7065007CB358 /* SpeedReaderExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 02E2FE192F7F7065007CB358 /* SpeedReaderExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60576CF8DFF855A5FBC03458 /* SettingsTests.swift */; };
-		BB0000000000000000000001 /* OnboardingContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000010 /* OnboardingContentTests.swift */; };
-		BB0000000000000000000002 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E2FE0B2F7F6F9E007CB358 /* OnboardingView.swift */; };
 		EE0000000000000000000001 /* OnboardingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000010 /* OnboardingPhase.swift */; };
 		EE0000000000000000000002 /* OnboardingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000010 /* OnboardingPhase.swift */; };
 		EE0000000000000000000003 /* OnboardingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000010 /* OnboardingPhase.swift */; };
@@ -70,7 +68,6 @@
 		02E2FDF02F7F6E15007CB358 /* SpeedReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpeedReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		02E2FE082F7F6F9E007CB358 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		02E2FE0A2F7F6F9E007CB358 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		02E2FE0B2F7F6F9E007CB358 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		02E2FE0C2F7F6F9E007CB358 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		02E2FE192F7F7065007CB358 /* SpeedReaderExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SpeedReaderExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		02E2FE4C2F7F707E007CB358 /* SettingsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsKeys.swift; sourceTree = "<group>"; };
@@ -90,7 +87,6 @@
 		4DFBFC19ACD7105EA7C06AF3 /* word-processor.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; path = "word-processor.js"; sourceTree = "<group>"; };
 		57270C891B5A8607F4D7800E /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		60576CF8DFF855A5FBC03458 /* SettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
-		BB0000000000000000000010 /* OnboardingContentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingContentTests.swift; sourceTree = "<group>"; };
 		CC0000000000000000000010 /* OnboardingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingUITests.swift; sourceTree = "<group>"; };
 		CC0000000000000000000099 /* SpeedReaderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpeedReaderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		64C4F798A63CCC4C2CF9EFAE /* toolbar-icon-19.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "toolbar-icon-19.png"; sourceTree = "<group>"; };
@@ -213,7 +209,6 @@
 			isa = PBXGroup;
 			children = (
 				02E2FE0A2F7F6F9E007CB358 /* ContentView.swift */,
-				02E2FE0B2F7F6F9E007CB358 /* OnboardingView.swift */,
 				02E2FE0C2F7F6F9E007CB358 /* SettingsView.swift */,
 			);
 			name = Views;
@@ -256,7 +251,6 @@
 			isa = PBXGroup;
 			children = (
 				60576CF8DFF855A5FBC03458 /* SettingsTests.swift */,
-				BB0000000000000000000010 /* OnboardingContentTests.swift */,
 				EE0000000000000000000020 /* OnboardingPhaseTests.swift */,
 			);
 			path = SpeedReaderTests;
@@ -523,8 +517,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				697D9278EF21F9EE41CFA1CC /* SettingsTests.swift in Sources */,
-				BB0000000000000000000001 /* OnboardingContentTests.swift in Sources */,
-				BB0000000000000000000002 /* OnboardingView.swift in Sources */,
 				AA0000000000000000000001 /* Settings.swift in Sources */,
 				AA0000000000000000000002 /* SettingsKeys.swift in Sources */,
 				EE0000000000000000000003 /* OnboardingPhase.swift in Sources */,
