@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.0 (2026-04-11)
+
+- Add phased onboarding walkthrough: Phase 1 guides enabling the Safari extension, Phase 2 is a 4-step wizard showing how to use SpeedReader in Safari
+- Platform-specific views for iOS (swipeable pages) and macOS (stepped navigation with Back button)
+- Stylized SwiftUI diagrams (Safari address bar, toolbar, extension menu, RSVP preview)
+- On-device funnel tracking via App Group UserDefaults (phase, step, completion, replays, first activation)
+- "How to Use in Safari" button in Settings replays the walkthrough
+- First extension activation detection via native messaging bridge
+- Backward-compatible migration from legacy onboarding boolean
+
 ## v1.0.5 (2026-04-11)
 
 - Use build_mac_app for macOS builds instead of build_app
