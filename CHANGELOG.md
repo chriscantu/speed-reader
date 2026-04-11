@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.5 (2026-04-11)
+
+- Use build_mac_app for macOS builds instead of build_app
+
 ## v1.0.4 (2026-04-11)
 
 - Fix macOS build: separate output dirs, use pkg for macOS uploads
