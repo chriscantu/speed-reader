@@ -124,21 +124,22 @@ platform :ios do
     # Archive the macOS build, then export manually so we can capture
     # the full xcodebuild -exportArchive output for diagnostics.
     # sh() runs from the repo root (fastlane cds up one level)
+    repo_root = File.expand_path("..", __dir__)
     sh(
       "xcodebuild archive " \
       "-scheme SpeedReader " \
-      "-project '../#{XCODE_PROJECT}' " \
+      "-project '#{File.join(repo_root, XCODE_PROJECT)}' " \
       "-destination 'generic/platform=macOS' " \
-      "-archivePath '../build/macos/SpeedReader.xcarchive' " \
+      "-archivePath '#{File.join(repo_root, "build/macos/SpeedReader.xcarchive")}' " \
       "clean"
     )
 
-    archive_path = "../build/macos/SpeedReader.xcarchive"
-    export_dir = "../build/macos/export"
+    archive_path = File.join(repo_root, "build/macos/SpeedReader.xcarchive")
+    export_dir = File.join(repo_root, "build/macos/export")
     FileUtils.mkdir_p(export_dir)
 
     # Write the export options plist
-    plist_path = "../build/macos/ExportOptions.plist"
+    plist_path = File.join(repo_root, "build/macos/ExportOptions.plist")
     plist_content = <<~PLIST
       <?xml version="1.0" encoding="UTF-8"?>
       <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
