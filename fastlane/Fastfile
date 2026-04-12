@@ -114,41 +114,27 @@ platform :ios do
     # --- macOS ---
     macos_profiles = fetch_profiles(platform: "macos")
     apply_signing(profiles: macos_profiles)
-    build_app(
+    build_mac_app(
       destination: "generic/platform=macOS",
       scheme: "SpeedReader",
       project: XCODE_PROJECT,
       output_directory: "./build/macos",
       export_method: "app-store",
       clean: true,
-      skip_package_ipa: true,
+      installer_cert_name: "3rd Party Mac Developer Installer",
+      xcodebuild_formatter: "",
       export_options: {
         signingStyle: "manual",
-        provisioningProfiles: macos_profiles,
-        installerSigningCertificate: "3rd Party Mac Developer Installer"
+        provisioningProfiles: macos_profiles
       }
     )
-
-    # Debug: list all files in macos output and temp gym directories
-    UI.message("=== build/macos contents ===")
-    Dir.glob("./build/macos/**/*").each { |f| UI.message("  #{f}") }
-    UI.message("=== Lane context ===")
-    UI.message("PKG_OUTPUT_PATH: #{lane_context[SharedValues::PKG_OUTPUT_PATH]}")
-    UI.message("IPA_OUTPUT_PATH: #{lane_context[SharedValues::IPA_OUTPUT_PATH]}")
-    UI.message("XCODEBUILD_ARCHIVE: #{lane_context[SharedValues::XCODEBUILD_ARCHIVE]}")
-
-    # Find the .pkg — check output dir and gym temp output
-    pkg_path = lane_context[SharedValues::PKG_OUTPUT_PATH]
-    pkg_path ||= Dir.glob("./build/macos/*.pkg").first
-    UI.user_error!("macOS .pkg was not produced — check export logs") unless pkg_path && File.exist?(pkg_path)
-
     upload_to_app_store(
       submit_for_review: false,
       automatic_release: false,
       skip_screenshots: true,
       skip_metadata: true,
       precheck_include_in_app_purchases: false,
-      pkg: pkg_path
+      pkg: lane_context[SharedValues::PKG_OUTPUT_PATH]
     )
   end
 end
