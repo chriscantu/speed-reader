@@ -91,6 +91,42 @@ platform :ios do
     )
   end
 
+  desc "Delete an unsubmitted App Store version. Usage: fastlane delete_version version:1.2.4 platform:IOS"
+  lane :delete_version do |options|
+    version_string = options[:version] or UI.user_error!("Pass version:X.Y.Z")
+    platform = (options[:platform] || "IOS").upcase
+    unless %w[IOS MAC_OS].include?(platform)
+      UI.user_error!("platform must be IOS or MAC_OS")
+    end
+
+    app = Spaceship::ConnectAPI::App.find(APP_BUNDLE_ID)
+    UI.user_error!("App #{APP_BUNDLE_ID} not found") unless app
+
+    versions = app.get_app_store_versions(filter: {
+      versionString: version_string,
+      platform: platform
+    })
+
+    if versions.empty?
+      UI.important("No #{platform} versions matching #{version_string} found.")
+      next
+    end
+
+    versions.each do |v|
+      state = v.app_store_state
+      if state == "PREPARE_FOR_SUBMISSION"
+        UI.message("Deleting #{platform} #{v.version_string} (state: #{state})")
+        v.delete!
+        UI.success("Deleted #{platform} #{v.version_string}")
+      else
+        UI.important(
+          "Skipping #{platform} #{v.version_string} — state is #{state}, " \
+          "only PREPARE_FOR_SUBMISSION versions can be deleted via API."
+        )
+      end
+    end
+  end
+
   desc "Build and upload to App Store (iOS + macOS)"
   lane :release do
     # Keychain is created and certificates imported by the CI workflow.
