@@ -1,0 +1,47 @@
+name: Create App Store Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version string to create (e.g., 1.1.1)'
+        required: true
+        type: string
+      build:
+        description: 'Build number to attach (e.g., 24)'
+        required: true
+        type: string
+      platform:
+        description: 'Platform'
+        required: true
+        type: choice
+        default: 'MAC_OS'
+        options:
+          - IOS
+          - MAC_OS
+
+jobs:
+  create:
+    name: Create version and attach build
+    runs-on: macos-26
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Create version
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY: ${{ secrets.APP_STORE_CONNECT_KEY }}
+        run: |
+          bundle exec fastlane create_version \
+            version:${{ github.event.inputs.version }} \
+            build:${{ github.event.inputs.build }} \
+            platform:${{ github.event.inputs.platform }}

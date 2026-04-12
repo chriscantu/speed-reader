@@ -219,6 +219,83 @@ platform :ios do
     end
   end
 
+  desc "Create a new App Store version and attach a build. Usage: fastlane create_version version:1.1.1 platform:MAC_OS build:24"
+  lane :create_version do |options|
+    require "jwt"
+    require "base64"
+    require "openssl"
+    require "net/http"
+    require "json"
+
+    version_string = options[:version] or UI.user_error!("Pass version:X.Y.Z")
+    build_number = options[:build] or UI.user_error!("Pass build:N")
+    platform = (options[:platform] || "IOS").upcase
+    unless %w[IOS MAC_OS].include?(platform)
+      UI.user_error!("platform must be IOS or MAC_OS")
+    end
+
+    app = Spaceship::ConnectAPI::App.find(APP_BUNDLE_ID)
+    UI.user_error!("App not found") unless app
+
+    # Find the build by version and platform
+    builds = Spaceship::ConnectAPI::Build.all(
+      app_id: app.id,
+      sort: "-uploadedDate",
+      limit: 100
+    )
+    build = builds.find do |b|
+      b.version == build_number.to_s &&
+        b.pre_release_version&.platform == platform
+    end
+    UI.user_error!("Build #{build_number} for #{platform} not found") unless build
+
+    UI.message("Found build #{build.version} (id: #{build.id}) state=#{build.processing_state}")
+
+    # Build JWT
+    private_key = OpenSSL::PKey::EC.new(Base64.decode64(ENV.fetch("APP_STORE_CONNECT_KEY")))
+    jwt = JWT.encode(
+      {
+        iss: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+        exp: Time.now.to_i + 60 * 10,
+        aud: "appstoreconnect-v1"
+      },
+      private_key,
+      "ES256",
+      { kid: ENV.fetch("APP_STORE_CONNECT_KEY_ID"), typ: "JWT" }
+    )
+
+    # POST /v1/appStoreVersions — creates the version and attaches the build
+    uri = URI("https://api.appstoreconnect.apple.com/v1/appStoreVersions")
+    request = Net::HTTP::Post.new(uri)
+    request["Authorization"] = "Bearer #{jwt}"
+    request["Content-Type"] = "application/json"
+    request.body = {
+      data: {
+        type: "appStoreVersions",
+        attributes: {
+          platform: platform,
+          versionString: version_string
+        },
+        relationships: {
+          app: {
+            data: { type: "apps", id: app.id.to_s }
+          },
+          build: {
+            data: { type: "builds", id: build.id }
+          }
+        }
+      }
+    }.to_json
+
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.request(request) }
+
+    if response.code.to_i.between?(200, 299)
+      UI.success("Created #{platform} #{version_string} with build #{build_number} attached")
+    else
+      UI.user_error!("Failed to create version: HTTP #{response.code} — #{response.body}")
+    end
+  end
+
   desc "Rename an unsubmitted App Store version. Usage: fastlane rename_version from:1.2.4 to:1.1.1 platform:IOS"
   lane :rename_version do |options|
     require "jwt"
