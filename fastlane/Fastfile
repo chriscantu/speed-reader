@@ -120,26 +120,72 @@ platform :ios do
     # --- macOS ---
     macos_profiles = fetch_profiles(platform: "macos")
     apply_signing(profiles: macos_profiles)
-    build_mac_app(
-      destination: "generic/platform=macOS",
-      scheme: "SpeedReader",
-      project: XCODE_PROJECT,
-      output_directory: "./build/macos",
-      export_method: "app-store",
-      clean: true,
-      installer_cert_name: "3rd Party Mac Developer Installer",
-      export_options: {
-        signingStyle: "manual",
-        provisioningProfiles: macos_profiles
-      }
+
+    # Archive the macOS build, then export manually so we can capture
+    # the full xcodebuild -exportArchive output for diagnostics.
+    # sh() runs from the repo root (fastlane cds up one level)
+    sh(
+      "xcodebuild archive " \
+      "-scheme SpeedReader " \
+      "-project #{XCODE_PROJECT} " \
+      "-destination 'generic/platform=macOS' " \
+      "-archivePath '../build/macos/SpeedReader.xcarchive' " \
+      "clean"
     )
+
+    archive_path = "../build/macos/SpeedReader.xcarchive"
+    export_dir = "../build/macos/export"
+    FileUtils.mkdir_p(export_dir)
+
+    # Write the export options plist
+    plist_path = "../build/macos/ExportOptions.plist"
+    plist_content = <<~PLIST
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+        <key>method</key>
+        <string>app-store</string>
+        <key>signingStyle</key>
+        <string>manual</string>
+        <key>installerSigningCertificate</key>
+        <string>3rd Party Mac Developer Installer: Chris Cantu (4AKSB2RDBU)</string>
+        <key>provisioningProfiles</key>
+        <dict>
+          <key>#{APP_BUNDLE_ID}</key>
+          <string>#{macos_profiles[APP_BUNDLE_ID]}</string>
+          <key>#{EXTENSION_BUNDLE_ID}</key>
+          <string>#{macos_profiles[EXTENSION_BUNDLE_ID]}</string>
+        </dict>
+      </dict>
+      </plist>
+    PLIST
+    File.write(plist_path, plist_content)
+
+    # Run export directly — capture stdout+stderr, don't abort on failure.
+    sh(
+      "xcodebuild -exportArchive " \
+      "-archivePath '#{archive_path}' " \
+      "-exportOptionsPlist '#{plist_path}' " \
+      "-exportPath '#{export_dir}' " \
+      "2>&1; true"
+    )
+
+    # List what was produced
+    UI.important("=== Export directory contents ===")
+    Dir.glob("#{export_dir}/**/*").each { |f| UI.important("  #{f}") }
+
+    # Find the pkg
+    pkg_path = Dir.glob("#{export_dir}/*.pkg").first
+    UI.user_error!("macOS .pkg was not produced. See xcodebuild output above.") unless pkg_path
+
     upload_to_app_store(
       submit_for_review: false,
       automatic_release: false,
       skip_screenshots: true,
       skip_metadata: true,
       precheck_include_in_app_purchases: false,
-      pkg: lane_context[SharedValues::PKG_OUTPUT_PATH]
+      pkg: pkg_path
     )
   end
 end
