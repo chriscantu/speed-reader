@@ -289,13 +289,22 @@ platform :ios do
       precheck_include_in_app_purchases: false
     )
 
-    # --- macOS ---
+    build_and_upload_macos
+  end
+
+  desc "Build and upload macOS only (used for retrying after a stuck/silent failure)"
+  lane :release_macos do
+    build_and_upload_macos
+  end
+
+  private_lane :build_and_upload_macos do
     macos_profiles = fetch_profiles(platform: "macos")
     apply_signing(profiles: macos_profiles)
 
     # Archive the macOS build, then export manually so we can capture
     # the full xcodebuild -exportArchive output for diagnostics.
-    # sh() runs from the repo root (fastlane cds up one level)
+    # sh() runs from the fastlane/ directory; use absolute paths
+    # via repo_root to avoid path resolution issues.
     repo_root = File.expand_path("..", __dir__)
     sh(
       "xcodebuild archive " \
