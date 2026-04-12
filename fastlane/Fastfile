@@ -53,6 +53,12 @@ platform :ios do
   lane :beta do
     setup_ci
 
+    import_certificate(
+      certificate_path: File.join(ENV.fetch("RUNNER_TEMP"), "certificate.p12"),
+      certificate_password: ENV.fetch("SIGNING_CERTIFICATE_PASSWORD", ""),
+      keychain_name: lane_context[SharedValues::KEYCHAIN_PATH] || "fastlane_tmp_keychain"
+    )
+
     # --- iOS ---
     ios_profiles = fetch_profiles(platform: "ios")
     apply_signing(profiles: ios_profiles)
@@ -92,6 +98,16 @@ platform :ios do
   lane :release do
     setup_ci
 
+    # Import signing certificates into fastlane's CI keychain.
+    # The workflow decodes the P12 to $RUNNER_TEMP/certificate.p12;
+    # import_certificate puts it in the keychain setup_ci created,
+    # so both codesign and productbuild can find the identities.
+    import_certificate(
+      certificate_path: File.join(ENV.fetch("RUNNER_TEMP"), "certificate.p12"),
+      certificate_password: ENV.fetch("SIGNING_CERTIFICATE_PASSWORD", ""),
+      keychain_name: lane_context[SharedValues::KEYCHAIN_PATH] || "fastlane_tmp_keychain"
+    )
+
     # --- iOS ---
     ios_profiles = fetch_profiles(platform: "ios")
     apply_signing(profiles: ios_profiles)
@@ -122,7 +138,6 @@ platform :ios do
       export_method: "app-store",
       clean: true,
       installer_cert_name: "3rd Party Mac Developer Installer",
-      xcodebuild_formatter: "",
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: macos_profiles
