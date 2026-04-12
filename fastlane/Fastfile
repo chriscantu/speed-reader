@@ -160,6 +160,35 @@ platform :ios do
     app = Spaceship::ConnectAPI::App.find(APP_BUNDLE_ID)
     UI.user_error!("App not found") unless app
 
+    UI.message("=== App attributes ===")
+    UI.message("  id: #{app.id}")
+    UI.message("  name: #{app.name}")
+    UI.message("  bundle_id: #{app.bundle_id}")
+    UI.message("  primary_locale: #{app.primary_locale}")
+    UI.message("  removed_from_sale: #{app.removed_from_sale}") if app.respond_to?(:removed_from_sale)
+    # Try to dump the raw attributes hash for any platform-related fields
+    if app.respond_to?(:to_attributes)
+      attrs = app.to_attributes rescue {}
+      attrs.each { |k, v| UI.message("  #{k}: #{v}") }
+    end
+
+    UI.message("")
+    UI.message("=== ALL builds (no platform filter) ===")
+    all_builds = Spaceship::ConnectAPI::Build.all(
+      app_id: app.id,
+      sort: "-uploadedDate",
+      limit: 5
+    )
+    if all_builds.empty?
+      UI.message("  (none)")
+    else
+      all_builds.each do |b|
+        platform = b.pre_release_version&.platform || "?"
+        version = b.pre_release_version&.version || "?"
+        UI.message("  [#{platform}] v#{version} build #{b.version} #{b.processing_state} uploaded #{b.uploaded_date}")
+      end
+    end
+
     %w[IOS MAC_OS].each do |platform|
       UI.message("")
       UI.message("=== #{platform} App Store Versions ===")
