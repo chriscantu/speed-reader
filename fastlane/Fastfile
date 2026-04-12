@@ -93,6 +93,11 @@ platform :ios do
 
   desc "Delete an unsubmitted App Store version. Usage: fastlane delete_version version:1.2.4 platform:IOS"
   lane :delete_version do |options|
+    require "jwt"
+    require "base64"
+    require "openssl"
+    require "net/http"
+
     version_string = options[:version] or UI.user_error!("Pass version:X.Y.Z")
     platform = (options[:platform] || "IOS").upcase
     unless %w[IOS MAC_OS].include?(platform)
@@ -112,17 +117,40 @@ platform :ios do
       next
     end
 
+    # Build a JWT once for all delete requests
+    private_key = OpenSSL::PKey::EC.new(Base64.decode64(ENV.fetch("APP_STORE_CONNECT_KEY")))
+    jwt = JWT.encode(
+      {
+        iss: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+        exp: Time.now.to_i + 60 * 10,
+        aud: "appstoreconnect-v1"
+      },
+      private_key,
+      "ES256",
+      { kid: ENV.fetch("APP_STORE_CONNECT_KEY_ID"), typ: "JWT" }
+    )
+
     versions.each do |v|
       state = v.app_store_state
-      if state == "PREPARE_FOR_SUBMISSION"
-        UI.message("Deleting #{platform} #{v.version_string} (id: #{v.id}, state: #{state})")
-        Spaceship::ConnectAPI.client.delete("appStoreVersions/#{v.id}")
-        UI.success("Deleted #{platform} #{v.version_string}")
-      else
+      unless state == "PREPARE_FOR_SUBMISSION"
         UI.important(
           "Skipping #{platform} #{v.version_string} — state is #{state}, " \
           "only PREPARE_FOR_SUBMISSION versions can be deleted via API."
         )
+        next
+      end
+
+      UI.message("Deleting #{platform} #{v.version_string} (id: #{v.id}, state: #{state})")
+
+      uri = URI("https://api.appstoreconnect.apple.com/v1/appStoreVersions/#{v.id}")
+      request = Net::HTTP::Delete.new(uri)
+      request["Authorization"] = "Bearer #{jwt}"
+      response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.request(request) }
+
+      if response.code.to_i.between?(200, 299)
+        UI.success("Deleted #{platform} #{v.version_string}")
+      else
+        UI.user_error!("Failed to delete: HTTP #{response.code} — #{response.body}")
       end
     end
   end
