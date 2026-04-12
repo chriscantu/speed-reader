@@ -155,27 +155,38 @@ platform :ios do
     end
   end
 
-  desc "List all App Store versions and macOS builds"
+  desc "List all App Store versions and builds for both platforms"
   lane :list_state do
     app = Spaceship::ConnectAPI::App.find(APP_BUNDLE_ID)
     UI.user_error!("App not found") unless app
 
-    UI.message("=== App Store Versions ===")
-    app.get_app_store_versions.each do |v|
-      UI.message("  #{v.platform.ljust(8)} #{v.version_string.ljust(10)} #{v.app_store_state}")
-    end
+    %w[IOS MAC_OS].each do |platform|
+      UI.message("")
+      UI.message("=== #{platform} App Store Versions ===")
+      versions = app.get_app_store_versions(filter: { platform: platform }, limit: 50)
+      if versions.empty?
+        UI.message("  (none)")
+      else
+        versions.each do |v|
+          UI.message("  #{v.version_string.ljust(10)} #{v.app_store_state}")
+        end
+      end
 
-    UI.message("")
-    UI.message("=== Builds (most recent first, both platforms) ===")
-    builds = Spaceship::ConnectAPI::Build.all(
-      filter: { app: app.id },
-      sort: "-uploadedDate",
-      limit: 20
-    )
-    builds.each do |b|
-      platform = b.pre_release_version&.platform || "?"
-      version = b.pre_release_version&.version || "?"
-      UI.message("  #{platform.ljust(8)} #{version.ljust(10)} build #{b.version.ljust(4)} #{b.processing_state} uploaded #{b.uploaded_date}")
+      UI.message("=== #{platform} Builds (most recent first) ===")
+      builds = Spaceship::ConnectAPI::Build.all(
+        app_id: app.id,
+        platform: platform,
+        sort: "-uploadedDate",
+        limit: 10
+      )
+      if builds.empty?
+        UI.message("  (none)")
+      else
+        builds.each do |b|
+          version = b.pre_release_version&.version || "?"
+          UI.message("  v#{version.ljust(8)} build #{b.version.ljust(4)} #{b.processing_state.ljust(12)} uploaded #{b.uploaded_date}")
+        end
+      end
     end
   end
 
