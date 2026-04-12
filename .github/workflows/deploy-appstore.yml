@@ -36,26 +36,50 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: Decode signing certificate
+      - name: Set up code signing
         env:
           SIGNING_CERTIFICATE_P12: ${{ secrets.SIGNING_CERTIFICATE_P12 }}
+          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
         run: |
-          # Decode P12 to disk; Fastlane's import_certificate will import
-          # it into the CI keychain that setup_ci creates.
-          echo -n "$SIGNING_CERTIFICATE_P12" | base64 --decode -o $RUNNER_TEMP/certificate.p12
+          CERTIFICATE_PATH=$RUNNER_TEMP/certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/signing.keychain-db
+
+          # Decode P12
+          echo -n "$SIGNING_CERTIFICATE_P12" | base64 --decode -o $CERTIFICATE_PATH
+
+          # Create a single keychain, import certs, set as default.
+          # Fastlane lanes intentionally skip setup_ci so this is the
+          # only keychain — codesign AND productbuild both find it.
+          security create-keychain -p "ci" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "ci" $KEYCHAIN_PATH
+
+          security import $CERTIFICATE_PATH \
+            -P "$SIGNING_CERTIFICATE_PASSWORD" \
+            -A -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: \
+            -k "ci" $KEYCHAIN_PATH
+
+          security list-keychains -d user -s $KEYCHAIN_PATH login.keychain-db
+          security default-keychain -s $KEYCHAIN_PATH
+
+          # Verify identities are accessible
+          echo "=== Signing identities ==="
+          security find-identity -v -p codesigning
+          echo "=== All identities (including installer) ==="
+          security find-identity -v
 
       - name: Build and upload to App Store
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY: ${{ secrets.APP_STORE_CONNECT_KEY }}
-          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
         run: bundle exec fastlane release
 
       - name: Clean up keychain
         if: always()
         run: |
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          KEYCHAIN_PATH=$RUNNER_TEMP/signing.keychain-db
           if [ -f "$KEYCHAIN_PATH" ]; then
             security delete-keychain $KEYCHAIN_PATH
           fi

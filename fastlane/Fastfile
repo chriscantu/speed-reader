@@ -51,13 +51,10 @@ platform :ios do
 
   desc "Build and upload to TestFlight (iOS + macOS)"
   lane :beta do
-    setup_ci
-
-    import_certificate(
-      certificate_path: File.join(ENV.fetch("RUNNER_TEMP"), "certificate.p12"),
-      certificate_password: ENV.fetch("SIGNING_CERTIFICATE_PASSWORD", ""),
-      keychain_name: lane_context[SharedValues::KEYCHAIN_PATH] || "fastlane_tmp_keychain"
-    )
+    # Keychain is created and certificates imported by the CI workflow.
+    # Do NOT call setup_ci — it creates a second empty keychain that
+    # becomes the default, hiding the installer certificate from
+    # productbuild (which only searches the default keychain).
 
     # --- iOS ---
     ios_profiles = fetch_profiles(platform: "ios")
@@ -96,17 +93,10 @@ platform :ios do
 
   desc "Build and upload to App Store (iOS + macOS)"
   lane :release do
-    setup_ci
-
-    # Import signing certificates into fastlane's CI keychain.
-    # The workflow decodes the P12 to $RUNNER_TEMP/certificate.p12;
-    # import_certificate puts it in the keychain setup_ci created,
-    # so both codesign and productbuild can find the identities.
-    import_certificate(
-      certificate_path: File.join(ENV.fetch("RUNNER_TEMP"), "certificate.p12"),
-      certificate_password: ENV.fetch("SIGNING_CERTIFICATE_PASSWORD", ""),
-      keychain_name: lane_context[SharedValues::KEYCHAIN_PATH] || "fastlane_tmp_keychain"
-    )
+    # Keychain is created and certificates imported by the CI workflow.
+    # Do NOT call setup_ci — it creates a second empty keychain that
+    # becomes the default, hiding the installer certificate from
+    # productbuild (which only searches the default keychain).
 
     # --- iOS ---
     ios_profiles = fetch_profiles(platform: "ios")
