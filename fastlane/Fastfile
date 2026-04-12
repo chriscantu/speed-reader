@@ -116,7 +116,7 @@ platform :ios do
       state = v.app_store_state
       if state == "PREPARE_FOR_SUBMISSION"
         UI.message("Deleting #{platform} #{v.version_string} (id: #{v.id}, state: #{state})")
-        Spaceship::ConnectAPI.delete_app_store_version(app_store_version_id: v.id)
+        Spaceship::ConnectAPI.client.delete("appStoreVersions/#{v.id}")
         UI.success("Deleted #{platform} #{v.version_string}")
       else
         UI.important(
