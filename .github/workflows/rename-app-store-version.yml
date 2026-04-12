@@ -1,0 +1,47 @@
+name: Rename App Store Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      from:
+        description: 'Current version string (e.g., 1.2.4)'
+        required: true
+        type: string
+      to:
+        description: 'New version string (e.g., 1.1.1)'
+        required: true
+        type: string
+      platform:
+        description: 'Platform'
+        required: true
+        type: choice
+        default: 'IOS'
+        options:
+          - IOS
+          - MAC_OS
+
+jobs:
+  rename:
+    name: Rename unsubmitted version
+    runs-on: macos-26
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Rename version
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY: ${{ secrets.APP_STORE_CONNECT_KEY }}
+        run: |
+          bundle exec fastlane rename_version \
+            from:${{ github.event.inputs.from }} \
+            to:${{ github.event.inputs.to }} \
+            platform:${{ github.event.inputs.platform }}
