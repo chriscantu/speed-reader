@@ -127,7 +127,7 @@ platform :ios do
     sh(
       "xcodebuild archive " \
       "-scheme SpeedReader " \
-      "-project #{XCODE_PROJECT} " \
+      "-project '../#{XCODE_PROJECT}' " \
       "-destination 'generic/platform=macOS' " \
       "-archivePath '../build/macos/SpeedReader.xcarchive' " \
       "clean"
