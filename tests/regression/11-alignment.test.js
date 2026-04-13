@@ -33,7 +33,7 @@ describe('ORP Alignment', () => {
     dispatch('set-alignment', { alignment: 'orp' });
     dispatch('set-font-size', { fontSize: 42 });
     dispatch('set-font', { font: 'system' });
-    dispatch('set-theme', { theme: 'system' });
+    dispatch('set-paper', { paper: 'cream' });
   });
 
   // --- Alignment switching ---
@@ -172,27 +172,27 @@ describe('ORP Alignment', () => {
     });
   }
 
-  // --- Both alignment modes × light/dark theme ---
+  // --- Both alignment modes × all 4 papers ---
 
-  const THEMES = ['light', 'dark'];
+  const PAPERS = ['white', 'cream', 'slate', 'black'];
 
-  for (const theme of THEMES) {
-    it(`orp mode renders with ${theme} theme`, async () => {
+  for (const paper of PAPERS) {
+    it(`orp mode renders with ${paper} paper`, async () => {
       dispatch('set-alignment', { alignment: 'orp' });
-      dispatch('set-theme', { theme });
-      await waitFor(async () => (await queryState()).theme === theme, { timeout: 3000 });
+      dispatch('set-paper', { paper });
+      await waitFor(async () => (await queryState()).paper === paper, { timeout: 3000 });
 
       const state = await queryState();
-      assert.ok(state.hasFocus, `Focus should render in ${theme} theme ORP mode`);
+      assert.ok(state.hasFocus, `Focus should render in ${paper} paper ORP mode`);
       assert.strictEqual(state.alignment, 'orp');
     });
 
-    it(`center mode renders with ${theme} theme`, async () => {
+    it(`center mode renders with ${paper} paper`, async () => {
       dispatch('set-alignment', { alignment: 'center' });
       await waitFor(async () => (await queryState()).alignment === 'center', { timeout: 3000 });
 
       const state = await queryState();
-      assert.ok(state.hasFocus, `Focus should render in ${theme} theme center mode`);
+      assert.ok(state.hasFocus, `Focus should render in ${paper} paper center mode`);
       assert.strictEqual(state.alignment, 'center');
     });
   }
