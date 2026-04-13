@@ -12,7 +12,7 @@ final class ReaderSettings {
 
     var wpm: Int = SettingsKeys.Defaults.wpm
     var font: ReaderFont = SettingsKeys.Defaults.font
-    var theme: ReaderTheme = SettingsKeys.Defaults.theme
+    var paper: ReaderPaper = SettingsKeys.Defaults.paper
     var fontSize: Int = SettingsKeys.Defaults.fontSize
     var punctuationPause: Bool = SettingsKeys.Defaults.punctuationPause
     var alignment: ReaderAlignment = SettingsKeys.Defaults.alignment
@@ -37,6 +37,7 @@ final class ReaderSettings {
         }
 
         self.defaults = store
+        SettingsKeys.migrateThemeToPaper(in: store)
         loadFromDefaults(store)
     }
 
@@ -60,10 +61,10 @@ final class ReaderSettings {
         defaults.set(font.rawValue, forKey: SettingsKeys.font)
     }
 
-    /// Sets theme and persists to UserDefaults.
-    func setTheme(_ value: ReaderTheme) {
-        theme = value
-        defaults.set(theme.rawValue, forKey: SettingsKeys.theme)
+    /// Sets paper and persists to UserDefaults.
+    func setPaper(_ value: ReaderPaper) {
+        paper = value
+        defaults.set(paper.rawValue, forKey: SettingsKeys.paper)
     }
 
     /// Sets punctuation pause and persists to UserDefaults.
@@ -93,9 +94,9 @@ final class ReaderSettings {
             ?? SettingsKeys.Defaults.font.rawValue
         font = ReaderFont(rawValue: fontRaw) ?? SettingsKeys.Defaults.font
 
-        let themeRaw = store.string(forKey: SettingsKeys.theme)
-            ?? SettingsKeys.Defaults.theme.rawValue
-        theme = ReaderTheme(rawValue: themeRaw) ?? SettingsKeys.Defaults.theme
+        let paperRaw = store.string(forKey: SettingsKeys.paper)
+            ?? SettingsKeys.Defaults.paper.rawValue
+        paper = ReaderPaper(rawValue: paperRaw) ?? SettingsKeys.Defaults.paper
 
         let loadedFontSize = store.object(forKey: SettingsKeys.fontSize) as? Int
             ?? SettingsKeys.Defaults.fontSize

@@ -13,6 +13,28 @@ extension ReaderFont {
     }
 }
 
+extension ReaderPaper {
+    /// Background + text colors for the SwiftUI preview.
+    /// MUST match overlay.css `:host([data-paper=...])` color tokens exactly.
+    /// Keep in sync with CSS — there is no shared source of truth for these 4 colors.
+    var previewColors: (background: Color, text: Color) {
+        switch self {
+        case .white:
+            return (Color(red: 1.0,   green: 1.0,   blue: 1.0),
+                    Color(red: 0.2,   green: 0.2,   blue: 0.2))
+        case .cream:
+            return (Color(red: 0.992, green: 0.965, blue: 0.890),
+                    Color(red: 0.361, green: 0.290, blue: 0.165))
+        case .slate:
+            return (Color(red: 0.165, green: 0.165, blue: 0.165),
+                    Color(red: 0.867, green: 0.867, blue: 0.867))
+        case .black:
+            return (Color(red: 0.0,   green: 0.0,   blue: 0.0),
+                    Color(red: 0.878, green: 0.878, blue: 0.878))
+        }
+    }
+}
+
 /// Small label used for slider min/max value annotations.
 private struct SliderBoundLabel: View {
     let value: Int
@@ -32,7 +54,7 @@ private let orpAccentColor = Color(red: 8 / 255, green: 145 / 255, blue: 178 / 2
 private struct RSVPPreview: View {
     let font: ReaderFont
     let fontSize: Int
-    let theme: ReaderTheme
+    let paper: ReaderPaper
     let alignment: ReaderAlignment
     let chunkSize: Int
 
@@ -48,26 +70,8 @@ private struct RSVPPreview: View {
     private var focus: String { String(word[word.index(word.startIndex, offsetBy: focusIndex)]) }
     private var after: String { String(word.suffix(word.count - focusIndex - 1)) }
 
-    private var backgroundColor: Color {
-        switch theme {
-        case .dark: return Color.black
-        case .light: return Color.white
-        case .system:
-            #if os(macOS)
-            return Color(nsColor: .windowBackgroundColor)
-            #else
-            return Color(uiColor: .systemBackground)
-            #endif
-        }
-    }
-
-    private var textColor: Color {
-        switch theme {
-        case .dark: return Color.white
-        case .light: return Color.black
-        case .system: return Color.primary
-        }
-    }
+    private var backgroundColor: Color { paper.previewColors.background }
+    private var textColor: Color { paper.previewColors.text }
 
     // Concatenated Text so minimumScaleFactor applies uniformly to all parts.
     // ORP centering is approximate in this preview — the overlay uses CSS grid
@@ -171,7 +175,7 @@ struct SettingsView: View {
                 RSVPPreview(
                     font: settings.font,
                     fontSize: settings.fontSize,
-                    theme: settings.theme,
+                    paper: settings.paper,
                     alignment: settings.alignment,
                     chunkSize: settings.chunkSize
                 )
@@ -186,12 +190,12 @@ struct SettingsView: View {
                     }
                 }
 
-                Picker("Theme", selection: Binding(
-                    get: { settings.theme },
-                    set: { settings.setTheme($0) }
+                Picker("Paper", selection: Binding(
+                    get: { settings.paper },
+                    set: { settings.setPaper($0) }
                 )) {
-                    ForEach(ReaderTheme.allCases) { theme in
-                        Text(theme.displayName).tag(theme)
+                    ForEach(ReaderPaper.allCases) { paper in
+                        Text(paper.displayName).tag(paper)
                     }
                 }
 
