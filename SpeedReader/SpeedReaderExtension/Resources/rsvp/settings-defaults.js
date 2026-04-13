@@ -14,12 +14,17 @@ export const CHUNK_SIZE_MAX = 3;
 export const ALIGNMENT_DEFAULT = 'orp';
 export const VALID_ALIGNMENTS = ['orp', 'center'];
 
-export const SETTINGS_KEYS = ['wpm', 'font', 'theme', 'fontSize', 'punctuationPause', 'alignment', 'chunkSize'];
+export const PAPER_DEFAULT = 'cream';
+export const VALID_PAPERS = ['white', 'cream', 'slate', 'black'];
+
+export const SETTINGS_KEYS = [
+  'wpm', 'font', 'paper', 'fontSize', 'punctuationPause', 'alignment', 'chunkSize',
+];
 
 export const SETTINGS_DEFAULTS = {
   wpm: WPM_DEFAULT,
   font: 'system',
-  theme: 'system',
+  paper: PAPER_DEFAULT,
   fontSize: FONT_SIZE_DEFAULT,
   punctuationPause: true,
   alignment: ALIGNMENT_DEFAULT,
@@ -39,6 +44,11 @@ export function clampFontSize(value) {
 export function validateAlignment(value) {
   if (typeof value === 'string' && VALID_ALIGNMENTS.includes(value)) return value;
   return ALIGNMENT_DEFAULT;
+}
+
+export function validatePaper(value) {
+  if (typeof value === 'string' && VALID_PAPERS.includes(value)) return value;
+  return PAPER_DEFAULT;
 }
 
 export function clampChunkSize(value) {
