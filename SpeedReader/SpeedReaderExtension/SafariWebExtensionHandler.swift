@@ -97,7 +97,7 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         return [
             "wpm": defaults.object(forKey: SettingsKeys.wpm) ?? SettingsKeys.Defaults.wpm,
             "font": defaults.string(forKey: SettingsKeys.font) ?? SettingsKeys.Defaults.font.rawValue,
-            "theme": defaults.string(forKey: SettingsKeys.theme) ?? SettingsKeys.Defaults.theme.rawValue,
+            "paper": defaults.string(forKey: SettingsKeys.paper) ?? SettingsKeys.Defaults.paper.rawValue,
             "fontSize": defaults.object(forKey: SettingsKeys.fontSize) ?? SettingsKeys.Defaults.fontSize,
             "punctuationPause": defaults.object(forKey: SettingsKeys.punctuationPause)
                 ?? SettingsKeys.Defaults.punctuationPause,
@@ -122,7 +122,7 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         [
             "wpm": SettingsKeys.Defaults.wpm,
             "font": SettingsKeys.Defaults.font.rawValue,
-            "theme": SettingsKeys.Defaults.theme.rawValue,
+            "paper": SettingsKeys.Defaults.paper.rawValue,
             "fontSize": SettingsKeys.Defaults.fontSize,
             "punctuationPause": SettingsKeys.Defaults.punctuationPause,
             "alignment": SettingsKeys.Defaults.alignment.rawValue,

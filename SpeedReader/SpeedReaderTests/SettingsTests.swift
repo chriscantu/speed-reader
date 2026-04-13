@@ -136,7 +136,7 @@ final class SettingsTests: XCTestCase {
         let payload: [String: Any] = [
             "wpm": 300,
             "font": "opendyslexic",
-            "theme": "dark",
+            "paper": "slate",
             "fontSize": 36,
             "punctuationPause": false,
             "alignment": "center",
@@ -145,7 +145,7 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(count, 6)
         XCTAssertEqual(store.integer(forKey: SettingsKeys.wpm), 300)
         XCTAssertEqual(store.string(forKey: SettingsKeys.font), "opendyslexic")
-        XCTAssertEqual(store.string(forKey: SettingsKeys.theme), "dark")
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "slate")
         XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), 36)
         XCTAssertFalse(store.bool(forKey: SettingsKeys.punctuationPause))
         XCTAssertEqual(store.string(forKey: SettingsKeys.alignment), "center")
@@ -156,7 +156,7 @@ final class SettingsTests: XCTestCase {
         let payload: [String: Any] = [
             "wpm": "fast",
             "font": 42,
-            "theme": true,
+            "paper": 42,
             "fontSize": "big",
             "punctuationPause": 1,
             "alignment": 42,
@@ -170,27 +170,20 @@ final class SettingsTests: XCTestCase {
         let payload: [String: Any] = [
             "wpm": 200,           // valid
             "font": 42,           // wrong type
-            "theme": "dark",      // valid
+            "paper": "slate",     // valid
             "fontSize": "big",    // wrong type
             "punctuationPause": true,  // valid
         ]
         let count = SettingsKeys.saveSettings(payload, to: store)
         XCTAssertEqual(count, 3)
         XCTAssertEqual(store.integer(forKey: SettingsKeys.wpm), 200)
-        XCTAssertEqual(store.string(forKey: SettingsKeys.theme), "dark")
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "slate")
         XCTAssertTrue(store.bool(forKey: SettingsKeys.punctuationPause))
     }
 
     func testSaveSettingsRejectsInvalidFontRawValue() {
         let store = makeDefaults()
         let payload: [String: Any] = ["font": "comic-sans"]
-        let count = SettingsKeys.saveSettings(payload, to: store)
-        XCTAssertEqual(count, 0)
-    }
-
-    func testSaveSettingsRejectsInvalidThemeRawValue() {
-        let store = makeDefaults()
-        let payload: [String: Any] = ["theme": "neon-pink"]
         let count = SettingsKeys.saveSettings(payload, to: store)
         XCTAssertEqual(count, 0)
     }

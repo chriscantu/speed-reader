@@ -22,23 +22,6 @@ enum ReaderFont: String, CaseIterable, Identifiable {
     }
 }
 
-/// Theme options for the RSVP reader.
-enum ReaderTheme: String, CaseIterable, Identifiable {
-    case system
-    case light
-    case dark
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .system: return "System"
-        case .light: return "Light"
-        case .dark: return "Dark"
-        }
-    }
-}
-
 /// Alignment options for the RSVP word display.
 enum ReaderAlignment: String, CaseIterable, Identifiable {
     case orpAligned = "orp"
@@ -87,7 +70,6 @@ enum SettingsKeys {
 
     static let wpm = "sr_wpm"
     static let font = "sr_font"
-    static let theme = "sr_theme"
     static let fontSize = "sr_fontSize"
     static let punctuationPause = "sr_punctuationPause"
     static let alignment = "sr_alignment"
@@ -109,7 +91,6 @@ enum SettingsKeys {
     enum Defaults {
         static let wpm = 250
         static let font: ReaderFont = .system
-        static let theme: ReaderTheme = .system
         static let fontSize = 42
         static let punctuationPause = true
         static let alignment: ReaderAlignment = .orpAligned
@@ -183,11 +164,6 @@ enum SettingsKeys {
         if let font = settings["font"] as? String,
            ReaderFont(rawValue: font) != nil {
             defaults.set(font, forKey: SettingsKeys.font)
-            savedCount += 1
-        }
-        if let theme = settings["theme"] as? String,
-           ReaderTheme(rawValue: theme) != nil {
-            defaults.set(theme, forKey: SettingsKeys.theme)
             savedCount += 1
         }
         if let paper = settings["paper"] as? String,
