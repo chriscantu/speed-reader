@@ -356,4 +356,33 @@ final class SettingsTests: XCTestCase {
         let count = SettingsKeys.saveSettings(["alignment": "scrambled"], to: store)
         XCTAssertEqual(count, 0)
     }
+
+    // MARK: - Paper
+
+    func testReaderPaperRawValues() {
+        XCTAssertEqual(ReaderPaper.white.rawValue, "white")
+        XCTAssertEqual(ReaderPaper.cream.rawValue, "cream")
+        XCTAssertEqual(ReaderPaper.slate.rawValue, "slate")
+        XCTAssertEqual(ReaderPaper.black.rawValue, "black")
+    }
+
+    func testReaderPaperAllCasesCount() {
+        XCTAssertEqual(ReaderPaper.allCases.count, 4)
+    }
+
+    func testReaderPaperDisplayNames() {
+        XCTAssertEqual(ReaderPaper.white.displayName, "White")
+        XCTAssertEqual(ReaderPaper.cream.displayName, "Cream")
+        XCTAssertEqual(ReaderPaper.slate.displayName, "Slate")
+        XCTAssertEqual(ReaderPaper.black.displayName, "Black")
+    }
+
+    func testPaperDefaultIsCream() {
+        XCTAssertEqual(SettingsKeys.Defaults.paper, .cream)
+    }
+
+    func testPaperKeyIsNamespaced() {
+        XCTAssertEqual(SettingsKeys.paper, "sr_paper")
+        XCTAssertEqual(SettingsKeys.migratedToPaper, "sr_migratedToPaper")
+    }
 }

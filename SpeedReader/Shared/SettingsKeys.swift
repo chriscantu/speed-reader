@@ -54,6 +54,29 @@ enum ReaderAlignment: String, CaseIterable, Identifiable {
     }
 }
 
+/// Paper (background + text palette) options for the RSVP reader.
+/// Replaces the old ReaderTheme — see docs/superpowers/specs/2026-04-13-paper-backgrounds-design.md.
+///
+/// Keep in sync with overlay.css `:host([data-paper=...])` blocks and
+/// SettingsView.swift `ReaderPaper.previewColors` extension.
+enum ReaderPaper: String, CaseIterable, Identifiable {
+    case white
+    case cream
+    case slate
+    case black
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .white: return "White"
+        case .cream: return "Cream"
+        case .slate: return "Slate"
+        case .black: return "Black"
+        }
+    }
+}
+
 /// Constants for App Group settings shared between the app and extension.
 enum SettingsKeys {
     /// App Group identifier — must match the entitlements file.
@@ -69,6 +92,8 @@ enum SettingsKeys {
     static let punctuationPause = "sr_punctuationPause"
     static let alignment = "sr_alignment"
     static let chunkSize = "sr_chunkSize"
+    static let paper = "sr_paper"
+    static let migratedToPaper = "sr_migratedToPaper"
 
     // Onboarding & funnel tracking keys
     /// Legacy onboarding boolean key (pre-v1.1). Used only for migration.
@@ -89,6 +114,7 @@ enum SettingsKeys {
         static let punctuationPause = true
         static let alignment: ReaderAlignment = .orpAligned
         static let chunkSize = 1
+        static let paper: ReaderPaper = .cream
     }
 
     /// WPM bounds
