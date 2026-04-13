@@ -467,6 +467,8 @@ final class SettingsTests: XCTestCase {
         SettingsKeys.migrateThemeToPaper(in: store)
         // Expect user's explicit choice preserved, not reset to "slate"
         XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "white")
+        XCTAssertNil(store.object(forKey: "sr_theme"),
+                     "sr_theme should remain absent after the no-op second migration")
     }
 
     func testMigrationSkipsIfAlreadyMigrated() {
@@ -475,5 +477,7 @@ final class SettingsTests: XCTestCase {
         store.set("dark", forKey: "sr_theme")  // Should be ignored
         SettingsKeys.migrateThemeToPaper(in: store)
         XCTAssertNil(store.string(forKey: SettingsKeys.paper))
+        XCTAssertEqual(store.string(forKey: "sr_theme"), "dark",
+                       "sr_theme should be untouched when migration early-returns")
     }
 }
