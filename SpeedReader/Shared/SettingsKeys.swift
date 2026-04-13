@@ -140,6 +140,36 @@ enum SettingsKeys {
         Swift.max(min, Swift.min(max, value))
     }
 
+    /// One-shot migration from legacy `sr_theme` to `sr_paper`.
+    ///
+    /// Mapping (see spec 2026-04-13-paper-backgrounds-design.md):
+    /// - `light`   → `white`  (preserve explicit choice)
+    /// - `dark`    → `slate`  (preserve explicit choice)
+    /// - `system`  → `cream`  (upgrade implicit choice to new accessible default)
+    /// - missing / unknown → `cream`
+    ///
+    /// Idempotent — keyed off `sr_migratedToPaper`. Deletes `sr_theme` after
+    /// successful migration to prevent stale reads.
+    static func migrateThemeToPaper(in defaults: UserDefaults) {
+        if defaults.bool(forKey: migratedToPaper) {
+            return
+        }
+
+        let legacyKey = "sr_theme"
+        let legacyValue = defaults.string(forKey: legacyKey)
+        let mapped: ReaderPaper
+        switch legacyValue {
+        case "light":  mapped = .white
+        case "dark":   mapped = .slate
+        case "system": mapped = .cream
+        default:       mapped = .cream
+        }
+
+        defaults.set(mapped.rawValue, forKey: paper)
+        defaults.set(true, forKey: migratedToPaper)
+        defaults.removeObject(forKey: legacyKey)
+    }
+
     /// Saves settings to the given UserDefaults store with type checking and clamping.
     /// Returns the number of fields that matched expected types.
     @discardableResult

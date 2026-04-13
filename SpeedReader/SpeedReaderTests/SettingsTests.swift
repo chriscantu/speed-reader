@@ -406,4 +406,74 @@ final class SettingsTests: XCTestCase {
         let count = SettingsKeys.saveSettings(["paper": 42], to: store)
         XCTAssertEqual(count, 0)
     }
+
+    // MARK: - Migration from theme to paper
+
+    func testMigrationMapsLightToWhite() {
+        let store = makeDefaults()
+        store.set("light", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "white")
+    }
+
+    func testMigrationMapsDarkToSlate() {
+        let store = makeDefaults()
+        store.set("dark", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "slate")
+    }
+
+    func testMigrationMapsSystemToCream() {
+        let store = makeDefaults()
+        store.set("system", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "cream")
+    }
+
+    func testMigrationMapsMissingThemeToCream() {
+        let store = makeDefaults()
+        // No sr_theme key set
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "cream")
+    }
+
+    func testMigrationMapsUnknownThemeToCream() {
+        let store = makeDefaults()
+        store.set("neon-pink", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "cream")
+    }
+
+    func testMigrationSetsMigratedFlag() {
+        let store = makeDefaults()
+        store.set("light", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertTrue(store.bool(forKey: SettingsKeys.migratedToPaper))
+    }
+
+    func testMigrationDeletesOldThemeKey() {
+        let store = makeDefaults()
+        store.set("dark", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertNil(store.object(forKey: "sr_theme"))
+    }
+
+    func testMigrationIsIdempotent() {
+        let store = makeDefaults()
+        store.set("dark", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        // Second run: user has since changed paper to "white" explicitly
+        store.set("white", forKey: SettingsKeys.paper)
+        SettingsKeys.migrateThemeToPaper(in: store)
+        // Expect user's explicit choice preserved, not reset to "slate"
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "white")
+    }
+
+    func testMigrationSkipsIfAlreadyMigrated() {
+        let store = makeDefaults()
+        store.set(true, forKey: SettingsKeys.migratedToPaper)
+        store.set("dark", forKey: "sr_theme")  // Should be ignored
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertNil(store.string(forKey: SettingsKeys.paper))
+    }
 }
