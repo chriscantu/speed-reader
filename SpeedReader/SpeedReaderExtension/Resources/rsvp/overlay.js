@@ -1,5 +1,5 @@
 import { RSVPStateMachine } from './state-machine.js';
-import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, ALIGNMENT_DEFAULT, clampWpm, clampFontSize, validateAlignment } from './settings-defaults.js';
+import { FONT_SIZE_DEFAULT, FONT_SIZE_STEP, ALIGNMENT_DEFAULT, PAPER_DEFAULT, clampWpm, clampFontSize, validateAlignment, validatePaper } from './settings-defaults.js';
 import { save, restore, clear } from './reading-position.js';
 
 export class RSVPOverlay {
@@ -8,7 +8,7 @@ export class RSVPOverlay {
     this.timerId = null;
     this.title = '';
     this.settings = {
-      theme: 'system',
+      paper: PAPER_DEFAULT,
       font: 'system',
       fontSize: FONT_SIZE_DEFAULT,
       alignment: ALIGNMENT_DEFAULT,
@@ -71,11 +71,16 @@ export class RSVPOverlay {
     Object.assign(this.settings, settings);
 
     if (this.host) {
-      this._syncHostAttr('data-theme', settings.theme);
+      // Paper bypasses _syncHostAttr: unlike font, paper has no 'system' state —
+      // the attribute must always be present so the CSS :host([data-paper=...])
+      // selector matches and tokens resolve.
+      if (settings.paper !== undefined) {
+        this.host.setAttribute('data-paper', validatePaper(settings.paper));
+      }
       this._syncHostAttr('data-font', settings.font);
-      // Alignment bypasses _syncHostAttr intentionally: unlike theme/font,
-      // alignment has no 'system' state — the attribute must always be present
-      // for the CSS grid selector to match.
+      // Alignment bypasses _syncHostAttr intentionally: unlike font, alignment
+      // has no 'system' state — the attribute must always be present for the
+      // CSS grid selector to match.
       if (settings.alignment !== undefined) {
         this.host.setAttribute('data-alignment', validateAlignment(settings.alignment));
       }
@@ -458,8 +463,8 @@ export class RSVPOverlay {
     this.host = document.createElement('speed-reader-overlay');
     this.shadow = this.host.attachShadow({ mode: 'closed' });
 
-    // Set theme and font attributes
-    this._syncHostAttr('data-theme', this.settings.theme);
+    // Set paper and font attributes. Paper is always explicit (no 'system' state).
+    this.host.setAttribute('data-paper', validatePaper(this.settings.paper));
     this._syncHostAttr('data-font', this.settings.font);
     // Alignment bypasses _syncHostAttr — see comment in updateSettings().
     this.host.setAttribute('data-alignment', validateAlignment(this.settings.alignment));
