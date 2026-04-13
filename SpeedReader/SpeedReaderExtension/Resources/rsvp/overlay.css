@@ -11,14 +11,6 @@
 :host {
   --sr-accent: #0891b2;
   --sr-accent-soft: #06b6d4;
-  --sr-bg: #ffffff;
-  --sr-bg-secondary: #f5f5f5;
-  --sr-text: #333333;
-  --sr-text-dim: #aaaaaa;
-  --sr-text-muted: #888888;
-  --sr-border: #eeeeee;
-  --sr-overlay-bg: rgba(0, 0, 0, 0.5);
-  --sr-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   --sr-card-radius: 16px;
   --sr-font-family: -apple-system, system-ui, 'Helvetica Neue', sans-serif;
   --sr-word-size: 42px;
@@ -28,22 +20,35 @@
   --sr-word-area-height: 176px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :host(:not([data-theme="light"])) {
-    --sr-accent: #0891b2;
-    --sr-bg: #2a2a2a;
-    --sr-bg-secondary: #222222;
-    --sr-text: #dddddd;
-    --sr-text-dim: #555555;
-    --sr-text-muted: #777777;
-    --sr-border: #333333;
-    --sr-overlay-bg: rgba(0, 0, 0, 0.7);
-    --sr-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  }
+/* Paper color tokens. MUST match ReaderPaper.previewColors in SettingsView.swift.
+   See docs/superpowers/specs/2026-04-13-paper-backgrounds-design.md. */
+
+:host([data-paper="white"]) {
+  --sr-bg: #ffffff;
+  --sr-bg-secondary: #f5f5f5;
+  --sr-text: #333333;
+  --sr-text-dim: #aaaaaa;
+  --sr-text-muted: #888888;
+  --sr-border: #eeeeee;
+  --sr-overlay-bg: rgba(0, 0, 0, 0.5);
+  --sr-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --sr-context-highlight: rgba(8, 145, 178, 0.15);
 }
 
-:host([data-theme="dark"]) {
-  --sr-accent: #0891b2;
+:host([data-paper="cream"]),
+:host(:not([data-paper])) {
+  --sr-bg: #fdf6e3;
+  --sr-bg-secondary: #f5eed5;
+  --sr-text: #5c4a2a;
+  --sr-text-dim: #a89878;
+  --sr-text-muted: #8a7858;
+  --sr-border: #ebe2c7;
+  --sr-overlay-bg: rgba(60, 45, 20, 0.4);
+  --sr-shadow: 0 8px 32px rgba(60, 45, 20, 0.25);
+  --sr-context-highlight: rgba(8, 145, 178, 0.18);
+}
+
+:host([data-paper="slate"]) {
   --sr-bg: #2a2a2a;
   --sr-bg-secondary: #222222;
   --sr-text: #dddddd;
@@ -52,6 +57,19 @@
   --sr-border: #333333;
   --sr-overlay-bg: rgba(0, 0, 0, 0.7);
   --sr-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --sr-context-highlight: rgba(8, 145, 178, 0.25);
+}
+
+:host([data-paper="black"]) {
+  --sr-bg: #000000;
+  --sr-bg-secondary: #0a0a0a;
+  --sr-text: #e0e0e0;
+  --sr-text-dim: #4a4a4a;
+  --sr-text-muted: #6a6a6a;
+  --sr-border: #1a1a1a;
+  --sr-overlay-bg: rgba(0, 0, 0, 0.85);
+  --sr-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --sr-context-highlight: rgba(8, 145, 178, 0.6);
 }
 
 :host([data-font="opendyslexic"]) {
@@ -209,20 +227,10 @@
 }
 
 .sr-context-highlight {
-  background: rgba(8, 145, 178, 0.15);
+  background: var(--sr-context-highlight);
   padding: 2px 4px;
   border-radius: 3px;
   color: var(--sr-text);
-}
-
-@media (prefers-color-scheme: dark) {
-  :host(:not([data-theme="light"])) .sr-context-highlight {
-    background: rgba(8, 145, 178, 0.25);
-  }
-}
-
-:host([data-theme="dark"]) .sr-context-highlight {
-  background: rgba(61, 53, 32, 0.8);
 }
 
 .sr-tip-banner {
