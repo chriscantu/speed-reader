@@ -385,4 +385,25 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(SettingsKeys.paper, "sr_paper")
         XCTAssertEqual(SettingsKeys.migratedToPaper, "sr_migratedToPaper")
     }
+
+    func testSaveSettingsAcceptsAllValidPaperValues() {
+        let store = makeDefaults()
+        for rawValue in ["white", "cream", "slate", "black"] {
+            let count = SettingsKeys.saveSettings(["paper": rawValue], to: store)
+            XCTAssertEqual(count, 1, "Expected '\(rawValue)' to be accepted")
+            XCTAssertEqual(store.string(forKey: SettingsKeys.paper), rawValue)
+        }
+    }
+
+    func testSaveSettingsRejectsInvalidPaperRawValue() {
+        let store = makeDefaults()
+        let count = SettingsKeys.saveSettings(["paper": "magenta"], to: store)
+        XCTAssertEqual(count, 0)
+    }
+
+    func testSaveSettingsRejectsPaperWithWrongType() {
+        let store = makeDefaults()
+        let count = SettingsKeys.saveSettings(["paper": 42], to: store)
+        XCTAssertEqual(count, 0)
+    }
 }

@@ -160,6 +160,11 @@ enum SettingsKeys {
             defaults.set(theme, forKey: SettingsKeys.theme)
             savedCount += 1
         }
+        if let paper = settings["paper"] as? String,
+           ReaderPaper(rawValue: paper) != nil {
+            defaults.set(paper, forKey: SettingsKeys.paper)
+            savedCount += 1
+        }
         if let fontSize = settings["fontSize"] as? Int {
             defaults.set(clamp(fontSize, min: fontSizeMin, max: fontSizeMax), forKey: SettingsKeys.fontSize)
             savedCount += 1
