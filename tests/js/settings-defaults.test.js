@@ -117,3 +117,63 @@ describe('clampChunkSize', () => {
     assert.strictEqual(clampChunkSize(0.6), 1);
   });
 });
+
+import {
+  validatePaper, VALID_PAPERS, PAPER_DEFAULT,
+} from '../../SpeedReader/SpeedReaderExtension/Resources/rsvp/settings-defaults.js';
+
+describe('validatePaper', () => {
+  it('returns valid paper values unchanged', () => {
+    assert.strictEqual(validatePaper('white'), 'white');
+    assert.strictEqual(validatePaper('cream'), 'cream');
+    assert.strictEqual(validatePaper('slate'), 'slate');
+    assert.strictEqual(validatePaper('black'), 'black');
+  });
+
+  it('returns default for invalid string', () => {
+    assert.strictEqual(validatePaper('magenta'), PAPER_DEFAULT);
+  });
+
+  it('returns default for non-string input', () => {
+    assert.strictEqual(validatePaper(42), PAPER_DEFAULT);
+    assert.strictEqual(validatePaper(undefined), PAPER_DEFAULT);
+    assert.strictEqual(validatePaper(null), PAPER_DEFAULT);
+    assert.strictEqual(validatePaper(true), PAPER_DEFAULT);
+  });
+
+  it('returns default for empty string', () => {
+    assert.strictEqual(validatePaper(''), PAPER_DEFAULT);
+  });
+
+  it('PAPER_DEFAULT is cream', () => {
+    assert.strictEqual(PAPER_DEFAULT, 'cream');
+  });
+
+  it('VALID_PAPERS contains all four papers', () => {
+    assert.ok(VALID_PAPERS.includes('white'));
+    assert.ok(VALID_PAPERS.includes('cream'));
+    assert.ok(VALID_PAPERS.includes('slate'));
+    assert.ok(VALID_PAPERS.includes('black'));
+    assert.strictEqual(VALID_PAPERS.length, 4);
+  });
+});
+
+describe('SETTINGS_KEYS includes paper', () => {
+  it('has paper in key list', () => {
+    assert.ok(SETTINGS_KEYS.includes('paper'));
+  });
+
+  it('does not have theme in key list', () => {
+    assert.ok(!SETTINGS_KEYS.includes('theme'));
+  });
+});
+
+describe('SETTINGS_DEFAULTS.paper', () => {
+  it('defaults paper to cream', () => {
+    assert.strictEqual(SETTINGS_DEFAULTS.paper, 'cream');
+  });
+
+  it('does not include theme key', () => {
+    assert.ok(!Object.prototype.hasOwnProperty.call(SETTINGS_DEFAULTS, 'theme'));
+  });
+});

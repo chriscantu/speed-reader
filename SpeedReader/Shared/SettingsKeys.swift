@@ -22,23 +22,6 @@ enum ReaderFont: String, CaseIterable, Identifiable {
     }
 }
 
-/// Theme options for the RSVP reader.
-enum ReaderTheme: String, CaseIterable, Identifiable {
-    case system
-    case light
-    case dark
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .system: return "System"
-        case .light: return "Light"
-        case .dark: return "Dark"
-        }
-    }
-}
-
 /// Alignment options for the RSVP word display.
 enum ReaderAlignment: String, CaseIterable, Identifiable {
     case orpAligned = "orp"
@@ -54,6 +37,29 @@ enum ReaderAlignment: String, CaseIterable, Identifiable {
     }
 }
 
+/// Paper (background + text palette) options for the RSVP reader.
+/// Replaces the old ReaderTheme — see docs/superpowers/specs/2026-04-13-paper-backgrounds-design.md.
+///
+/// Keep in sync with overlay.css `:host([data-paper=...])` blocks and
+/// SettingsView.swift `ReaderPaper.previewColors` extension.
+enum ReaderPaper: String, CaseIterable, Identifiable {
+    case white
+    case cream
+    case slate
+    case black
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .white: return "White"
+        case .cream: return "Cream"
+        case .slate: return "Slate"
+        case .black: return "Black"
+        }
+    }
+}
+
 /// Constants for App Group settings shared between the app and extension.
 enum SettingsKeys {
     /// App Group identifier — must match the entitlements file.
@@ -64,11 +70,12 @@ enum SettingsKeys {
 
     static let wpm = "sr_wpm"
     static let font = "sr_font"
-    static let theme = "sr_theme"
     static let fontSize = "sr_fontSize"
     static let punctuationPause = "sr_punctuationPause"
     static let alignment = "sr_alignment"
     static let chunkSize = "sr_chunkSize"
+    static let paper = "sr_paper"
+    static let migratedToPaper = "sr_migratedToPaper"
 
     // Onboarding & funnel tracking keys
     /// Legacy onboarding boolean key (pre-v1.1). Used only for migration.
@@ -84,11 +91,11 @@ enum SettingsKeys {
     enum Defaults {
         static let wpm = 250
         static let font: ReaderFont = .system
-        static let theme: ReaderTheme = .system
         static let fontSize = 42
         static let punctuationPause = true
         static let alignment: ReaderAlignment = .orpAligned
         static let chunkSize = 1
+        static let paper: ReaderPaper = .cream
     }
 
     /// WPM bounds
@@ -114,6 +121,36 @@ enum SettingsKeys {
         Swift.max(min, Swift.min(max, value))
     }
 
+    /// One-shot migration from legacy `sr_theme` to `sr_paper`.
+    ///
+    /// Mapping (see spec 2026-04-13-paper-backgrounds-design.md):
+    /// - `light`   → `white`  (preserve explicit choice)
+    /// - `dark`    → `slate`  (preserve explicit choice)
+    /// - `system`  → `cream`  (upgrade implicit choice to new accessible default)
+    /// - missing / unknown → `cream`
+    ///
+    /// Idempotent — keyed off `sr_migratedToPaper`. Deletes `sr_theme` after
+    /// successful migration to prevent stale reads.
+    static func migrateThemeToPaper(in defaults: UserDefaults) {
+        if defaults.bool(forKey: migratedToPaper) {
+            return
+        }
+
+        let legacyKey = "sr_theme"
+        let legacyValue = defaults.string(forKey: legacyKey)
+        let mapped: ReaderPaper
+        switch legacyValue {
+        case "light":  mapped = .white
+        case "dark":   mapped = .slate
+        case "system": mapped = .cream
+        default:       mapped = .cream
+        }
+
+        defaults.set(mapped.rawValue, forKey: paper)
+        defaults.set(true, forKey: migratedToPaper)
+        defaults.removeObject(forKey: legacyKey)
+    }
+
     /// Saves settings to the given UserDefaults store with type checking and clamping.
     /// Returns the number of fields that matched expected types.
     @discardableResult
@@ -129,9 +166,9 @@ enum SettingsKeys {
             defaults.set(font, forKey: SettingsKeys.font)
             savedCount += 1
         }
-        if let theme = settings["theme"] as? String,
-           ReaderTheme(rawValue: theme) != nil {
-            defaults.set(theme, forKey: SettingsKeys.theme)
+        if let paper = settings["paper"] as? String,
+           ReaderPaper(rawValue: paper) != nil {
+            defaults.set(paper, forKey: SettingsKeys.paper)
             savedCount += 1
         }
         if let fontSize = settings["fontSize"] as? Int {

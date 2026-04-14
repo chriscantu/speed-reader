@@ -33,11 +33,6 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(settings.font, .system)
     }
 
-    func testDefaultTheme() {
-        let settings = makeSettings()
-        XCTAssertEqual(settings.theme, .system)
-    }
-
     func testDefaultPunctuationPause() {
         let settings = makeSettings()
         XCTAssertTrue(settings.punctuationPause)
@@ -113,13 +108,6 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(settings.font, SettingsKeys.Defaults.font)
     }
 
-    func testInitFallsBackForInvalidThemeRawValue() {
-        let store = makeDefaults()
-        store.set("neon-pink", forKey: SettingsKeys.theme)
-        let settings = ReaderSettings(defaults: store)
-        XCTAssertEqual(settings.theme, SettingsKeys.Defaults.theme)
-    }
-
     func testInitFallsBackWhenWPMStoredAsWrongType() {
         let store = makeDefaults()
         store.set("not-a-number", forKey: SettingsKeys.wpm)
@@ -148,7 +136,7 @@ final class SettingsTests: XCTestCase {
         let payload: [String: Any] = [
             "wpm": 300,
             "font": "opendyslexic",
-            "theme": "dark",
+            "paper": "slate",
             "fontSize": 36,
             "punctuationPause": false,
             "alignment": "center",
@@ -157,7 +145,7 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(count, 6)
         XCTAssertEqual(store.integer(forKey: SettingsKeys.wpm), 300)
         XCTAssertEqual(store.string(forKey: SettingsKeys.font), "opendyslexic")
-        XCTAssertEqual(store.string(forKey: SettingsKeys.theme), "dark")
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "slate")
         XCTAssertEqual(store.integer(forKey: SettingsKeys.fontSize), 36)
         XCTAssertFalse(store.bool(forKey: SettingsKeys.punctuationPause))
         XCTAssertEqual(store.string(forKey: SettingsKeys.alignment), "center")
@@ -168,7 +156,7 @@ final class SettingsTests: XCTestCase {
         let payload: [String: Any] = [
             "wpm": "fast",
             "font": 42,
-            "theme": true,
+            "paper": 42,
             "fontSize": "big",
             "punctuationPause": 1,
             "alignment": 42,
@@ -182,27 +170,20 @@ final class SettingsTests: XCTestCase {
         let payload: [String: Any] = [
             "wpm": 200,           // valid
             "font": 42,           // wrong type
-            "theme": "dark",      // valid
+            "paper": "slate",     // valid
             "fontSize": "big",    // wrong type
             "punctuationPause": true,  // valid
         ]
         let count = SettingsKeys.saveSettings(payload, to: store)
         XCTAssertEqual(count, 3)
         XCTAssertEqual(store.integer(forKey: SettingsKeys.wpm), 200)
-        XCTAssertEqual(store.string(forKey: SettingsKeys.theme), "dark")
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "slate")
         XCTAssertTrue(store.bool(forKey: SettingsKeys.punctuationPause))
     }
 
     func testSaveSettingsRejectsInvalidFontRawValue() {
         let store = makeDefaults()
         let payload: [String: Any] = ["font": "comic-sans"]
-        let count = SettingsKeys.saveSettings(payload, to: store)
-        XCTAssertEqual(count, 0)
-    }
-
-    func testSaveSettingsRejectsInvalidThemeRawValue() {
-        let store = makeDefaults()
-        let payload: [String: Any] = ["theme": "neon-pink"]
         let count = SettingsKeys.saveSettings(payload, to: store)
         XCTAssertEqual(count, 0)
     }
@@ -234,7 +215,7 @@ final class SettingsTests: XCTestCase {
         let first = ReaderSettings(defaults: store)
         first.setWpm(400)
         first.setFont(.openDyslexic)
-        first.setTheme(.dark)
+        first.setPaper(.slate)
         first.setFontSize(36)
         first.setPunctuationPause(false)
         first.setAlignment(.center)
@@ -242,7 +223,7 @@ final class SettingsTests: XCTestCase {
         let second = ReaderSettings(defaults: store)
         XCTAssertEqual(second.wpm, 400)
         XCTAssertEqual(second.font, .openDyslexic)
-        XCTAssertEqual(second.theme, .dark)
+        XCTAssertEqual(second.paper, .slate)
         XCTAssertEqual(second.fontSize, 36)
         XCTAssertFalse(second.punctuationPause)
         XCTAssertEqual(second.alignment, .center)
@@ -355,5 +336,168 @@ final class SettingsTests: XCTestCase {
         let store = makeDefaults()
         let count = SettingsKeys.saveSettings(["alignment": "scrambled"], to: store)
         XCTAssertEqual(count, 0)
+    }
+
+    // MARK: - Paper
+
+    func testReaderPaperRawValues() {
+        XCTAssertEqual(ReaderPaper.white.rawValue, "white")
+        XCTAssertEqual(ReaderPaper.cream.rawValue, "cream")
+        XCTAssertEqual(ReaderPaper.slate.rawValue, "slate")
+        XCTAssertEqual(ReaderPaper.black.rawValue, "black")
+    }
+
+    func testReaderPaperAllCasesCount() {
+        XCTAssertEqual(ReaderPaper.allCases.count, 4)
+    }
+
+    func testReaderPaperDisplayNames() {
+        XCTAssertEqual(ReaderPaper.white.displayName, "White")
+        XCTAssertEqual(ReaderPaper.cream.displayName, "Cream")
+        XCTAssertEqual(ReaderPaper.slate.displayName, "Slate")
+        XCTAssertEqual(ReaderPaper.black.displayName, "Black")
+    }
+
+    func testPaperDefaultIsCream() {
+        XCTAssertEqual(SettingsKeys.Defaults.paper, .cream)
+    }
+
+    func testPaperKeyIsNamespaced() {
+        XCTAssertEqual(SettingsKeys.paper, "sr_paper")
+        XCTAssertEqual(SettingsKeys.migratedToPaper, "sr_migratedToPaper")
+    }
+
+    func testSaveSettingsAcceptsAllValidPaperValues() {
+        let store = makeDefaults()
+        for rawValue in ["white", "cream", "slate", "black"] {
+            let count = SettingsKeys.saveSettings(["paper": rawValue], to: store)
+            XCTAssertEqual(count, 1, "Expected '\(rawValue)' to be accepted")
+            XCTAssertEqual(store.string(forKey: SettingsKeys.paper), rawValue)
+        }
+    }
+
+    func testSaveSettingsRejectsInvalidPaperRawValue() {
+        let store = makeDefaults()
+        let count = SettingsKeys.saveSettings(["paper": "magenta"], to: store)
+        XCTAssertEqual(count, 0)
+    }
+
+    func testSaveSettingsRejectsPaperWithWrongType() {
+        let store = makeDefaults()
+        let count = SettingsKeys.saveSettings(["paper": 42], to: store)
+        XCTAssertEqual(count, 0)
+    }
+
+    // MARK: - Migration from theme to paper
+
+    func testMigrationMapsLightToWhite() {
+        let store = makeDefaults()
+        store.set("light", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "white")
+    }
+
+    func testMigrationMapsDarkToSlate() {
+        let store = makeDefaults()
+        store.set("dark", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "slate")
+    }
+
+    func testMigrationMapsSystemToCream() {
+        let store = makeDefaults()
+        store.set("system", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "cream")
+    }
+
+    func testMigrationMapsMissingThemeToCream() {
+        let store = makeDefaults()
+        // No sr_theme key set
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "cream")
+    }
+
+    func testMigrationMapsUnknownThemeToCream() {
+        let store = makeDefaults()
+        store.set("neon-pink", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "cream")
+    }
+
+    func testMigrationSetsMigratedFlag() {
+        let store = makeDefaults()
+        store.set("light", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertTrue(store.bool(forKey: SettingsKeys.migratedToPaper))
+    }
+
+    func testMigrationDeletesOldThemeKey() {
+        let store = makeDefaults()
+        store.set("dark", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertNil(store.object(forKey: "sr_theme"))
+    }
+
+    func testMigrationIsIdempotent() {
+        let store = makeDefaults()
+        store.set("dark", forKey: "sr_theme")
+        SettingsKeys.migrateThemeToPaper(in: store)
+        // Second run: user has since changed paper to "white" explicitly
+        store.set("white", forKey: SettingsKeys.paper)
+        SettingsKeys.migrateThemeToPaper(in: store)
+        // Expect user's explicit choice preserved, not reset to "slate"
+        XCTAssertEqual(store.string(forKey: SettingsKeys.paper), "white")
+        XCTAssertNil(store.object(forKey: "sr_theme"),
+                     "sr_theme should remain absent after the no-op second migration")
+    }
+
+    func testMigrationSkipsIfAlreadyMigrated() {
+        let store = makeDefaults()
+        store.set(true, forKey: SettingsKeys.migratedToPaper)
+        store.set("dark", forKey: "sr_theme")  // Should be ignored
+        SettingsKeys.migrateThemeToPaper(in: store)
+        XCTAssertNil(store.string(forKey: SettingsKeys.paper))
+        XCTAssertEqual(store.string(forKey: "sr_theme"), "dark",
+                       "sr_theme should be untouched when migration early-returns")
+    }
+
+    func testDefaultPaperIsCream() {
+        let settings = makeSettings()
+        XCTAssertEqual(settings.paper, .cream)
+    }
+
+    func testSetPaperPersists() {
+        let store = makeDefaults()
+        let first = ReaderSettings(defaults: store)
+        first.setPaper(.slate)
+        let second = ReaderSettings(defaults: store)
+        XCTAssertEqual(second.paper, .slate)
+    }
+
+    func testInitFallsBackForInvalidPaperRawValue() {
+        let store = makeDefaults()
+        store.set(true, forKey: SettingsKeys.migratedToPaper)  // skip migration
+        store.set("magenta", forKey: SettingsKeys.paper)
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.paper, SettingsKeys.Defaults.paper)
+    }
+
+    func testInitRunsMigrationFromLegacyTheme() {
+        let store = makeDefaults()
+        store.set("dark", forKey: "sr_theme")
+        // No sr_migratedToPaper flag — migration should run
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.paper, .slate)
+        XCTAssertNil(store.object(forKey: "sr_theme"))
+    }
+
+    func testInitSkipsMigrationWhenAlreadyMigrated() {
+        let store = makeDefaults()
+        store.set(true, forKey: SettingsKeys.migratedToPaper)
+        store.set("white", forKey: SettingsKeys.paper)
+        store.set("dark", forKey: "sr_theme")  // Should be ignored
+        let settings = ReaderSettings(defaults: store)
+        XCTAssertEqual(settings.paper, .white)
     }
 }

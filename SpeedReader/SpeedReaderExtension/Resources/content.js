@@ -153,7 +153,7 @@ async function extractAndLaunch() {
 var settingsDefaults = {
   wpm: 250,
   font: 'system',
-  theme: 'system',
+  paper: 'cream',
   fontSize: 42,
   punctuationPause: true,
   alignment: 'orp',
@@ -242,7 +242,7 @@ window.addEventListener('message', function(event) {
       result.hasPrev = overlay.elements.prevBtn !== undefined;
       result.hasNext = overlay.elements.nextBtn !== undefined;
       result.hasClose = overlay.shadow.querySelector('.sr-close') !== null;
-      result.theme = overlay.host.getAttribute('data-theme') || 'system';
+      result.paper = overlay.host.getAttribute('data-paper') || 'cream';
       result.font = overlay.host.getAttribute('data-font') || 'default';
       result.fontSize = overlay.settings.fontSize || settingsDefaults.fontSize;
       result.alignment = overlay.host.getAttribute('data-alignment') || 'orp';
@@ -267,14 +267,14 @@ window.addEventListener('message', function(event) {
   if (event.data.type === 'speedreader-test-dispatch') {
     var action = event.data.action;
     var payload = event.data.payload || {};
-    var overlayActions = ['set-theme', 'set-font', 'set-wpm', 'set-font-size', 'set-alignment', 'set-chunk-size'];
+    var overlayActions = ['set-paper', 'set-font', 'set-wpm', 'set-font-size', 'set-alignment', 'set-chunk-size'];
 
     if (overlayActions.indexOf(action) !== -1 && !overlay) {
       console.warn('[SpeedReader] dispatch ' + action + ' ignored: overlay not open');
     } else if (action === 'keydown') {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: payload.key, bubbles: true }));
-    } else if (action === 'set-theme') {
-      overlay.updateSettings({ theme: payload.theme });
+    } else if (action === 'set-paper') {
+      overlay.updateSettings({ paper: payload.paper });
     } else if (action === 'set-font') {
       overlay.updateSettings({ font: payload.font });
     } else if (action === 'set-wpm') {
